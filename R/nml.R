@@ -1,0 +1,168 @@
+#########################
+# Compute NML complexity for decision strategies
+#########################
+
+# -log(a(theta)); luckiness not normalized
+# => complexity of order-constrained models can be compared
+# default:    standard NML; luck=c(1,1)
+# uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
+luckiness <- function(par, luck = c(1, 1)){
+  dd <- 0
+  if (length(par) > 0)
+    dd <- sum(dbeta(par, luck[1], luck[2], log = TRUE))
+  dd
+}
+
+ll_luckiness <- function(par, b, n, prediction, luck = c(1,1)){
+  loglik(par, b, n, prediction) + luckiness(par, luck)
+}
+
+#' Maximum-likelihood Estimate
+#'
+#' Get ML estimate (possible weighted by luckinesss function).
+#' @export
+maximize_ll <- function(b, n, prediction, c = .5,
+                        luck = c(1,1), n.fit = 5){
+
+  # analytic ML estimate, boundary correction and order constraints
+  est <- estimate_par(b, n, prediction, luck = luck)
+  start <- adjust_par(est, prediction, c)
+  n.par <- length(est)
+
+  # check for unordered models (EQW, TTB, WADD, baseline)
+  # oo <- optim(ll_luckiness, lower=0, upper=c, control = list(fn=-1),
+  #                b = b, n = n, prediction=prediction, luck = luck)
+  if (n.par>1 && !is.null(attr(prediction, "ordered"))){
+    start <- adjust_par(est, prediction, c, BOUND)
+    ui <- rbind(diag(n.par), 0) - rbind(0, diag(n.par))
+    ci <- c(rep(0, n.par), -c)
+    tryCatch(oo <- constrOptim(start, ll_luckiness, grad = NULL,
+                               b = b, n = n, prediction = prediction, luck = luck,
+                               ui = ui, ci = ci, control = list(fnscale = -1)),
+             error = function(e) {print(e);
+               cat("\n\n  (optimization failed with start values =", start, ")\n")})
+    cnt <- 1
+    while (cnt < n.fit){
+      start <- sort(runif(n.par, 0, c))
+      oo2 <- constrOptim(start, ll_luckiness, grad = NULL,
+                         b = b, n = n, prediction = prediction, luck = luck,
+                         ui = ui, ci = ci, control = list(fnscale = -1))
+      oo2
+      cnt <- cnt + 1
+      if(oo2$value > oo$value) oo <- oo2
+    }
+    start <- oo$par
+  }
+  ll <- ll_luckiness(start, b, n, prediction, luck)
+  list(loglik = ll, est = start, luck = luck)
+}
+
+# TODO: make generic S3 method
+# compute NML complexity term:
+#' Compute NML Complexity
+#'
+#' Enumerates discrete data space and adds the maximum likelihood values.
+#' @param prediction a vector of strategy predictions. See \code{\link{get_prediction}}
+#' @param n vector with the number of choices per item type
+#' @param c upper threshold of probabilities
+#' @param luck parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
+#' @param n.fit number of repeated fitting runs with random starting values
+#' @param cores number of processing units to be used
+#' @export
+compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
+                         n.fit = 3, cores = 1){
+  if (is.list(prediction)){
+    res <- lapply(prediction, compute_cnml, n=n, c=c,
+                  luck=luck, n.fit=n.fit, cores=cores)
+  } else {
+    check_bnp(n, n, prediction)
+    check_luck(luck)
+
+    # generate all possible data and fit models
+    dat <- do.call("expand.grid", lapply(n, function(nn) 0:nn))
+    time <- system.time({
+      if (cores > 1){
+        cl <- makeCluster(cores)
+        clusterExport(cl, c( "luck", "n.fit", "c", "n"),
+                      envir=environment())
+        lls <- parApply(cl = cl, X = dat, MARGIN = 1,
+                        function(xx) maximize_ll(b = xx, n = n, prediction = prediction,
+                                                 luck = luck, c = c,
+                                                 n.fit = n.fit)$loglik)
+        stopCluster(cl)
+      } else {
+        lls <- apply(X = dat, MARGIN = 1,
+                     function(xx) maximize_ll(b = xx, n = n, prediction = prediction,
+                                              luck = luck, c = c,
+                                              n.fit = n.fit)$loglik)
+      }
+    })
+
+    cnml <- log(sum(exp(lls)))
+    res <- list(cnml = cnml, n = n, prediction = prediction, c = c,
+                luck = luck, time = time["elapsed"])
+  }
+  res
+}
+
+
+
+
+### for empirical analyses
+# N: N per item type (N=rep(4,4))
+# choiceB: frequency of B choices (matrix: rows=subjects)
+# complexity: NML complexity
+# modelNames: which models to include in comparison
+#' Strategy Selection Using NML
+#'
+#' Compute (L)NML for observed frequencies.
+#' @param b observed frequencies of Option B.
+#'          Either a vector or a matrix/data frame (one person per row)
+#' @export
+select_nml <- function(b, ...){
+  UseMethod("select_nml", b)
+}
+
+#' @rdname select_nml
+#' @export
+select_nml.default <- function(b, n, cnml, n.fit = 5){
+  b <- unlist(b)
+  n <- unlist(n)
+  check_bnp(b, n, n)
+  check_cnml(cnml, n)
+  lls <- sapply(cnml, function(cc)
+    maximize_ll(b = b, n = n, prediction = cc$prediction, c = cc$c,
+                luck = cc$luck, n.fit = n.fit)$loglik)
+
+  nml <- - lls + sapply(cnml, "[[", "cnml")
+  strat_names <- sapply(cnml, function(cc) attr(cc, "label"))
+  sel <- !sapply(strat_names, is.null)
+  names(nml)[sel] <- strat_names[sel]
+  nml
+}
+
+#' @rdname select_nml
+#' @inheritParams compute_cnml
+#' @param cnml NML complexity values computed with \code{\link{compute_cnml}}.
+#'             Note that the sample size \code{n} must match.
+#' @export
+select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
+
+  if (cores > 1){
+    cl <- makeCluster(cores)
+    # clusterExport(cl, c("cnml"), envir=environment())
+    nml <- parApply(cl, b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+    stopCluster(cl)
+  } else {
+    nml <- apply(b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+  }
+  t(nml)
+}
+
+#' @rdname select_nml
+#' @export
+select_nml.data.frame <- function(b, ...){
+  # number of subjects
+  b <- as.matrix(b)
+  NextMethod("select_nml", b, ...)
+}

@@ -1,0 +1,13 @@
+---
+title: "stratsel: Strategy Classification for Binary Choice Models"
+author: "Daniel W. Heck"
+date: "`r Sys.Date()`"
+number_section: true
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{stratsel: Strategy Classification for Binary Choice Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+  
+## Strategy Classification
