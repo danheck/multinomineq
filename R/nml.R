@@ -162,6 +162,7 @@ select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
 }
 
 #' @rdname select_nml
+#' @method select_nml data.frame
 #' @export
 select_nml.data.frame <- function(b, n, cnml, n.fit = 5, cores = 1){
   b <- as.matrix(b)

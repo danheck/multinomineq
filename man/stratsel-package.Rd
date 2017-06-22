@@ -4,9 +4,9 @@
 \name{stratsel-package}
 \alias{stratsel}
 \alias{stratsel-package}
-\title{stratsel:}
+\title{stratsel: Outcome-Based Strategy Selection for Binary Choice Models}
 \description{
-Outcome-based
+Outcome-based strategy classification
 }
 \details{
 Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}

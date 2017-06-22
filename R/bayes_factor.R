@@ -22,8 +22,8 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
     # deterministic (constant error parameter)
     s1 <- error + prior[1]
     s2 <- adherence + prior[2]
-    pm <- pbeta(c, s1, s2, log = TRUE) + lbeta(s1, s2) + # prior*lik (unnormalized)
-      - pbeta(c, prior[1], prior[2], log = TRUE) - lbeta(prior[1], prior[2])
+    pm <- pbeta(c, s1, s2, log.p = TRUE) + lbeta(s1, s2) + # prior*lik (unnormalized)
+      - pbeta(c, prior[1], prior[2], log.p = TRUE) - lbeta(prior[1], prior[2])
     # (normalization of order-constrained prior)
 
   } else if (n_par > 1){
@@ -42,7 +42,7 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
       }
     }
     pm <- log(integrate(ff, 0, c, idx = n_par)$value) +
-      lfactorial(n_par) - n_par* (pbeta(c, prior[1], prior[2], log = TRUE) +
+      lfactorial(n_par) - n_par* (pbeta(c, prior[1], prior[2], log.p = TRUE) +
                                     lbeta(prior[1], prior[2]))
   }
 
@@ -96,6 +96,7 @@ select_bf.matrix <- function (b, n, prediction, c = .5,
 }
 
 #' @rdname select_bf
+#' @method select_bf data.frame
 #' @export
 select_bf.data.frame <- function (b, n, prediction, c = .5,
                                   prior = c(1, 1), cores = 1){

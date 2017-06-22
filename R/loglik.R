@@ -32,7 +32,7 @@ get_par_number <- function(prediction){
 loglik <- function (par, b, n, prediction){
   pb <- get_prob_B(par, prediction)
   ll <- sum(dbinom(x = b, size = n, prob = pb, log = TRUE))
-  if (ll == - Inf)
+  if (ll == - Inf && all(b <= n))
     ll <- MIN_LL
   ll
 }

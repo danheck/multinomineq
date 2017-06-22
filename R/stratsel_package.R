@@ -1,8 +1,9 @@
-#' stratsel:
+#' stratsel: Outcome-Based Strategy Selection for Binary Choice Models
 #'
-#' Outcome-based
+#' Outcome-based strategy classification
 #'
 #' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}
+#'
 #' @author Daniel W. Heck
 #' @docType package
 #' @importFrom stats sd dbeta rbinom dbinom pbeta integrate runif constrOptim

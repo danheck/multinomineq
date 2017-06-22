@@ -15,7 +15,7 @@ select_bf(b, n, prediction, c = 0.5, prior = c(1, 1), cores = 1)
 \method{select_bf}{matrix}(b, n, prediction, c = 0.5, prior = c(1, 1),
   cores = 1)
 
-select_bf.data.frame(b, n, prediction, c = 0.5, prior = c(1, 1),
+\method{select_bf}{data.frame}(b, n, prediction, c = 0.5, prior = c(1, 1),
   cores = 1)
 }
 \arguments{

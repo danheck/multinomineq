@@ -40,7 +40,7 @@ test_that('loglik works', {
   expect_lte(loglik(c(), b ,n, GUESS), 0)
 
   # expected errors
-  expect_error(loglik(runif(1), b_false ,n, TTB))
+  expect_identical(loglik(runif(1), b_false , n, TTB), -Inf)
 
 })
 
@@ -51,7 +51,7 @@ test_that('ML estimation works', {
 
 
   expect_silent(est_ttb <- maximize_ll(b, n, TTB))
-  expect_equal(est_ttb$est, c(par1 = sum(b)/sum(n)))
+  expect_equal(est_ttb$est, sum(b)/sum(n))
 
   expect_silent(est_guess <- maximize_ll(b, n, GUESS))
   expect_length(est_guess$est, 0)
@@ -66,7 +66,7 @@ test_that('c_NML computation works', {
   n <- rep(2,3)
   # GUESS
   cnml_g <- compute_cnml(GUESS, n)
-  expect_length(cnml_g, 5)
+  expect_length(cnml_g, 6)
   expect_named(cnml_g, c("cnml", "n", "prediction", "c", "luck", "time"))
   expect_equal(cnml_g$cnml, 0)
 
