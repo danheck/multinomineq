@@ -4,9 +4,10 @@
 #' Returns a vector of predictions for well-known choice strategies (TTB, WADD)
 #' @param cueA cue values of Option A (-1/+1 = negative/positive; 0 = missing)
 #' @param cueB cue values of Option B (see \code{cueA})
+#' @param v cue validities: probability that cue leads to correct decision.
 #' @param strategy strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}. See details.
 #' @export
-get_prediction <- function (cueA, cueB, strategy){
+get_prediction <- function (cueA, cueB, v, strategy){
   pred <- switch(strategy,
                  "TTB" = {},
                  "EQW" = {},

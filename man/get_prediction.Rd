@@ -4,12 +4,14 @@
 \alias{get_prediction}
 \title{Get Predictions of Common Strategies}
 \usage{
-get_prediction(cueA, cueB, strategy)
+get_prediction(cueA, cueB, v, strategy)
 }
 \arguments{
 \item{cueA}{cue values of Option A (-1/+1 = negative/positive; 0 = missing)}
 
 \item{cueB}{cue values of Option B (see \code{cueA})}
+
+\item{v}{cue validities: probability that cue leads to correct decision.}
 
 \item{strategy}{strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}. See details.}
 }

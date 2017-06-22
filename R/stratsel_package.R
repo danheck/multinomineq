@@ -6,12 +6,13 @@
 #' @author Daniel W. Heck
 #' @docType package
 #' @importFrom stats sd dbeta rbinom
-#' @importFrom parallel parSapply clusterExport makeCluster stopCluster
+#' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @useDynLib "stratsel", .registration=TRUE
 #'
-#' @references
-#' Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. https://doi.org/10.1016/j.cogpsych.2017.05.003
+#' @template ref_heck17
+#' @template ref_hilbig14
+#' @template ref_broder03
 #'
 "_PACKAGE"
 

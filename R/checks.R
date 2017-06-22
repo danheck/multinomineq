@@ -17,13 +17,15 @@ check_bnp <- function(b = NULL, n = NULL, prediction = NULL){
 
 
 check_cnml <- function(cnml, n = NULL){
-  if (identical(names(cnml), c("cnml", "n", "prediction", "c", "luck", "time")) ){
+  if (is.list(cnml) && identical(names(cnml), c("cnml", "n", "prediction", "c", "luck", "time")) ){
     if(!missing(n) && !identical(n, cnml$n))
       stop("sample size 'n' not identical for 'cnml'")
 
     check_luck(cnml$luck)
-  } else {
+  } else if (is.list(cnml)) {
     sapply(cnml, check_cnml)
+  } else {
+    stop("Structure of 'cnml' does not fit to that returned by compute_cnml().")
   }
 }
 

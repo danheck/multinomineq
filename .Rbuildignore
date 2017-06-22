@@ -1,2 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+man-roxygen/*
+\.github/*
+README.md
+^.*\.o$

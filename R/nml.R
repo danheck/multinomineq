@@ -119,7 +119,7 @@ compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
 #' @param b observed frequencies of Option B.
 #'          Either a vector or a matrix/data frame (one person per row)
 #' @export
-select_nml <- function(b, ...){
+select_nml <- function(b, n, cnml, n.fit = 5, ...){
   UseMethod("select_nml", b)
 }
 
@@ -161,8 +161,7 @@ select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
 
 #' @rdname select_nml
 #' @export
-select_nml.data.frame <- function(b, ...){
-  # number of subjects
+select_nml.data.frame <- function(b, n, cnml, n.fit = 5, cores = 1){
   b <- as.matrix(b)
-  NextMethod("select_nml", b, ...)
+  UseMethod("select_nml", b)
 }

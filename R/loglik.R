@@ -38,18 +38,28 @@ loglik <- function (par, b, n, prediction){
 }
 
 
-estimate_par <- function (b, n, prediction, luck = c(1,1)){
-  tmp <- b
+# get_adherence <- function(b, prediction){
+#
+#   par_label <- get_par_unique(prediction)
+#   idx <- match(abs(prediction), par_label, nomatch = NA)
+#   cnt_predicted <-  tapply(tmp, list(idx), sum)
+#   unname(c(cnt_predicted), force = TRUE)
+# }
+
+estimate_par <- function (b, n, prediction, luck = c(1,1), prob = TRUE){
   # reversed items:
+  tmp <- b
   pred_B <- prediction > 0
   tmp[pred_B] <- n[pred_B] - b[pred_B]
 
   par_label <- get_par_unique(prediction)
   idx <- match(abs(prediction), par_label, nomatch = NA)
-  cnt_predicted <-  tapply(tmp, list(idx), sum) + luck[1] - 1
-  cnt_total <-  tapply(n, list(idx), sum) + sum(luck) - 2
-
-  unname(c(cnt_predicted/cnt_total), force = TRUE)
+  cnt_predicted <- tapply(tmp, list(idx), sum) + luck[1] - 1
+  if (prob){
+    cnt_total <-  tapply(n, list(idx), sum) + sum(luck) - 2
+    cnt_predicted <- cnt_predicted / cnt_total
+  }
+  unname(c(cnt_predicted), force = TRUE)
 }
 
 adjust_par <- function(par, prediction, c = .50, bound = 1e-10){

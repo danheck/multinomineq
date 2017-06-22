@@ -13,6 +13,10 @@ Detailed explanations and examples can be found in the package vignette, accessi
 }
 \references{
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. https://doi.org/10.1016/j.cogpsych.2017.05.003
+
+Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. https://doi.org/10.3758/s13423-014-0643-0
+
+Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. https://doi.org/10.1002/bdm.442
 }
 \seealso{
 Useful links:

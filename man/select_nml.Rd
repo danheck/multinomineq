@@ -7,13 +7,13 @@
 \alias{select_nml.data.frame}
 \title{Strategy Selection Using NML}
 \usage{
-select_nml(b, ...)
+select_nml(b, n, cnml, n.fit = 5, ...)
 
 \method{select_nml}{default}(b, n, cnml, n.fit = 5)
 
 \method{select_nml}{matrix}(b, n, cnml, n.fit = 5, cores = 1)
 
-\method{select_nml}{data.frame}(b, ...)
+select_nml.data.frame(b, n, cnml, n.fit = 5, cores = 1)
 }
 \arguments{
 \item{b}{observed frequencies of Option B.
