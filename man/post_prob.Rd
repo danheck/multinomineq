@@ -2,11 +2,14 @@
 % Please edit documentation in R/transformations.R
 \name{post_prob}
 \alias{post_prob}
+\alias{post_prob.default}
 \alias{post_prob.matrix}
 \alias{post_prob.data.frame}
 \title{Get Posterior Model Probabilities}
 \usage{
 post_prob(marginal, prior)
+
+\method{post_prob}{default}(marginal, prior)
 
 \method{post_prob}{matrix}(marginal, prior)
 

@@ -7,9 +7,10 @@
 \alias{select_bf.data.frame}
 \title{Strategy Selection Using the Bayes Factor}
 \usage{
-select_bf(b, n, prediction, c = 0.5, prior = c(1, 1), ...)
+select_bf(b, n, prediction, c = 0.5, prior = c(1, 1), cores = 1)
 
-\method{select_bf}{default}(b, n, prediction, c = 0.5, prior = c(1, 1))
+\method{select_bf}{default}(b, n, prediction, c = 0.5, prior = c(1, 1),
+  cores = 1)
 
 \method{select_bf}{matrix}(b, n, prediction, c = 0.5, prior = c(1, 1),
   cores = 1)

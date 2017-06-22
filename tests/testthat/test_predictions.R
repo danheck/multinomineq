@@ -1,7 +1,4 @@
-
-cueA
-v <- seq(.9, .6, -.1)
-
+# models of Hilbig & Moshagen (2014)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)
 WADDprob <- c(-1, 3, -2)
@@ -9,6 +6,11 @@ EQW <- c(-1, 1, 0)
 GUESS <- rep(0, 3)
 baseline <- 1:3
 attr(WADDprob, "ordered") <- TRUE
+
+# cue patterns
+cueA <- NA
+v <- seq(.9, .6, -.1)
+
 
 b <- c(0, 1, 1)
 b_false <- c(11,1,1)

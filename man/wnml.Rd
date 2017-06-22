@@ -5,7 +5,6 @@
 \alias{wnml.default}
 \alias{wnml.matrix}
 \alias{wnml.data.frame}
-\alias{post_prob.default}
 \title{Get NML Model Weights}
 \usage{
 wnml(nml)
@@ -15,8 +14,6 @@ wnml(nml)
 \method{wnml}{matrix}(nml)
 
 \method{wnml}{data.frame}(nml)
-
-\method{post_prob}{default}(marginal, prior)
 }
 \arguments{
 \item{nml}{vector or matrix (one row per person) with NML values}

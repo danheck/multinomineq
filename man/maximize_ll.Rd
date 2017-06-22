@@ -6,6 +6,19 @@
 \usage{
 maximize_ll(b, n, prediction, c = 0.5, luck = c(1, 1), n.fit = 5)
 }
+\arguments{
+\item{b}{vector with observed frequencies for Option B}
+
+\item{n}{vector with the number of choices per item type}
+
+\item{prediction}{a vector of strategy predictions. See \code{\link{get_prediction}}}
+
+\item{c}{upper threshold of probabilities}
+
+\item{luck}{parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor}
+
+\item{n.fit}{number of repeated fitting runs with random starting values}
+}
 \description{
 Get ML estimate (possible weighted by luckinesss function).
 }

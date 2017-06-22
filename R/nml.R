@@ -20,6 +20,8 @@ ll_luckiness <- function(par, b, n, prediction, luck = c(1,1)){
 #' Maximum-likelihood Estimate
 #'
 #' Get ML estimate (possible weighted by luckinesss function).
+#' @inheritParams compute_cnml
+#' @param b vector with observed frequencies for Option B
 #' @export
 maximize_ll <- function(b, n, prediction, c = .5,
                         luck = c(1,1), n.fit = 5){
@@ -119,13 +121,13 @@ compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
 #' @param b observed frequencies of Option B.
 #'          Either a vector or a matrix/data frame (one person per row)
 #' @export
-select_nml <- function(b, n, cnml, n.fit = 5, ...){
+select_nml <- function(b, n, cnml, n.fit = 5, cores = 1){
   UseMethod("select_nml", b)
 }
 
 #' @rdname select_nml
 #' @export
-select_nml.default <- function(b, n, cnml, n.fit = 5){
+select_nml.default <- function(b, n, cnml, n.fit = 5, cores = 1){
   b <- unlist(b)
   n <- unlist(n)
   check_bnp(b, n, n)
@@ -151,7 +153,7 @@ select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
   if (cores > 1){
     cl <- makeCluster(cores)
     # clusterExport(cl, c("cnml"), envir=environment())
-    nml <- parApply(cl, b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+    nml <- parApply(cl = cl, b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
     stopCluster(cl)
   } else {
     nml <- apply(b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)

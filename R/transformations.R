@@ -39,7 +39,7 @@ post_prob <- function(marginal, prior){
   UseMethod("post_prob", marginal)
 }
 
-#' @rdname wnml
+#' @rdname post_prob
 #' @export
 post_prob.default <- function(marginal, prior){
   if (missing(prior))

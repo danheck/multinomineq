@@ -5,7 +5,7 @@
 #' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}
 #' @author Daniel W. Heck
 #' @docType package
-#' @importFrom stats sd dbeta rbinom
+#' @importFrom stats sd dbeta rbinom dbinom pbeta integrate runif constrOptim
 #' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @useDynLib "stratsel", .registration=TRUE

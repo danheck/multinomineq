@@ -1,4 +1,4 @@
-# models om Hilbig & Moshagen (2014)
+# models of Hilbig & Moshagen (2014)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)
 WADDprob <- c(-1, 3, -2)

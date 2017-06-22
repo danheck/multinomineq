@@ -1,16 +1,8 @@
-
-
-# unique parameter labels
-get_par_unique <- function(prediction){
-  pred <- prediction[prediction != 0]
-  sort(unique(abs(pred)))
-}
-
-get_par_number <- function(prediction){
-  length(get_par_unique(prediction))
-}
-
-# model predictions: vector with probabilities to choose Option B
+#' Get Probabilities Predicted by Strategy
+#'
+#' Returns a vector with probabilities of choosing Option B for the different item types.
+#' @param par parameter vector (i.e., error probabilities)
+#' @inheritParams compute_cnml
 #' @export
 get_prob_B <- function(par, prediction){
   pb <- rep(NA, length(prediction))
@@ -26,26 +18,27 @@ get_prob_B <- function(par, prediction){
   pb
 }
 
+# unique parameter indices/labels
+get_par_unique <- function(prediction){
+  pred <- prediction[prediction != 0]
+  sort(unique(abs(pred)))
+}
+
+get_par_number <- function(prediction){
+  length(get_par_unique(prediction))
+}
 
 # product binomial loglikelihood
 loglik <- function (par, b, n, prediction){
   pb <- get_prob_B(par, prediction)
   ll <- sum(dbinom(x = b, size = n, prob = pb, log = TRUE))
-  #   ll <- sum(b*log(pb)+(n-b)*log(1-pb)) + lgamma(N+1) - lgamma(B+1) - lgamma(N-B+1) )
   if (ll == - Inf)
     ll <- MIN_LL
   ll
 }
 
-
-# get_adherence <- function(b, prediction){
-#
-#   par_label <- get_par_unique(prediction)
-#   idx <- match(abs(prediction), par_label, nomatch = NA)
-#   cnt_predicted <-  tapply(tmp, list(idx), sum)
-#   unname(c(cnt_predicted), force = TRUE)
-# }
-
+# count adherence/error rates
+# used to get ML estimate : adherence/n
 estimate_par <- function (b, n, prediction, luck = c(1,1), prob = TRUE){
   # reversed items:
   tmp <- b
@@ -62,6 +55,7 @@ estimate_par <- function (b, n, prediction, luck = c(1,1), prob = TRUE){
   unname(c(cnt_predicted), force = TRUE)
 }
 
+# move analytical estimate into interior of parameter space
 adjust_par <- function(par, prediction, c = .50, bound = 1e-10){
   par_adj <- par
   o <- attr(prediction, "ordered")

@@ -91,7 +91,7 @@ test_that('c_LNML computation works', {
   n <- rep(2,3)
   # GUESS
   cnml_g <- compute_cnml(GUESS, n, luck = c(1.5, 1.5))
-  expect_length(cnml_g, 5)
+  expect_length(cnml_g, 6)
   expect_equal(cnml_g$cnml, 0)
 
   # baseline + deterministic

@@ -20,7 +20,7 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
 
   } else if (n_par == 1){
     # deterministic (constant error parameter)
-    s1 <- sum(n)-adherence + prior[1]
+    s1 <- error + prior[1]
     s2 <- adherence + prior[2]
     pm <- pbeta(c, s1, s2, log = TRUE) + lbeta(s1, s2) + # prior*lik (unnormalized)
       - pbeta(c, prior[1], prior[2], log = TRUE) - lbeta(prior[1], prior[2])
@@ -60,13 +60,15 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
 #' @inheritParams select_nml
 #' @inheritParams compute_marginal
 #' @export
-select_bf <- function(b, n, prediction, c = .5, prior = c(1, 1), ...){
+select_bf <- function(b, n, prediction, c = .5,
+                      prior = c(1, 1), cores = 1){
   UseMethod("select_bf", b)
 }
 
 #' @rdname select_bf
 #' @export
-select_bf.default <- function (b, n, prediction, c = .5, prior = c(1, 1)){
+select_bf.default <- function (b, n, prediction, c = .5,
+                               prior = c(1, 1), cores = 1){
 
   if (is.numeric(prediction)){
     marginal <- compute_marginal(b, n, prediction, prior, c)
@@ -83,7 +85,7 @@ select_bf.matrix <- function (b, n, prediction, c = .5,
                               prior = c(1, 1), cores = 1){
   if (cores > 1){
     cl <- makeCluster(cores)
-    marg <- parApply(cl, b, 1, select_bf, n = n, prediction = prediction,
+    marg <- parApply(cl = cl, X = b, 1, select_bf, n = n, prediction = prediction,
                      c = c, prior = prior)
     stopCluster(cl)
   } else {
