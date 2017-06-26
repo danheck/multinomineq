@@ -7,16 +7,16 @@
 #' @inheritParams compute_cnml
 #' @inheritParams select_nml
 #' @export
-compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
+compute_marginal <- function(k, n, prediction, prior = c(1, 1), c=0.5){
 
   n_par <- get_par_number(prediction)
-  adherence <- estimate_par(b, n, - prediction, prob = FALSE)
-  error <- estimate_par(b, n, prediction, prob = FALSE)
+  adherence <- estimate_par(k, n, - prediction, prob = FALSE)
+  error <- estimate_par(k, n, prediction, prob = FALSE)
   pm <- 0
 
-  if (c == 1 && n_par == length(b) && is.null(attr(prediction, "ordered"))){
+  if (c == 1 && n_par == length(k) && is.null(attr(prediction, "ordered"))){
     # baseline
-    pm <- sum(lbeta(b + prior[1], n - b + prior[2]) - lbeta(prior[1], prior[2]))
+    pm <- sum(lbeta(k + prior[1], n - k + prior[2]) - lbeta(prior[1], prior[2]))
 
   } else if (n_par == 1){
     # deterministic (constant error parameter)
@@ -50,7 +50,7 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
     # GUESS
     pm <- pm + sum(n[prediction == 0]) * log(.50)
   }
-  sum(lchoose(n, b)) + pm
+  sum(lchoose(n, k)) + pm
 }
 
 
@@ -60,46 +60,49 @@ compute_marginal <- function(b, n, prediction, prior = c(1, 1), c=0.5){
 #' @inheritParams select_nml
 #' @inheritParams compute_marginal
 #' @export
-select_bf <- function(b, n, prediction, c = .5,
+select_bf <- function(k, n, prediction, c = .5,
                       prior = c(1, 1), cores = 1){
-  UseMethod("select_bf", b)
+  UseMethod("select_bf", k)
 }
 
 #' @rdname select_bf
 #' @export
-select_bf.default <- function (b, n, prediction, c = .5,
+select_bf.default <- function (k, n, prediction, c = .5,
                                prior = c(1, 1), cores = 1){
 
   if (is.numeric(prediction)){
-    marginal <- compute_marginal(b, n, prediction, prior, c)
+    marginal <- compute_marginal(k, n, prediction, prior, c)
   } else {
     marginal <- sapply(prediction, function(p)
-      compute_marginal(b, n, p, prior, c))
+      compute_marginal(k, n, p, prior, c))
   }
   marginal
 }
 
 #' @rdname select_bf
 #' @export
-select_bf.matrix <- function (b, n, prediction, c = .5,
+select_bf.matrix <- function (k, n, prediction, c = .5,
                               prior = c(1, 1), cores = 1){
   if (cores > 1){
     cl <- makeCluster(cores)
-    marg <- parApply(cl = cl, X = b, 1, select_bf, n = n, prediction = prediction,
-                     c = c, prior = prior)
+    marg <- clusterMap(cl, select_bf, as.list(data.frame(t(k))),
+                       MoreArgs = list(n = n, prediction = prediction,
+                                       c = c, prior = prior),
+                       SIMPLIFY = TRUE, .scheduling = "dynamic")
     stopCluster(cl)
   } else {
-    marg <- apply(b, 1, select_bf, n = n, prediction = prediction,
+    marg <- apply(k, 1, select_bf, n = n, prediction = prediction,
                   c = c, prior = prior)
   }
-  t(marg)
+  if (is.matrix(marg)) marg <- t(marg)
+  marg
 }
 
 #' @rdname select_bf
 #' @method select_bf data.frame
 #' @export
-select_bf.data.frame <- function (b, n, prediction, c = .5,
+select_bf.data.frame <- function (k, n, prediction, c = .5,
                                   prior = c(1, 1), cores = 1){
-  b <- as.matrix(b)
-  UseMethod("select_bf", b)
+  k <- as.matrix(k)
+  UseMethod("select_bf", k)
 }

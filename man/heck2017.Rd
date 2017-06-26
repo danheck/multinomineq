@@ -15,10 +15,12 @@
 heck2017
 }
 \description{
-Dataset with multiattribute decisions across 4 item types (Heck, Hilbig & Moshagen, 2017).
+Choice frequencies with multiattribute decisions across 4 item types (Heck, Hilbig & Moshagen, 2017).
 }
 \details{
-Each participant made 40 choices for each of 4 item types with four cues (with validities .9, .8, .7, and .6).
+Each participant made 40 choices for each of 4 item types with four cues
+(with validities .9, .8, .7, and .6).
+Raw data are available as \code{\link{heck2017_raw}}
 }
 \examples{
 data(heck2017)
@@ -37,6 +39,6 @@ select_nml(heck2017[1:5,], n,
 }
 }
 \references{
-Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. https://doi.org/10.3758/s13423-014-0643-0
+Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. https://doi.org/10.1016/j.cogpsych.2017.05.003
 }
 \keyword{datasets}

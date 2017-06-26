@@ -4,15 +4,15 @@
 \alias{compute_marginal}
 \title{Compute Log-Marginal Probabilities for Strategies}
 \usage{
-compute_marginal(b, n, prediction, prior = c(1, 1), c = 0.5)
+compute_marginal(k, n, prediction, prior = c(1, 1), c = 0.5)
 }
 \arguments{
-\item{b}{observed frequencies of Option B.
+\item{k}{observed frequencies of Option B.
 Either a vector or a matrix/data frame (one person per row)}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{prediction}{a vector of strategy predictions. See \code{\link{get_prediction}}}
+\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
 
 \item{prior}{prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])}
 

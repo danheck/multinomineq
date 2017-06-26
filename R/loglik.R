@@ -1,8 +1,18 @@
 #' Get Probabilities Predicted by Strategy
 #'
 #' Returns a vector with probabilities of choosing Option B for the different item types.
+#'
 #' @param par parameter vector (i.e., error probabilities)
 #' @inheritParams compute_cnml
+#' @examples
+#' # Predicted: B, B, [guess], A
+#' pred <- c(1, 1, 0, -1)
+#' # error probability = .10
+#' get_prob_B(par = .10, pred)
+#'
+#' # Predicted: B,B,A with errors: e1 < e2 < e3
+#' pred2 <- c(1, 2, -3)
+#' get_prob_B(par = c(.10, .15,.20), pred2)
 #' @export
 get_prob_B <- function(par, prediction){
   pb <- rep(NA, length(prediction))
@@ -29,21 +39,21 @@ get_par_number <- function(prediction){
 }
 
 # product binomial loglikelihood
-loglik <- function (par, b, n, prediction){
+loglik <- function (par, k, n, prediction){
   pb <- get_prob_B(par, prediction)
-  ll <- sum(dbinom(x = b, size = n, prob = pb, log = TRUE))
-  if (ll == - Inf && all(b <= n))
+  ll <- sum(dbinom(x = k, size = n, prob = pb, log = TRUE))
+  if (ll == - Inf && all(k <= n))
     ll <- MIN_LL
   ll
 }
 
 # count adherence/error rates
 # used to get ML estimate : adherence/n
-estimate_par <- function (b, n, prediction, luck = c(1,1), prob = TRUE){
+estimate_par <- function (k, n, prediction, luck = c(1,1), prob = TRUE){
   # reversed items:
-  tmp <- b
+  tmp <- k
   pred_B <- prediction > 0
-  tmp[pred_B] <- n[pred_B] - b[pred_B]
+  tmp[pred_B] <- n[pred_B] - k[pred_B]
 
   par_label <- get_par_unique(prediction)
   idx <- match(abs(prediction), par_label, nomatch = NA)

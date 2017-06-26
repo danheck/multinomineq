@@ -4,14 +4,14 @@
 \alias{maximize_ll}
 \title{Maximum-likelihood Estimate}
 \usage{
-maximize_ll(b, n, prediction, c = 0.5, luck = c(1, 1), n.fit = 5)
+maximize_ll(k, n, prediction, c = 0.5, luck = c(1, 1), n.fit = 5)
 }
 \arguments{
-\item{b}{vector with observed frequencies for Option B}
+\item{k}{vector with observed frequencies for Option B}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{prediction}{a vector of strategy predictions. See \code{\link{get_prediction}}}
+\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
 
 \item{c}{upper threshold of probabilities}
 

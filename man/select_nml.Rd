@@ -7,16 +7,16 @@
 \alias{select_nml.data.frame}
 \title{Strategy Selection Using NML}
 \usage{
-select_nml(b, n, cnml, n.fit = 5, cores = 1)
+select_nml(k, n, cnml, n.fit = 5, cores = 1)
 
-\method{select_nml}{default}(b, n, cnml, n.fit = 5, cores = 1)
+\method{select_nml}{default}(k, n, cnml, n.fit = 5, cores = 1)
 
-\method{select_nml}{matrix}(b, n, cnml, n.fit = 5, cores = 1)
+\method{select_nml}{matrix}(k, n, cnml, n.fit = 5, cores = 1)
 
-\method{select_nml}{data.frame}(b, n, cnml, n.fit = 5, cores = 1)
+\method{select_nml}{data.frame}(k, n, cnml, n.fit = 5, cores = 1)
 }
 \arguments{
-\item{b}{observed frequencies of Option B.
+\item{k}{observed frequencies of Option B.
 Either a vector or a matrix/data frame (one person per row)}
 
 \item{n}{vector with the number of choices per item type}

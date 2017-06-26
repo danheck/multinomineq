@@ -13,33 +13,33 @@ luckiness <- function(par, luck = c(1, 1)){
   dd
 }
 
-ll_luckiness <- function(par, b, n, prediction, luck = c(1,1)){
-  loglik(par, b, n, prediction) + luckiness(par, luck)
+ll_luckiness <- function(par, k, n, prediction, luck = c(1,1)){
+  loglik(par, k, n, prediction) + luckiness(par, luck)
 }
 
 #' Maximum-likelihood Estimate
 #'
 #' Get ML estimate (possible weighted by luckinesss function).
 #' @inheritParams compute_cnml
-#' @param b vector with observed frequencies for Option B
+#' @param k vector with observed frequencies for Option B
 #' @export
-maximize_ll <- function(b, n, prediction, c = .5,
+maximize_ll <- function(k, n, prediction, c = .5,
                         luck = c(1,1), n.fit = 5){
 
   # analytic ML estimate, boundary correction and order constraints
-  est <- estimate_par(b, n, prediction, luck = luck)
+  est <- estimate_par(k, n, prediction, luck = luck)
   start <- adjust_par(est, prediction, c)
   n.par <- length(est)
 
   # check for unordered models (EQW, TTB, WADD, baseline)
   # oo <- optim(ll_luckiness, lower=0, upper=c, control = list(fn=-1),
-  #                b = b, n = n, prediction=prediction, luck = luck)
+  #                k = k, n = n, prediction=prediction, luck = luck)
   if (n.par>1 && !is.null(attr(prediction, "ordered"))){
     start <- adjust_par(est, prediction, c, BOUND)
     ui <- rbind(diag(n.par), 0) - rbind(0, diag(n.par))
     ci <- c(rep(0, n.par), -c)
     tryCatch(oo <- constrOptim(start, ll_luckiness, grad = NULL,
-                               b = b, n = n, prediction = prediction, luck = luck,
+                               k = k, n = n, prediction = prediction, luck = luck,
                                ui = ui, ci = ci, control = list(fnscale = -1)),
              error = function(e) {print(e);
                cat("\n\n  (optimization failed with start values =", start, ")\n")})
@@ -47,7 +47,7 @@ maximize_ll <- function(b, n, prediction, c = .5,
     while (cnt < n.fit){
       start <- sort(runif(n.par, 0, c))
       oo2 <- constrOptim(start, ll_luckiness, grad = NULL,
-                         b = b, n = n, prediction = prediction, luck = luck,
+                         k = k, n = n, prediction = prediction, luck = luck,
                          ui = ui, ci = ci, control = list(fnscale = -1))
       oo2
       cnt <- cnt + 1
@@ -55,7 +55,7 @@ maximize_ll <- function(b, n, prediction, c = .5,
     }
     start <- oo$par
   }
-  ll <- ll_luckiness(start, b, n, prediction, luck)
+  ll <- ll_luckiness(start, k, n, prediction, luck)
   list(loglik = ll, est = start, luck = luck)
 }
 
@@ -64,7 +64,7 @@ maximize_ll <- function(b, n, prediction, c = .5,
 #' Compute NML Complexity
 #'
 #' Enumerates discrete data space and adds the maximum likelihood values.
-#' @param prediction a vector of strategy predictions. See \code{\link{get_prediction}}
+#' @param prediction a vector of strategy predictions. See \code{\link{predict_multiattribute}}
 #' @param n vector with the number of choices per item type
 #' @param c upper threshold of probabilities
 #' @param luck parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
@@ -87,14 +87,15 @@ compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
         cl <- makeCluster(cores)
         clusterExport(cl, c( "luck", "n.fit", "c", "n"),
                       envir=environment())
-        lls <- parApply(cl = cl, X = dat, MARGIN = 1,
-                        function(xx) maximize_ll(b = xx, n = n, prediction = prediction,
-                                                 luck = luck, c = c,
-                                                 n.fit = n.fit)$loglik)
+        lls <- parSapplyLB(cl, as.list(data.frame(t(dat))),
+                           # lls <- parApply(cl = cl, X = dat, MARGIN = 1,
+                           function(xx) maximize_ll(k = xx, n = n, prediction = prediction,
+                                                    luck = luck, c = c,
+                                                    n.fit = n.fit)$loglik)
         stopCluster(cl)
       } else {
         lls <- apply(X = dat, MARGIN = 1,
-                     function(xx) maximize_ll(b = xx, n = n, prediction = prediction,
+                     function(xx) maximize_ll(k = xx, n = n, prediction = prediction,
                                               luck = luck, c = c,
                                               n.fit = n.fit)$loglik)
       }
@@ -118,22 +119,22 @@ compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
 #' Strategy Selection Using NML
 #'
 #' Compute (L)NML for observed frequencies.
-#' @param b observed frequencies of Option B.
+#' @param k observed frequencies of Option B.
 #'          Either a vector or a matrix/data frame (one person per row)
 #' @export
-select_nml <- function(b, n, cnml, n.fit = 5, cores = 1){
-  UseMethod("select_nml", b)
+select_nml <- function(k, n, cnml, n.fit = 5, cores = 1){
+  UseMethod("select_nml", k)
 }
 
 #' @rdname select_nml
 #' @export
-select_nml.default <- function(b, n, cnml, n.fit = 5, cores = 1){
-  b <- unlist(b)
+select_nml.default <- function(k, n, cnml, n.fit = 5, cores = 1){
+  k <- unlist(k)
   n <- unlist(n)
-  check_bnp(b, n, n)
+  check_bnp(k, n, n)
   check_cnml(cnml, n)
   lls <- sapply(cnml, function(cc)
-    maximize_ll(b = b, n = n, prediction = cc$prediction, c = cc$c,
+    maximize_ll(k = k, n = n, prediction = cc$prediction, c = cc$c,
                 luck = cc$luck, n.fit = n.fit)$loglik)
 
   nml <- - lls + sapply(cnml, "[[", "cnml")
@@ -148,15 +149,15 @@ select_nml.default <- function(b, n, cnml, n.fit = 5, cores = 1){
 #' @param cnml NML complexity values computed with \code{\link{compute_cnml}}.
 #'             Note that the sample size \code{n} must match.
 #' @export
-select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
+select_nml.matrix <- function (k, n, cnml, n.fit = 5, cores = 1){
 
   if (cores > 1){
     cl <- makeCluster(cores)
     # clusterExport(cl, c("cnml"), envir=environment())
-    nml <- parApply(cl = cl, b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+    nml <- parApply(cl = cl, k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
     stopCluster(cl)
   } else {
-    nml <- apply(b, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+    nml <- apply(k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
   }
   t(nml)
 }
@@ -164,7 +165,7 @@ select_nml.matrix <- function (b, n, cnml, n.fit = 5, cores = 1){
 #' @rdname select_nml
 #' @method select_nml data.frame
 #' @export
-select_nml.data.frame <- function(b, n, cnml, n.fit = 5, cores = 1){
-  b <- as.matrix(b)
-  UseMethod("select_nml", b)
+select_nml.data.frame <- function(k, n, cnml, n.fit = 5, cores = 1){
+  k <- as.matrix(k)
+  UseMethod("select_nml", k)
 }

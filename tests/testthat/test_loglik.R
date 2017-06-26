@@ -7,8 +7,8 @@ GUESS <- rep(0, 3)
 baseline <- 1:3
 attr(WADDprob, "ordered") <- TRUE
 
-b <- c(0, 1, 1)
-b_false <- c(11,1,1)
+k <- c(0, 1, 1)
+k_false <- c(11,1,1)
 n <- c(10, 15, 12)
 
 test_that('predictions work as expected', {
@@ -31,33 +31,33 @@ test_that('predictions work as expected', {
 
 test_that('loglik works', {
 
-  expect_lte(loglik(runif(1), b ,n, TTB), 0)
-  expect_gte(loglik(sum(b)/sum(n), b ,n, TTB),
-             loglik(runif(1), b ,n, TTB))
+  expect_lte(loglik(runif(1), k ,n, TTB), 0)
+  expect_gte(loglik(sum(k)/sum(n), k ,n, TTB),
+             loglik(runif(1), k ,n, TTB))
 
-  expect_lte(loglik(runif(3), b ,n, WADD), 0)
-  expect_lte(loglik(runif(3), b ,n, baseline), 0)
-  expect_lte(loglik(c(), b ,n, GUESS), 0)
+  expect_lte(loglik(runif(3), k ,n, WADD), 0)
+  expect_lte(loglik(runif(3), k ,n, baseline), 0)
+  expect_lte(loglik(c(), k ,n, GUESS), 0)
 
   # expected errors
-  expect_identical(loglik(runif(1), b_false , n, TTB), -Inf)
+  expect_identical(loglik(runif(1), k_false , n, TTB), -Inf)
 
 })
 
 test_that('ML estimation works', {
 
-  expect_length(estimate_par(b, n, GUESS), 0)
-  expect_equivalent(estimate_par(b, n, baseline), 1 - b/n)
+  expect_length(estimate_par(k, n, GUESS), 0)
+  expect_equivalent(estimate_par(k, n, baseline), 1 - k/n)
 
 
-  expect_silent(est_ttb <- maximize_ll(b, n, TTB))
-  expect_equal(est_ttb$est, sum(b)/sum(n))
+  expect_silent(est_ttb <- maximize_ll(k, n, TTB))
+  expect_equal(est_ttb$est, sum(k)/sum(n))
 
-  expect_silent(est_guess <- maximize_ll(b, n, GUESS))
+  expect_silent(est_guess <- maximize_ll(k, n, GUESS))
   expect_length(est_guess$est, 0)
-  expect_equal(est_guess$loglik, sum(dbinom(b, n, .5, log = TRUE)))
+  expect_equal(est_guess$loglik, sum(dbinom(k, n, .5, log = TRUE)))
 
-  expect_silent(est_waddp <- maximize_ll(b, n, WADDprob))
+  expect_silent(est_waddp <- maximize_ll(k, n, WADDprob))
 
 
 })

@@ -17,6 +17,8 @@ Imports: Rcpp (>= 0.12.11),
 Suggests:
     knitr,
     testthat
-LinkingTo: Rcpp
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1

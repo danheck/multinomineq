@@ -8,7 +8,7 @@ compute_cnml(prediction, n, c = 0.5, luck = c(1, 1), n.fit = 3,
   cores = 1)
 }
 \arguments{
-\item{prediction}{a vector of strategy predictions. See \code{\link{get_prediction}}}
+\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
 
 \item{n}{vector with the number of choices per item type}
 

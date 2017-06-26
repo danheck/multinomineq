@@ -9,8 +9,18 @@ get_prob_B(par, prediction)
 \arguments{
 \item{par}{parameter vector (i.e., error probabilities)}
 
-\item{prediction}{a vector of strategy predictions. See \code{\link{get_prediction}}}
+\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
 }
 \description{
 Returns a vector with probabilities of choosing Option B for the different item types.
+}
+\examples{
+# Predicted: B, B, [guess], A
+pred <- c(1, 1, 0, -1)
+# error probability = .10
+get_prob_B(par = .10, pred)
+
+# Predicted: B,B,A with errors: e1 < e2 < e3
+pred2 <- c(1, 2, -3)
+get_prob_B(par = c(.10, .15,.20), pred2)
 }

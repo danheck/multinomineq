@@ -7,7 +7,7 @@
 #' @author Daniel W. Heck
 #' @docType package
 #' @importFrom stats sd dbeta rbinom dbinom pbeta integrate runif constrOptim
-#' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply
+#' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply parSapplyLB clusterMap
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @useDynLib "stratsel", .registration=TRUE
 #'
