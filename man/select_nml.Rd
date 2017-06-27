@@ -2,18 +2,9 @@
 % Please edit documentation in R/nml.R
 \name{select_nml}
 \alias{select_nml}
-\alias{select_nml.default}
-\alias{select_nml.matrix}
-\alias{select_nml.data.frame}
 \title{Strategy Selection Using NML}
 \usage{
 select_nml(k, n, cnml, n.fit = 5, cores = 1)
-
-\method{select_nml}{default}(k, n, cnml, n.fit = 5, cores = 1)
-
-\method{select_nml}{matrix}(k, n, cnml, n.fit = 5, cores = 1)
-
-\method{select_nml}{data.frame}(k, n, cnml, n.fit = 5, cores = 1)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.

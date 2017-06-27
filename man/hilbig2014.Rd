@@ -14,25 +14,44 @@
 hilbig2014
 }
 \description{
-Dataset with multiattribute decisions across 3 item types (Hilbig & Moshagen, 2014).
+Choice frequencies of multiattribute decisions across 3 item types (Hilbig & Moshagen, 2014).
 }
 \details{
 Each participant made 32 choices for each of 3 item types with four cues (with validities .9, .8, .7, and .6).
+
+The pattern of cue values of Option A and and B was as follows:
+\itemize{
+  \item{Item Type 1: }{A = (1, 1, 1, -1) vs. B = (-1, 1, -1, 1)}
+  \item{Item Type 2: }{A = (1, -1, -1, -1) vs. B = (-1, 1, 1, -1)}
+  \item{Item Type 3: }{A = (1, 1, 1, -1) vs. B = (-1, 1, 1, 1)}
+}
 }
 \examples{
 data(hilbig2014)
 head(hilbig2014)
 
 \dontrun{
+# validities and cue values
+v <- c(.9, .8, .7, .6)
+cueA <- matrix(c(1,  1,  1, -1,
+                 1, -1, -1, -1,
+                 1,  1,  1, -1),
+               ncol = 4, byrow = TRUE)
+cueB <- matrix(c(-1, 1, -1,  1,
+                 -1, 1,  1, -1,
+                 -1, 1,  1,  1),
+               ncol = 4, byrow = TRUE)
+
+# get strategy predictions
+strategies <- c("baseline", "WADDprob", "WADD",
+                "TTB", "EQW", "GUESS")
+preds <- predict_multiattribute(cueA, cueB, v, strategies)
+c <- c(1, rep(.5, 5))  # upper bound of probabilities
+
+# get NML complexity and perform model selection
 n <- rep(32, 3)
-preds <- list(WADDD = c(-1, 1, -1),
-              TTB =   c(-1, -1, -1),
-              EQW =   c(-1, 1, 0),
-              GUESS = c(0, 0, 0))
-cnmls <- compute_cnml(preds, n, c = .5)
-cnml_baseline <- compute_cnml(1:3, n, c = 1)
-select_nml(hilbig2014[1:5,], n,
-           c(list(baseline=cnml_baseline), cnmls))
+cnmls <- compute_cnml(preds, n, c, cores = 3)
+select_nml(hilbig2014[1:5,], n, cnmls)
 }
 }
 \references{

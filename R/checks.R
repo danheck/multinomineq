@@ -1,10 +1,10 @@
 
 check_bnp <- function(k = NULL, n = NULL, prediction = NULL){
-  if(any(n<0) || any(n != round(n)))
+  if(any(n < 0) || any(n != round(n)))
     stop("'n' must contain positive integers.")
 
-  if(any(k<0) || any(k>n) || any(k != round(k)))
-    stop("'k' must contain positive integers.")
+  if(any(k < 0) || any(k > n) || any(k != round(k)))
+    stop("'k' must contain positive integers smaller or equal to 'n'.")
 
   if(any(is.na(prediction))) # || any(prediction<0) || any(prediction>1) )
     stop("'prediction' must not contain missings.")
@@ -46,4 +46,13 @@ check_cues <- function (cueA, cueB, v){
     stop ("Cues must have values -1/0/+1.")
   if (any(v < 0, v > 1))
     stop ("Validities 'v' must be in [0,1].")
+}
+
+check_knpcp <- function(k, n, pred, c, prior = c(1, 1)){
+  check_bnp(k, n, pred)
+  if (!is.numeric(c) || length(c) != 1 || c < 0 || c > 1)
+    stop("'c' must be in the interval [0,1].")
+  if (!missing(prior) &&
+      (length(prior) != 2 || any(prior < 0) || !is.numeric(prior)))
+    stop("'prior' must be a numeric vector with two postive numbers.")
 }

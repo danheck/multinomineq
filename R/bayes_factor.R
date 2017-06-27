@@ -6,12 +6,29 @@
 #' @param prior prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])
 #' @inheritParams compute_cnml
 #' @inheritParams select_nml
+#' @examples
+#' k <- c(1,11,18)
+#' n <- c(20, 20, 20)
+#' # prediction: A, A, B with constant error e<.50
+#' pred <- c(-1, -1, 1)
+#' m1 <- compute_marginal(k, n, pred)
+#' m1
+#'
+#' # prediction: A, B, B with ordered error e1<e3<e2<.50
+#' pred2 <- c(-1, 3, 2)
+#' attr(pred2, "ordered") <- TRUE
+#' m2 <- compute_marginal(k, n, pred2)
+#' m2
+#'
+#' # Bayes factor: Model 2 vs. Model 1
+#' exp(m2 - m1)
 #' @export
-compute_marginal <- function(k, n, prediction, prior = c(1, 1), c=0.5){
+compute_marginal <- function (k, n, prediction, c = 0.5, prior = c(1, 1)){
+  check_knpcp(k, n, prediction, c, prior)
 
   n_par <- get_par_number(prediction)
   adherence <- estimate_par(k, n, - prediction, prob = FALSE)
-  error <- estimate_par(k, n, prediction, prob = FALSE)
+  error     <- estimate_par(k, n,   prediction, prob = FALSE)
   pm <- 0
 
   if (c == 1 && n_par == length(k) && is.null(attr(prediction, "ordered"))){
@@ -26,7 +43,7 @@ compute_marginal <- function(k, n, prediction, prior = c(1, 1), c=0.5){
       - pbeta(c, prior[1], prior[2], log.p = TRUE) - lbeta(prior[1], prior[2])
     # (normalization of order-constrained prior)
 
-  } else if (n_par > 1){
+  } else if (n_par > 1 && n_par <= 6){
     # probabilistic (linear order constraint; nested unidimensional integration)
     ff <- function(e, idx = 1){
       if (idx == 1){
@@ -44,6 +61,8 @@ compute_marginal <- function(k, n, prediction, prior = c(1, 1), c=0.5){
     pm <- log(integrate(ff, 0, c, idx = n_par)$value) +
       lfactorial(n_par) - n_par* (pbeta(c, prior[1], prior[2], log.p = TRUE) +
                                     lbeta(prior[1], prior[2]))
+  } else {
+
   }
 
   if (any(prediction == 0)){
@@ -56,53 +75,59 @@ compute_marginal <- function(k, n, prediction, prior = c(1, 1), c=0.5){
 
 #' Strategy Selection Using the Bayes Factor
 #'
+#' Computes the posterior model probabilities for multiple strategies (with equal prior model probabilities).
+#'
 #' @inheritParams compute_cnml
 #' @inheritParams select_nml
 #' @inheritParams compute_marginal
+#' @param prediction.list list of model predictions.
+#' @param c upper boundary for parameters/error probabilities.
+#'   Note that a vector of the same length as \code{prediction.list}
+#'   can be provided to use different upper bound per model.
+#' @template details_prediction
+#' @seealso \code{\link{compute_marginal}} and \code{\link{model_weights}}
+#' @examples
+#' k <- c(3, 4, 12)               # frequencies Option B
+#' n <- c(20, 20, 20)             # number of choices
+#' preds <- list(
+#'     strategy1 = c(-1, -1, -1), # A/A/A
+#'     strategy2 = c(0, 1, -1),   # guess/B/A
+#'     baseline = 1:3)
+#' select_bf(k, n, preds, c= c(.5, .5, 1))
 #' @export
-select_bf <- function(k, n, prediction, c = .5,
-                      prior = c(1, 1), cores = 1){
-  UseMethod("select_bf", k)
-}
+select_bf <- function (k, n, prediction.list, c = .5,
+                       prior = c(1, 1), cores = 1){
 
-#' @rdname select_bf
-#' @export
-select_bf.default <- function (k, n, prediction, c = .5,
-                               prior = c(1, 1), cores = 1){
-
-  if (is.numeric(prediction)){
-    marginal <- compute_marginal(k, n, prediction, prior, c)
-  } else {
-    marginal <- sapply(prediction, function(p)
-      compute_marginal(k, n, p, prior, c))
-  }
-  marginal
-}
-
-#' @rdname select_bf
-#' @export
-select_bf.matrix <- function (k, n, prediction, c = .5,
-                              prior = c(1, 1), cores = 1){
-  if (cores > 1){
-    cl <- makeCluster(cores)
-    marg <- clusterMap(cl, select_bf, as.list(data.frame(t(k))),
-                       MoreArgs = list(n = n, prediction = prediction,
+  if (!is.null(dim(k))){
+    if (is.null(dim(n)))
+      n <- matrix(n, nrow(k), length(n), byrow = TRUE)
+    if (cores > 1){
+      cl <- makeCluster(cores)
+      pp <- clusterMap(cl, select_bf,
+                       k = as.list(data.frame(t(k))),
+                       n = as.list(data.frame(t(n))),
+                       MoreArgs = list(prediction.list = prediction.list,
                                        c = c, prior = prior),
                        SIMPLIFY = TRUE, .scheduling = "dynamic")
-    stopCluster(cl)
-  } else {
-    marg <- apply(k, 1, select_bf, n = n, prediction = prediction,
-                  c = c, prior = prior)
-  }
-  if (is.matrix(marg)) marg <- t(marg)
-  marg
-}
+      stopCluster(cl)
+    } else {
+      pp <- mapply(select_bf, k = as.list(data.frame(t(k))),
+                   n = as.list(data.frame(t(n))),
+                   MoreArgs = list(prediction.list = prediction.list,
+                                   c = c, prior = prior))
+    }
+    if (is.matrix(pp)){
+      pp <- t(pp)
+      rownames(pp) <- rownames(k)
+    }
 
-#' @rdname select_bf
-#' @method select_bf data.frame
-#' @export
-select_bf.data.frame <- function (k, n, prediction, c = .5,
-                                  prior = c(1, 1), cores = 1){
-  k <- as.matrix(k)
-  UseMethod("select_bf", k)
+  } else {
+    if (length(c) == 1)
+      c <- rep(c, length(prediction.list))
+
+    marginal <- mapply(function(p, c) compute_marginal(k, n, p, c, prior),
+                       p = prediction.list, c = as.list(c))
+    pp <- model_weights(marginal)
+  }
+  pp
 }

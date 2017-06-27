@@ -23,3 +23,8 @@ compute_cnml(prediction, n, c = 0.5, luck = c(1, 1), n.fit = 3,
 \description{
 Enumerates discrete data space and adds the maximum likelihood values.
 }
+\examples{
+# predict: A/A/B with error probabilities e2<e3<e1<.50
+p <- c(-3, -1, +2)
+compute_cnml(p, n = c(3,3,3), c = .50)
+}

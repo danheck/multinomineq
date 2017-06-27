@@ -2,18 +2,9 @@
 % Please edit documentation in R/predict_multiattribute.R
 \name{predict_multiattribute}
 \alias{predict_multiattribute}
-\alias{predict_multiattribute.default}
-\alias{predict_multiattribute.matrix}
-\alias{predict_multiattribute.data.frame}
-\title{Get Predictions of Common Strategies}
+\title{Get Predictions for Multiattribute Decisions}
 \usage{
 predict_multiattribute(cueA, cueB, v, strategy)
-
-\method{predict_multiattribute}{default}(cueA, cueB, v, strategy)
-
-\method{predict_multiattribute}{matrix}(cueA, cueB, v, strategy)
-
-\method{predict_multiattribute}{data.frame}(cueA, cueB, v, strategy)
 }
 \arguments{
 \item{cueA}{cue values of Option A (-1/+1 = negative/positive; 0 = missing).
@@ -31,12 +22,20 @@ Predidcted choice pattern are encoded as negative = Option A, positive = Option 
         Different integers are used if error probabilities are assumed to be different.
 }
 \description{
-Returns a vector of predictions for well-known choice strategies (TTB, WADD)
+Returns a vector of predictions for choice strategies (e.g., TTB, WADD)
+}
+\details{
+The sign of the numbers indicate the prediction
+(positive = Option B, negative = Option A, zero = guessing), whereas
+absolute values indicate the ordering of the error probabilities.
+For instance, \code{c(-1,-3,2)} implies the predicted pattern (A,A,B) with error probabilities
+(e1<e2<e3<c), where the upper boundary c=.50 by default.
 }
 \examples{
 ca <- c(1, -1, -1, 1)
 cb <- c(-1, 1, -1, -1)
 v <- c(.9, .8, .7, .6)
+strategies <-
 predict_multiattribute(ca, cb, v, "TTBprob")
 predict_multiattribute(ca, cb, v, "TTB")
 predict_multiattribute(ca, cb, v, "WADDprob")

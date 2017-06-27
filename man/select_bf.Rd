@@ -2,21 +2,9 @@
 % Please edit documentation in R/bayes_factor.R
 \name{select_bf}
 \alias{select_bf}
-\alias{select_bf.default}
-\alias{select_bf.matrix}
-\alias{select_bf.data.frame}
 \title{Strategy Selection Using the Bayes Factor}
 \usage{
-select_bf(k, n, prediction, c = 0.5, prior = c(1, 1), cores = 1)
-
-\method{select_bf}{default}(k, n, prediction, c = 0.5, prior = c(1, 1),
-  cores = 1)
-
-\method{select_bf}{matrix}(k, n, prediction, c = 0.5, prior = c(1, 1),
-  cores = 1)
-
-\method{select_bf}{data.frame}(k, n, prediction, c = 0.5, prior = c(1, 1),
-  cores = 1)
+select_bf(k, n, prediction.list, c = 0.5, prior = c(1, 1), cores = 1)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -24,14 +12,35 @@ Either a vector or a matrix/data frame (one person per row)}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
+\item{prediction.list}{list of model predictions.}
 
-\item{c}{upper threshold of probabilities}
+\item{c}{upper boundary for parameters/error probabilities.
+Note that a vector of the same length as \code{prediction.list}
+can be provided to use different upper bound per model.}
 
 \item{prior}{prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])}
 
 \item{cores}{number of processing units to be used}
 }
 \description{
-Strategy Selection Using the Bayes Factor
+Computes the posterior model probabilities for multiple strategies (with equal prior model probabilities).
+}
+\details{
+The sign of the numbers indicate the prediction
+(positive = Option B, negative = Option A, zero = guessing), whereas
+absolute values indicate the ordering of the error probabilities.
+For instance, \code{c(-1,-3,2)} implies the predicted pattern (A,A,B) with error probabilities
+(e1<e2<e3<c), where the upper boundary c=.50 by default.
+}
+\examples{
+k <- c(3, 4, 12)               # frequencies Option B
+n <- c(20, 20, 20)             # number of choices
+preds <- list(
+    strategy1 = c(-1, -1, -1), # A/A/A
+    strategy2 = c(0, 1, -1),   # guess/B/A
+    baseline = 1:3)
+select_bf(k, n, preds, c= c(.5, .5, 1))
+}
+\seealso{
+\code{\link{compute_marginal}} and \code{\link{model_weights}}
 }

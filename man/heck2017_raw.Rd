@@ -4,7 +4,7 @@
 \name{heck2017_raw}
 \alias{heck2017_raw}
 \title{Data: Multiattribute Decisions (Heck, Hilbig & Moshagen, 2017)}
-\format{A data frame 4 variables:
+\format{A data frame with 21 variables:
 \describe{
   \item{\code{vp}}{ID code of participant}
   \item{\code{trial}}{Trial index}
@@ -45,10 +45,10 @@ head(heck2017_raw)
 
 \dontrun{
 # check predictions
-cA <- heck2017_raw[,paste0("a",1:4)]
-cB <- heck2017_raw[,paste0("b",1:4)]
+cueA <- heck2017_raw[,paste0("a",1:4)]
+cueB <- heck2017_raw[,paste0("b",1:4)]
 v <- c(.9, .8, .7, .6)
-ttb <- predict_multiattribute(cA, cB, v, "TTB")
+ttb <- predict_multiattribute(cueA, cueB, v, "TTB")
 table(ttb, heck2017_raw$ttb)
 }
 }

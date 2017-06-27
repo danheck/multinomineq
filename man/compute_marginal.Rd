@@ -4,7 +4,7 @@
 \alias{compute_marginal}
 \title{Compute Log-Marginal Probabilities for Strategies}
 \usage{
-compute_marginal(k, n, prediction, prior = c(1, 1), c = 0.5)
+compute_marginal(k, n, prediction, c = 0.5, prior = c(1, 1))
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -14,10 +14,27 @@ Either a vector or a matrix/data frame (one person per row)}
 
 \item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
 
-\item{prior}{prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])}
-
 \item{c}{upper threshold of probabilities}
+
+\item{prior}{prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])}
 }
 \description{
 Computes the logarithm of the integral over the likelihood function weighted by the prior distribution of the parameters.
+}
+\examples{
+k <- c(1,11,18)
+n <- c(20, 20, 20)
+# prediction: A, A, B with constant error e<.50
+pred <- c(-1, -1, 1)
+m1 <- compute_marginal(k, n, pred)
+m1
+
+# prediction: A, B, B with ordered error e1<e3<e2<.50
+pred2 <- c(-1, 3, 2)
+attr(pred2, "ordered") <- TRUE
+m2 <- compute_marginal(k, n, pred2)
+m2
+
+# Bayes factor: Model 2 vs. Model 1
+exp(m2 - m1)
 }

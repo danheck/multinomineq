@@ -70,12 +70,19 @@ maximize_ll <- function(k, n, prediction, c = .5,
 #' @param luck parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
 #' @param n.fit number of repeated fitting runs with random starting values
 #' @param cores number of processing units to be used
+#' @examples
+#' # predict: A/A/B with error probabilities e2<e3<e1<.50
+#' p <- c(-3, -1, +2)
+#' compute_cnml(p, n = c(3,3,3), c = .50)
 #' @export
-compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
+compute_cnml <- function(prediction, n, c = .50, luck = c(1, 1),
                          n.fit = 3, cores = 1){
   if (is.list(prediction)){
-    res <- lapply(prediction, compute_cnml, n=n, c=c,
-                  luck=luck, n.fit=n.fit, cores=cores)
+    if (length(c) == 1)
+      c <- rep(c, length(prediction))
+    res <- mapply(compute_cnml, prediction = prediction, c = c,
+                  MoreArgs = list(n=n, luck=luck, n.fit=n.fit, cores=cores),
+                  SIMPLIFY = FALSE)
   } else {
     check_bnp(n, n, prediction)
     check_luck(luck)
@@ -119,16 +126,25 @@ compute_cnml <- function(prediction, n, c = .5, luck = c(1, 1),
 #' Strategy Selection Using NML
 #'
 #' Compute (L)NML for observed frequencies.
+#' @inheritParams compute_cnml
 #' @param k observed frequencies of Option B.
 #'          Either a vector or a matrix/data frame (one person per row)
+#' @param cnml NML complexity values computed with \code{\link{compute_cnml}}.
+#'             Note that the sample size \code{n} must match.
 #' @export
 select_nml <- function(k, n, cnml, n.fit = 5, cores = 1){
-  UseMethod("select_nml", k)
-}
 
-#' @rdname select_nml
-#' @export
-select_nml.default <- function(k, n, cnml, n.fit = 5, cores = 1){
+  if (is.matrix(k) || is.data.frame(k)){
+    if (cores > 1){
+      cl <- makeCluster(cores)
+      nml <- parApply(cl = cl, k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+      stopCluster(cl)
+    } else {
+      nml <- apply(k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
+    }
+    if (is.matrix(nml)) nml <- t(nml)
+
+  } else {
   k <- unlist(k)
   n <- unlist(n)
   check_bnp(k, n, n)
@@ -141,31 +157,6 @@ select_nml.default <- function(k, n, cnml, n.fit = 5, cores = 1){
   strat_names <- sapply(cnml, function(cc) attr(cc, "label"))
   sel <- !sapply(strat_names, is.null)
   names(nml)[sel] <- strat_names[sel]
-  nml
-}
-
-#' @rdname select_nml
-#' @inheritParams compute_cnml
-#' @param cnml NML complexity values computed with \code{\link{compute_cnml}}.
-#'             Note that the sample size \code{n} must match.
-#' @export
-select_nml.matrix <- function (k, n, cnml, n.fit = 5, cores = 1){
-
-  if (cores > 1){
-    cl <- makeCluster(cores)
-    # clusterExport(cl, c("cnml"), envir=environment())
-    nml <- parApply(cl = cl, k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
-    stopCluster(cl)
-  } else {
-    nml <- apply(k, 1, select_nml, n = n, cnml = cnml, n.fit = n.fit)
   }
-  t(nml)
-}
-
-#' @rdname select_nml
-#' @method select_nml data.frame
-#' @export
-select_nml.data.frame <- function(k, n, cnml, n.fit = 5, cores = 1){
-  k <- as.matrix(k)
-  UseMethod("select_nml", k)
+  nml
 }

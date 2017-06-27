@@ -7,12 +7,15 @@ cuesB <- matrix(c(-1,1,-1,1,
                   -1,1,1,1), ncol = 4, byrow = TRUE)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)
-WADDprob <- c(-1, 3, -2)
+WADDprob <- predict_multiattribute(cuesA, cuesB, v, "WADDprob")
+# attr(WADDprob, "ordered") <- TRUE
 EQW <- c(-1, 1, 0)
 GUESS <- rep(0, 3)
 baseline <- 1:3
-attr(WADDprob, "ordered") <- TRUE
-
+predictions <- list("baseline" = baseline, "WADDprob" = WADDprob,
+                    "TTB" = TTB, "WADD" = WADD,
+                    "EQW" = EQW, "GUESS" = GUESS)
+strats <- names(predictions)
 
 test_that('predictions work as expected', {
 
@@ -26,7 +29,11 @@ test_that('predictions work as expected', {
   expect_equal(predict_multiattribute(ca, cb, v, "WADD"), -1)
   expect_equal(predict_multiattribute(ca, cb, v, "EQW"), -1)
   expect_equal(predict_multiattribute(ca, cb, v, "GUESS"), 0)
-
+  expect_silent(p <- predict_multiattribute(
+      ca, cb, v, c("TTBprob", "WADDprob", "WADD", "EQW", "GUESS")))
+  expect_equal(p, list("TTBprob" = -1,
+                       "WADDprob" = sum(log( 1/c(.9,.8,.6)-1 )),
+                       "WADD" = -1, "EQW" = -1, "GUESS" = 0))
 
   # deterministic models
   expect_equal(get_par_unique(TTB), 1)
@@ -43,10 +50,9 @@ test_that('predictions work as expected', {
   expect_equal(get_prob_B(c(.1,.25, .3), baseline),
                1-c(.1, .25, .3))
 
-  expect_equal(predict_multiattribute(cuesA, cuesB, v, "TTB"), TTB)
-  expect_equal(predict_multiattribute(cuesA, cuesB, v, "WADD"), WADD)
-  expect_equal(predict_multiattribute(cuesA, cuesB, v, "EQW"), EQW)
-  expect_equal(predict_multiattribute(cuesA, cuesB, v, "GUESS"), GUESS)
+  # warning: baseline c=1
+  expect_warning(p <- predict_multiattribute(cuesA, cuesB, v, strats))
+  expect_identical(p, predictions)
 
   data(heck2017_raw)
   cA <- heck2017_raw[,paste0("a",1:4)]

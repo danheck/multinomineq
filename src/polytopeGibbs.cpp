@@ -12,7 +12,7 @@ double rbeta_trunc(double shape1, double shape2,
 
   // inverse cdf method:
   double u = R::runif(0, 1);
-  return R::qbeta(pmin + u*(pmax - pmin), shape1, shape2, 0, false);
+  return R::qbeta(pmin + u * (pmax - pmin), shape1, shape2, 0, false);
 }
 
 // beta-distribution sampling (for conjugate beta)
@@ -32,13 +32,13 @@ arma::mat rbeta_mat(int n, int D, double shape1, double shape2)
   return rbeta_mat(n, shape1 * arma::ones(D), shape2 * arma::ones(D));
 }
 
-// count number of samples that adhere to constraint A*x <= c
+// count number of samples that adhere to constraint A*x <= b
 // x: samples (rows: D dimensions, cols: M replications)
 // [[Rcpp::export]]
-int count_samples(arma::mat x, arma::mat A, arma::vec c)
+int count_samples(arma::mat x, arma::mat A, arma::vec b)
 {
   int cnt = 0.;
-  arma::rowvec ct = c.t();
+  arma::rowvec ct = b.t();
   arma::mat At = A.t();
   for (unsigned int m = 0 ; m < x.n_rows ; m++)
   {
@@ -48,7 +48,7 @@ int count_samples(arma::mat x, arma::mat A, arma::vec c)
 }
 
 // DIFFICULT:
-// arma::vec get_interior_point(arma::mat A, arma::vec c)
+// arma::vec get_interior_point(arma::mat A, arma::vec b)
 // {
 //   arma::vec u = arma::randu(A.n_rows);
 //
@@ -59,11 +59,11 @@ int count_samples(arma::mat x, arma::mat A, arma::vec c)
 // (splits M samples into batches of size "batch" to decrease memory usage)
 // [[Rcpp::export]]
 NumericVector bf_encompassing(arma::vec k, arma::vec n,
-                              arma::mat A, arma::vec c, arma::vec prior,
+                              arma::mat A, arma::vec b, arma::vec prior,
                               int M, int batch = 5000)
 {
   unsigned  int D = A.n_cols;
-  int npost,nprior = 0;
+  double npost,nprior = 0;
   arma::mat sprior,spost;
   int m = M;
   while (m > 0)
@@ -71,22 +71,23 @@ NumericVector bf_encompassing(arma::vec k, arma::vec n,
     // count prior and posterior samples that match constraints:
     sprior = rbeta_mat(fmin(m, batch), D, prior(0), prior(1));
     spost  = rbeta_mat(fmin(m, batch), k + prior(0), n - k + prior(1));
-    npost  = npost  + count_samples(spost,  A, c);
-    nprior = nprior + count_samples(sprior, A, c);
+    npost  = npost  + count_samples(spost,  A, b);
+    nprior = nprior + count_samples(sprior, A, b);
     m = m - batch;
   }
-  return NumericVector::create(Named("posterior") = npost,
+  return NumericVector::create(Named("bf") = npost / nprior,
+                               Named("posterior") = npost,
                                Named("prior") = nprior,
                                Named("M") = M);
 }
 
 
-// posterior sampling for polytope: A*x <= c
-// => uniform prior sampling if  k=n=c(0,...,0)
+// posterior sampling for polytope: A*x <= b
+// => uniform prior sampling if  k=n=b(0,...,0)
 // start: permissible starting values (randomly drawn if start[1]==-1)
 // [[Rcpp::export]]
 arma::mat sampling_posterior(arma::vec k, arma::vec n,
-                             arma::mat A, arma::vec c, arma::vec prior,
+                             arma::mat A, arma::vec b, arma::vec prior,
                              int M, arma::vec start)
 {
   const int K = A.n_rows ;  // vertices
@@ -102,7 +103,7 @@ arma::mat sampling_posterior(arma::vec k, arma::vec n,
     {
       cnt++;
       start.randu(D);
-      search = any(A * start > c);
+      search = any(A * start > b);
     }
   }
   spost.row(0) = start.t();
@@ -121,7 +122,7 @@ arma::mat sampling_posterior(arma::vec k, arma::vec n,
       // get min/max for truncated beta:   [TODO: vectorize!]
       for (int v = 0 ; v < K ; v++)
       {
-        bnd = c(v) - arma::dot(A.row(v),  spost.row(i)) + A(v,j)*spost(i,j);
+        bnd = b(v) - arma::dot(A.row(v),  spost.row(i)) + A(v,j) * spost(i,j);
         if (A(v,j) < 0)
           bmin = fmax( bnd/A(v,j), bmin);
         else if (A(v,j) > 0)
@@ -138,7 +139,7 @@ arma::mat sampling_posterior(arma::vec k, arma::vec n,
 // (splits M samples into batches of size "batch" to decrease memory usage)
 // [[Rcpp::export]]
 List encompassing_stepwise(arma::vec k, arma::vec n,
-                           arma::mat A, arma::vec c, arma::vec prior,
+                           arma::mat A, arma::vec b, arma::vec prior,
                            arma::vec M, arma::vec steps, int batch = 5000){
   // int cores = omp_get_max_threads();
   // omp_set_num_threads(cores);
@@ -157,7 +158,7 @@ List encompassing_stepwise(arma::vec k, arma::vec n,
     // sampling from unit cube and go to first polytope
     sample = rbeta_mat(fmin(m,batch), k + prior(0), n - k + prior(1));
     cnt(0) = cnt(0) +
-      count_samples(sample, A.rows(0, steps(0)), c.subvec(0, steps(0)));
+      count_samples(sample, A.rows(0, steps(0)), b.subvec(0, steps(0)));
     m = m - batch;
   }
 
@@ -165,13 +166,13 @@ List encompassing_stepwise(arma::vec k, arma::vec n,
   {
     // prior/posterior sampling from constrained polytope
     sample =
-      sampling_posterior(k, n, A.rows(0, steps(s-1)), c.subvec(0, steps(s-1)),
+      sampling_posterior(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
                          prior, int(M(s)), -arma::ones(1));
     if (s < S - 1)
       cnt(s) = cnt(s) +
-        count_samples(sample, A.rows(0, steps(s)), c.subvec(0, steps(s)));
+        count_samples(sample, A.rows(0, steps(s)), b.subvec(0, steps(s)));
     else
-      cnt(s) = cnt(s) + count_samples(sample, A, c);
+      cnt(s) = cnt(s) + count_samples(sample, A, b);
   }
   return Rcpp::List::create(Named("integral") = prod(cnt/M),
                             Named("counts") = cnt,

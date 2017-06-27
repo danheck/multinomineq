@@ -35,5 +35,5 @@ test_that('Bayes factor works as expected', {
   expect_gt(margs[2], max(margs[-c(2)]))
 
   # errors
-  expect_warning(compute_marginal(k_false, n, TTB))
+  expect_error(compute_marginal(k_false, n, TTB))
 })

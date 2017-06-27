@@ -20,22 +20,46 @@ Choice frequencies with multiattribute decisions across 4 item types (Heck, Hilb
 \details{
 Each participant made 40 choices for each of 4 item types with four cues
 (with validities .9, .8, .7, and .6).
+The pattern of cue values of Option A and and B was as follows:
+\itemize{
+  \item{Item Type 1: }{A = (-1, 1, 1, -1) vs. B = (-1, -1, -1, -1)}
+  \item{Item Type 2: }{A = (1, -1, -1, 1) vs. B = (-1, 1, -1, 1)}
+  \item{Item Type 3: }{A = (-1, 1, 1, 1) vs. B = (-1, 1, 1, -1)}
+  \item{Item Type 4: }{A = (1, -1, -1, -1) vs. B = (-1, 1, 1, -1)}
+}
 Raw data are available as \code{\link{heck2017_raw}}
 }
 \examples{
 data(heck2017)
 head(heck2017)
+n <- rep(40, 4)
+
+# cue validities and values
+v <- c(.9, .8, .7, .6)
+cueA <- matrix(c(-1,  1,  1, -1,
+                  1, -1, -1,  1,
+                 -1,  1,  1,  1,
+                  1, -1, -1, -1),
+               ncol = 4, byrow = TRUE)
+cueB <- matrix(c(-1, -1, -1, -1,
+                 -1, 1 , -1, 1 ,
+                 -1, 1 , 1 , -1,
+                 -1, 1 , 1 , -1),
+               ncol = 4, byrow = TRUE)
+
+# get predictions
+strategies <- c("baseline", "WADDprob", "WADD",
+                "TTBprob", "TTB", "EQW", "GUESS")
+preds <- predict_multiattribute(cueA, cueB, v, strategies)
+c <- c(1, rep(.5, 6))  # upper bound of error probabilities
+
+# strategy classification with Bayes factor
+select_bf(heck2017[1:4,], n, preds, c)
 
 \dontrun{
-n <- rep(40, 4)
-preds <- list(WADDD = c(-1, -1, -1, 1),
-              TTB =   c(-1, -1, -1, -1),
-              EQW =   c(-1, 0, -1, 1),
-              GUESS = c(0, 0, 0, 0))
-cnmls <- compute_cnml(preds, n, c = .5)
-cnml_baseline <- compute_cnml(1:4, n, c = 1)
-select_nml(heck2017[1:5,], n,
-           c(list(baseline=cnml_baseline), cnmls))
+# strategy classification by NML (can take hours)
+cnmls <- compute_cnml(preds, n, c = c, cores = 3)
+select_nml(heck2017[1:4,], n, cnmls)
 }
 }
 \references{
