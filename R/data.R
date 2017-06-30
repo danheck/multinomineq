@@ -17,7 +17,7 @@
 #'   \item{\code{B2}}{Frequency of choosing Option B for Item Type 2}
 #'   \item{\code{B3}}{Frequency of choosing Option B for Item Type 3}
 #' }
-#' @template ref_hilbig14
+#' @template ref_hilbig2014
 #' @examples
 #' data(hilbig2014)
 #' head(hilbig2014)
@@ -70,7 +70,7 @@
 #'   \item{\code{B3}}{Frequency of choosing Option B for Item Type 3}
 #'   \item{\code{B4}}{Frequency of choosing Option B for Item Type 4}
 #' }
-#' @template ref_heck17
+#' @template ref_heck2017
 #' @examples
 #' data(heck2017)
 #' head(heck2017)
@@ -140,7 +140,7 @@
 #'   \item{\code{b3}}{Value of Cue 3 for Option B}
 #'   \item{\code{b4}}{Value of Cue 4 for Option B}
 #' }
-#' @template ref_heck17
+#' @template ref_heck2017
 #' @examples
 #' data(heck2017_raw)
 #' head(heck2017_raw)

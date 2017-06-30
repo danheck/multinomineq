@@ -9,7 +9,7 @@ get_prob_B(par, prediction)
 \arguments{
 \item{par}{parameter vector (i.e., error probabilities)}
 
-\item{prediction}{a vector of strategy predictions. See \code{\link{predict_multiattribute}}}
+\item{prediction}{a vector of strategy predictions. See details and \code{\link{predict_multiattribute}}}
 }
 \description{
 Returns a vector with probabilities of choosing Option B for the different item types.

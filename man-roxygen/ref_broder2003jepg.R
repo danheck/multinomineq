@@ -1,0 +1,1 @@
+#' @references Bröder, A., & Schiffer, S. (2003). Take The Best versus simultaneous feature matching: Probabilistic inferences from memory and effects of reprensentation format. Journal of Experimental Psychology: General, 132, 277-293. https://doi.org/10.1037/0096-3445.132.2.277

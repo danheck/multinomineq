@@ -42,6 +42,19 @@ test_that('loglik works', {
   # expected errors
   expect_identical(loglik(runif(1), k_false , n, TTB), -Inf)
 
+  # standard ML estimation
+  expect_silent(ml <- maximize_ll(k, n, rep(-1, length(k))))
+  est <- sum(k)/sum(n)
+  expect_equal(ml$est, est)
+  expect_equal(ml$loglik, sum(dbinom(k, n, est, log = TRUE)))
+
+  # luckiness ML estimation
+  expect_silent(ml <- maximize_ll(k, n, rep(-1, length(k)),
+                                  luck = c(1.5, 1.5)))      # Beta(1.5, 1.5)
+  est <- (sum(k) + .5)/(sum(n) + 1)
+  expect_equal(ml$est, est)
+  expect_equal(ml$loglik, sum(dbinom(k, n, est, log = TRUE)))
+
 })
 
 test_that('ML estimation works', {

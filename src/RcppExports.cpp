@@ -32,9 +32,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// bf_encompassing
-NumericVector bf_encompassing(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
-RcppExport SEXP stratsel_bf_encompassing(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
+// encompassing_bf
+NumericVector encompassing_bf(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
+RcppExport SEXP stratsel_encompassing_bf(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -45,7 +45,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(bf_encompassing(k, n, A, b, prior, M, batch));
+    rcpp_result_gen = Rcpp::wrap(encompassing_bf(k, n, A, b, prior, M, batch));
     return rcpp_result_gen;
 END_RCPP
 }

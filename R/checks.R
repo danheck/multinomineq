@@ -1,5 +1,5 @@
 
-check_bnp <- function(k = NULL, n = NULL, prediction = NULL){
+check_knp <- function(k = NULL, n = NULL, prediction = NULL){
   if(any(n < 0) || any(n != round(n)))
     stop("'n' must contain positive integers.")
 
@@ -49,10 +49,24 @@ check_cues <- function (cueA, cueB, v){
 }
 
 check_knpcp <- function(k, n, pred, c, prior = c(1, 1)){
-  check_bnp(k, n, pred)
+  check_knp(k, n, pred)
   if (!is.numeric(c) || length(c) != 1 || c < 0 || c > 1)
     stop("'c' must be in the interval [0,1].")
   if (!missing(prior) &&
       (length(prior) != 2 || any(prior < 0) || !is.numeric(prior)))
     stop("'prior' must be a numeric vector with two postive numbers.")
+}
+
+check_kAb <- function (k, A, b){
+  if (is.null(dim(A)) || ncol(A) != length(k) || nrow(A) != length(b))
+    stop("'A' must be a matrix with number of rows equal to the length of 'b'",
+         "\n  and number of columns equal to the length/column number of 'k'.")
+  if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
+    stop ("'A' and 'b' must be numeric.")
+}
+
+check_stepsA <- function(steps, A){
+  if (any(steps <= 0) || any(steps >= nrow(A)) || any(steps != round(steps)))
+    stop("'steps' must be a vector with positive integers smaller",
+         "\n  than the number of rows of the matrix 'A'.")
 }

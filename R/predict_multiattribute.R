@@ -91,9 +91,10 @@ predict_multiattribute <- function (cueA, cueB, v, strategy){
 
 #' Transform Vector of Predictions to Polytope
 #'
-#' Transforms ordered item-type predictions to polytope definition.
+#' Transforms ordered item-type predictions to polytope definition. This allows to use Monte-Carlo methods to compute the Bayes factor if the number of item types is large (\code{\link{compute_bf}}).
 #'
-#' @param prediction a numeric vector with probabilistic choice predictions. See details and \code{\link{predict_multiattribute}}.
+#' @param prediction a numeric vector with probabilistic choice predictions.
+#'   See details and \code{\link{predict_multiattribute}}.
 #' @param c upper boundary of error probabilities
 #'
 #' @template details_prediction
@@ -110,7 +111,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy){
 #'
 #' bf <- exp(compute_marginal(k, n, pred) - compute_marginal(k, n, 1:4, c = 1))
 #' bf
-#' stratsel:::bf_encompassing(k, n, poly$A, poly$b, c(1,1), 2e6)
+#' compute_bf(k, n, poly$A, poly$b, prior = c(1,1), M = 2e5)
 #' @export
 as_polytope <- function(prediction, c = .50){
   pu <- get_par_unique(prediction)

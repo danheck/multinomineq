@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 // sample from truncated beta distribution
 double rbeta_trunc(double shape1, double shape2,
-                  double min, double max)
+                   double min, double max)
 {
   // cumulative density for lower/upper bound:
   double pmin = R::pbeta(min, shape1, shape2, 0, false);
@@ -58,12 +58,12 @@ int count_samples(arma::mat x, arma::mat A, arma::vec b)
 // standard encompassing approach
 // (splits M samples into batches of size "batch" to decrease memory usage)
 // [[Rcpp::export]]
-NumericVector bf_encompassing(arma::vec k, arma::vec n,
+NumericVector encompassing_bf(arma::vec k, arma::vec n,
                               arma::mat A, arma::vec b, arma::vec prior,
                               int M, int batch = 5000)
 {
   unsigned  int D = A.n_cols;
-  double npost,nprior = 0;
+  int npost,nprior = 0;
   arma::mat sprior,spost;
   int m = M;
   while (m > 0)
@@ -75,7 +75,7 @@ NumericVector bf_encompassing(arma::vec k, arma::vec n,
     nprior = nprior + count_samples(sprior, A, b);
     m = m - batch;
   }
-  return NumericVector::create(Named("bf") = npost / nprior,
+  return NumericVector::create(Named("bf") = (double)npost / nprior,
                                Named("posterior") = npost,
                                Named("prior") = nprior,
                                Named("M") = M);

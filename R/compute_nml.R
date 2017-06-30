@@ -20,8 +20,10 @@ ll_luckiness <- function(par, k, n, prediction, luck = c(1,1)){
 #' Maximum-likelihood Estimate
 #'
 #' Get ML estimate (possible weighted by luckinesss function).
+#'
 #' @inheritParams compute_cnml
 #' @param k vector with observed frequencies for Option B
+#' @template details_prediction
 #' @export
 maximize_ll <- function(k, n, prediction, c = .5,
                         luck = c(1,1), n.fit = 5){
@@ -29,15 +31,15 @@ maximize_ll <- function(k, n, prediction, c = .5,
   # analytic ML estimate, boundary correction and order constraints
   est <- estimate_par(k, n, prediction, luck = luck)
   start <- adjust_par(est, prediction, c)
-  n.par <- length(est)
+  npar <- length(est)
 
   # check for unordered models (EQW, TTB, WADD, baseline)
   # oo <- optim(ll_luckiness, lower=0, upper=c, control = list(fn=-1),
   #                k = k, n = n, prediction=prediction, luck = luck)
-  if (n.par>1 && !is.null(attr(prediction, "ordered"))){
+  if (npar > 1 && !is.null(attr(prediction, "ordered"))){
     start <- adjust_par(est, prediction, c, BOUND)
-    ui <- rbind(diag(n.par), 0) - rbind(0, diag(n.par))
-    ci <- c(rep(0, n.par), -c)
+    ui <- rbind(diag(npar), 0) - rbind(0, diag(npar))
+    ci <- c(rep(0, npar), -c)
     tryCatch(oo <- constrOptim(start, ll_luckiness, grad = NULL,
                                k = k, n = n, prediction = prediction, luck = luck,
                                ui = ui, ci = ci, control = list(fnscale = -1)),
@@ -45,7 +47,7 @@ maximize_ll <- function(k, n, prediction, c = .5,
                cat("\n\n  (optimization failed with start values =", start, ")\n")})
     cnt <- 1
     while (cnt < n.fit){
-      start <- sort(runif(n.par, 0, c))
+      start <- sort(runif(npar, 0, c))
       oo2 <- constrOptim(start, ll_luckiness, grad = NULL,
                          k = k, n = n, prediction = prediction, luck = luck,
                          ui = ui, ci = ci, control = list(fnscale = -1))
@@ -59,21 +61,26 @@ maximize_ll <- function(k, n, prediction, c = .5,
   list(loglik = ll, est = start, luck = luck)
 }
 
-# TODO: make generic S3 method
-# compute NML complexity term:
 #' Compute NML Complexity
 #'
-#' Enumerates discrete data space and adds the maximum likelihood values.
-#' @param prediction a vector of strategy predictions. See \code{\link{predict_multiattribute}}
+#' Enumerates discrete data space and sums the maximum likelihood values of all data vectors.
+#'
+#' @param prediction a vector of strategy predictions. See details and \code{\link{predict_multiattribute}}
 #' @param n vector with the number of choices per item type
 #' @param c upper threshold of probabilities
 #' @param luck parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
 #' @param n.fit number of repeated fitting runs with random starting values
 #' @param cores number of processing units to be used
+#' @template details_prediction
 #' @examples
+#' # predict: A/A/B with error probabilities e2,e3,e1<.20
+#' p <- c(-3, -1, +2)
+#' compute_cnml(p, n = c(2, 2, 2), c = .20)
+#'
 #' # predict: A/A/B with error probabilities e2<e3<e1<.50
 #' p <- c(-3, -1, +2)
-#' compute_cnml(p, n = c(3,3,3), c = .50)
+#' attr(p, "ordered") <- TRUE
+#' compute_cnml(p, n = c(2, 2, 2), c = .50)
 #' @export
 compute_cnml <- function(prediction, n, c = .50, luck = c(1, 1),
                          n.fit = 3, cores = 1){
@@ -84,7 +91,7 @@ compute_cnml <- function(prediction, n, c = .50, luck = c(1, 1),
                   MoreArgs = list(n=n, luck=luck, n.fit=n.fit, cores=cores),
                   SIMPLIFY = FALSE)
   } else {
-    check_bnp(n, n, prediction)
+    check_knp(n, n, prediction)
     check_luck(luck)
 
     # generate all possible data and fit models
@@ -116,13 +123,6 @@ compute_cnml <- function(prediction, n, c = .50, luck = c(1, 1),
 }
 
 
-
-
-### for empirical analyses
-# N: N per item type (N=rep(4,4))
-# choiceB: frequency of B choices (matrix: rows=subjects)
-# complexity: NML complexity
-# modelNames: which models to include in comparison
 #' Strategy Selection Using NML
 #'
 #' Compute (L)NML for observed frequencies.
@@ -147,7 +147,7 @@ select_nml <- function(k, n, cnml, n.fit = 5, cores = 1){
   } else {
   k <- unlist(k)
   n <- unlist(n)
-  check_bnp(k, n, n)
+  check_knp(k, n, n)
   check_cnml(cnml, n)
   lls <- sapply(cnml, function(cc)
     maximize_ll(k = k, n = n, prediction = cc$prediction, c = cc$c,
