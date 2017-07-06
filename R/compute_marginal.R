@@ -1,49 +1,66 @@
 #########################
 #' Compute Log-Marginal Probabilities for Strategies
 #'
-#' Computes the logarithm of the integral over the likelihood function weighted by the prior distribution of the parameters.
+#' Computes the logarithm of the integral over the likelihood function weighted by the prior distribution of the error probabilities.
 #'
-#' @param prior prior parameters of beta distribution, theta[i]~dbeta(prior[1], prior[2])
-#' @inheritParams compute_cnml
-#' @inheritParams select_nml
+#' @param k observed frequencies of Option B.
+#'          Either a vector or a matrix/data frame (one person per row)
+#' @param n vector with the number of choices per item type
+#' @param strategy a list that defines the predictions of a strategy, see\code{\link{predict_multiattribute}}
+#'
+#'
 #' @examples
 #' k <- c(1,11,18)
 #' n <- c(20, 20, 20)
-#' # prediction: A, A, B with constant error e<.50
-#' pred <- c(-1, -1, 1)
-#' m1 <- compute_marginal(k, n, pred)
+#' # pattern: A, A, B with constant error e<.50
+#' strat <- list(pattern = c(-1, -1, 1),
+#'               c = .5, ordered = FALSE,
+#'               prior = c(1,1))
+#' m1 <- compute_marginal(strat)
 #' m1
 #'
-#' # prediction: A, B, B with ordered error e1<e3<e2<.50
-#' pred2 <- c(-1, 3, 2)
-#' attr(pred2, "ordered") <- TRUE
-#' m2 <- compute_marginal(k, n, pred2)
+#' # pattern: A, B, B with ordered error e1<e3<e2<.50
+#' strat2 <- list(pattern = c(-1, 3, 2),
+#'                c = .5, ordered = TRUE,
+#'                prior = c(1,1))
+#' m2 <- compute_marginal(k, n, strat2)
 #' m2
 #'
 #' # Bayes factor: Model 2 vs. Model 1
 #' exp(m2 - m1)
 #' @export
-compute_marginal <- function (k, n, prediction, c = 0.5, prior = c(1, 1)){
-  check_knpcp(k, n, prediction, c, prior)
+compute_marginal <- function (k, n, strategy){
+  check_data_strategy(k, n, strategy)
+  prior <- strategy$prior
+  c <- strategy$c
 
-  n_par <- get_par_number(prediction)
-  adherence <- estimate_par(k, n, - prediction, prob = FALSE)
-  error     <- estimate_par(k, n,   prediction, prob = FALSE)
+  n_error <- get_error_number(strategy$pattern)
+  error     <- estimate_error(k, n,   strategy$pattern, prob = FALSE)
+  adherence <- estimate_error(k, n, - strategy$pattern, prob = FALSE)
   pm <- 0
 
-  if (c == 1 && n_par == length(k) && is.null(attr(prediction, "ordered"))){
-    # baseline
-    pm <- sum(lbeta(k + prior[1], n - k + prior[2]) - lbeta(prior[1], prior[2]))
-
-  } else if (n_par == 1){
-    # deterministic (constant error parameter)
+  if (!strategy$ordered || n_error == 1){
+    ### includes:
+    # baseline model: separate e_i in [0,1]
+    # modal-choice model: separate errors    e_i in [0,c]
+    # deterministic (constant error): one parameter   e in [0,c]
     s1 <- error + prior[1]
     s2 <- adherence + prior[2]
-    pm <- pbeta(c, s1, s2, log.p = TRUE) + lbeta(s1, s2) + # prior*lik (unnormalized)
-      - pbeta(c, prior[1], prior[2], log.p = TRUE) - lbeta(prior[1], prior[2])
+    # integral & posterior normalization:
+    pm <- sum(pbeta(c, s1, s2, log.p = TRUE) +
+                lbeta(s1, s2) +
+                - lbeta(prior[1], prior[2]))    # prior
+    # prior normalization due to truncation:
+    if (c != 1)
+      pm <- pm - n_error * pbeta(c, prior[1],prior[2], log.p = TRUE)
+
+    ### DEPRECATED baseline / deterministic
+    # pm <- sum(lbeta(k + prior[1], n - k + prior[2]) - lbeta(prior[1], prior[2]))
+    # pm <- pbeta(c, s1, s2, log.p = TRUE) + lbeta(s1, s2) + # prior*lik (unnormalized)
+    #   - pbeta(c, prior[1], prior[2], log.p = TRUE) - lbeta(prior[1], prior[2])
     # (normalization of order-constrained prior)
 
-  } else if (n_par > 1 && n_par <= 6){
+  } else if (n_error <= 6){
     # probabilistic (linear order constraint; nested unidimensional integration)
     ff <- function(e, idx = 1){
       if (idx == 1){
@@ -58,16 +75,16 @@ compute_marginal <- function (k, n, prediction, c = 0.5, prior = c(1, 1)){
             integrate(ff, lower = 0, upper = ee, idx = idx - 1)$value)
       }
     }
-    pm <- log(integrate(ff, 0, c, idx = n_par)$value) +
-      lfactorial(n_par) - n_par* (pbeta(c, prior[1], prior[2], log.p = TRUE) +
+    pm <- log(integrate(ff, 0, c, idx = n_error)$value) +
+      lfactorial(n_error) - n_error* (pbeta(c, prior[1], prior[2], log.p = TRUE) +
                                     lbeta(prior[1], prior[2]))
-  } else {
-
+  } else if (n_error > 6){
+    stop("For more than 6 item types, use ?as_polytope and ?compute_bf.")
   }
 
-  if (any(prediction == 0)){
+  if (any(strategy$pattern == 0)){
     # GUESS
-    pm <- pm + sum(n[prediction == 0]) * log(.50)
+    pm <- pm + sum(n[strategy$pattern == 0]) * log(.50)
   }
   sum(lchoose(n, k)) + pm
 }
@@ -80,23 +97,33 @@ compute_marginal <- function (k, n, prediction, c = 0.5, prior = c(1, 1)){
 #' @inheritParams compute_cnml
 #' @inheritParams select_nml
 #' @inheritParams compute_marginal
-#' @param prediction.list list of model predictions.
-#' @param c upper boundary for parameters/error probabilities.
-#'   Note that a vector of the same length as \code{prediction.list}
-#'   can be provided to use different upper bound per model.
-#' @template details_prediction
+#' @param strategy.list list of strategies. See \link{predict_multiattribute}
+# @param c upper boundary for parameters/error probabilities.
+#   A vector of the same length as \code{strategy.list}
+#   can be provided to use a different upper bound per model.
+# @param ordered whether error probabilities are assumed to be ordered.
+#   Similar as for \code{c}, a vector of the same length as \code{strategy.list}
+#   can be provided to define which models have ordered error probabilities.
+#'
 #' @seealso \code{\link{compute_marginal}} and \code{\link{model_weights}}
 #' @examples
+#' # pattern 1: A, A, B with constant error e<.50
+#' strat1 <- list(pattern = c(-1, -1, 1),
+#'                c = .5, ordered = FALSE,
+#'                prior = c(1,1))
+#' # pattern 2: A, B, B with ordered error e1<e3<e2<.50
+#' strat2 <- list(pattern = c(-1, 3, 2),
+#'                c = .5, ordered = TRUE,
+#'                prior = c(1,1))
+#' baseline <- list(pattern = 1:3, c = 1, ordered = FALSE,
+#'                  prior = c(1,1))
+#'
+#' # data
 #' k <- c(3, 4, 12)               # frequencies Option B
 #' n <- c(20, 20, 20)             # number of choices
-#' preds <- list(
-#'     strategy1 = c(-1, -1, -1), # A/A/A
-#'     strategy2 = c(0, 1, -1),   # guess/B/A
-#'     baseline = 1:3)
-#' select_bf(k, n, preds, c= c(.5, .5, 1))
+#' select_bf(k, n, list(strat1, strat2, baseline))
 #' @export
-select_bf <- function (k, n, prediction.list, c = .5,
-                       prior = c(1, 1), cores = 1){
+select_bf <- function (k, n, strategy.list, cores = 1){
 
   if (!is.null(dim(k))){
     if (is.null(dim(n)))
@@ -106,15 +133,14 @@ select_bf <- function (k, n, prediction.list, c = .5,
       pp <- clusterMap(cl, select_bf,
                        k = as.list(data.frame(t(k))),
                        n = as.list(data.frame(t(n))),
-                       MoreArgs = list(prediction.list = prediction.list,
-                                       c = c, prior = prior),
+                       MoreArgs = list(strategy.list = strategy.list),
                        SIMPLIFY = TRUE, .scheduling = "dynamic")
       stopCluster(cl)
     } else {
-      pp <- mapply(select_bf, k = as.list(data.frame(t(k))),
+      pp <- mapply(select_bf,
+                   k = as.list(data.frame(t(k))),
                    n = as.list(data.frame(t(n))),
-                   MoreArgs = list(prediction.list = prediction.list,
-                                   c = c, prior = prior))
+                   MoreArgs = list(strategy.list = strategy.list))
     }
     if (is.matrix(pp)){
       pp <- t(pp)
@@ -122,11 +148,8 @@ select_bf <- function (k, n, prediction.list, c = .5,
     }
 
   } else {
-    if (length(c) == 1)
-      c <- rep(c, length(prediction.list))
-
-    marginal <- mapply(function(p, c) compute_marginal(k, n, p, c, prior),
-                       p = prediction.list, c = as.list(c))
+    marginal <- sapply(strategy.list, function(strat)
+      compute_marginal(k, n, strat))
     pp <- model_weights(marginal)
   }
   pp

@@ -2,9 +2,9 @@
 % Please edit documentation in R/predict_multiattribute.R
 \name{predict_multiattribute}
 \alias{predict_multiattribute}
-\title{Get Predictions for Multiattribute Decisions}
+\title{Strategy Predictions for Multiattribute Decisions}
 \usage{
-predict_multiattribute(cueA, cueB, v, strategy)
+predict_multiattribute(cueA, cueB, v, strategy, c = 0.5, prior = c(1, 1))
 }
 \arguments{
 \item{cueA}{cue values of Option A (-1/+1 = negative/positive; 0 = missing).
@@ -15,31 +15,34 @@ If a matrix is provided, each row defines one item type.}
 \item{v}{cue validities: probabilities that cues lead to correct decision.
 Must be of the same length as the number of cues.}
 
-\item{strategy}{strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}. See details.}
+\item{strategy}{strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}.
+Can be a vector. See details.}
 }
 \value{
-Predidcted choice pattern are encoded as negative = Option A, positive = Option B, and 0 = guessing.
-        Different integers are used if error probabilities are assumed to be different.
+a \code{strategy} object (a list) with the entries:
+\itemize{
+\item{\code{pattern}: }{a numeric vector encoding the predicted choice pattern by the sign
+       (negative = Option A, positive = Option B, 0 = guessing).
+      Identical error probabilities are encoded by using the same absolute number
+      (e.g., \code{c(-1,1,1)} defines one error probability with A,B,B predictions).}
+\item{\code{c}}{upper boundary of error probabilities}
+\item{\code{ordered}: }{whether error probabilities are linearly ordered by their absolute value in \code{pattern} (largest error: smallest absolute number)}
+\item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
+\item{\code{label}: }{strategy label}
+}
 }
 \description{
-Returns a vector of predictions for choice strategies (e.g., TTB, WADD)
-}
-\details{
-The sign of the numbers indicate the prediction
-(positive = Option B, negative = Option A, zero = guessing), whereas
-absolute values indicate the ordering of the error probabilities.
-For instance, \code{c(-1,-3,2)} implies the predicted pattern (A,A,B) with error probabilities
-(e1<e2<e3<c), where the upper boundary c=.50 by default.
+Returns a list defining the predictions of different choice strategies (e.g., TTB, WADD)
 }
 \examples{
 ca <- c(1, -1, -1, 1)
 cb <- c(-1, 1, -1, -1)
 v <- c(.9, .8, .7, .6)
-strategies <-
-predict_multiattribute(ca, cb, v, "TTBprob")
+
 predict_multiattribute(ca, cb, v, "TTB")
 predict_multiattribute(ca, cb, v, "WADDprob")
-predict_multiattribute(ca, cb, v, "WADD")
-predict_multiattribute(ca, cb, v, "EQW")
-predict_multiattribute(ca, cb, v, "GUESS")
+
+predict_multiattribute(rbind(c1 = ca, c2 = c(1,1,1,1)),
+                       rbind(cb, c(1,1,-1,1)),
+                       v, "WADDprob")
 }

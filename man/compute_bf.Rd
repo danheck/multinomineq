@@ -4,7 +4,7 @@
 \alias{compute_bf}
 \title{Encompassing Bayes Factor}
 \usage{
-compute_bf(k, n, A, b, prior = c(1, 1), M = 2e+05, steps, batch = 5000)
+compute_bf(k, n, A, b, prior = c(1, 1), M = 5e+05, steps, batch = 5000)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -13,9 +13,12 @@ Either a vector or a matrix/data frame (one person per row)}
 \item{n}{vector with the number of choices per item type}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
-column for each of the binomial parameters.}
+column for each of the binomial parameters. The parameter space is defined
+as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}}
+
+\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
@@ -23,9 +26,12 @@ column for each of the binomial parameters.}
 
 \item{batch}{size of the batches into which computations are split to reduce memory load}
 }
+\value{
+a list with the Bayes factor (and log BF) of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model, and the number of posterior/prior samples that satisfied the order-constraints.
+}
 \description{
 Computes the Bayes factor for order-constrained product-binomial models
-that are specified as a polytope via:  A*x < b (see details).
+that are specified as a polytope via:  A*x <= b (see details).
 }
 \details{
 The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2)  inequalities in \code{A[1:5,]} vs \code{A[1:10,]}; (3)  inequalities in \code{A[1:10,]} vs. all inequalities in \code{A}.
@@ -50,7 +56,8 @@ A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
 A \%*\% c(.05, .3, .12, .16, .19, .53) <= b
 
 # Bayes factor: unconstrained vs. constrained
-compute_bf(k, n, A, b, c(1, 1))
+compute_bf(k, n, A, b, c(1, 1), M = 2e5)
+compute_bf(k, n, A, b, c(1, 1), M = 1e4, steps = c(2,4,5))
 }
 \references{
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. https://doi.org/10.1016/j.jmp.2004.11.001

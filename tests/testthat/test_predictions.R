@@ -7,6 +7,7 @@ cuesB <- matrix(c(-1,1,-1,1,
                   -1,1,1,1), ncol = 4, byrow = TRUE)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)
+v <- c(.9, .8, .7, .6)
 WADDprob <- predict_multiattribute(cuesA, cuesB, v, "WADDprob")
 # attr(WADDprob, "ordered") <- TRUE
 EQW <- c(-1, 1, 0)
@@ -22,7 +23,6 @@ test_that('predictions work as expected', {
   # one item type
   ca <- c(1, 1, -1, 1)
   cb <- c(-1, -1, -1, -1)
-  v <- c(.9, .8, .7, .6)
   expect_equivalent(predict_multiattribute(ca, cb, v, "TTBprob"), -1)
   expect_equivalent(predict_multiattribute(ca, cb, v, "WADDprob"),
                     sum(log( 1/c(.9,.8,.6)-1 )))
@@ -36,19 +36,19 @@ test_that('predictions work as expected', {
                        "WADD" = -1, "EQW" = -1, "GUESS" = 0))
 
   # deterministic models
-  expect_equal(get_par_unique(TTB), 1)
-  expect_length(get_par_unique(GUESS), 0)
-  expect_equal(get_par_number(TTB), 1)
-  expect_equal(get_prob_B(.123, TTB), rep(.123, 3))
+  expect_equal(get_error_unique(TTB), 1)
+  expect_length(get_error_unique(GUESS), 0)
+  expect_equal(get_error_number(TTB), 1)
+  expect_equal(error_to_probB(.123, TTB), rep(.123, 3))
 
   # probabilistic models
-  expect_equal(get_par_unique(WADDprob), 1:3)
-  expect_equal(get_par_number(WADDprob), 3)
-  expect_equal(get_prob_B(c(.1,.25, .3), WADDprob),
-               c(.1, .7, .25))
+  expect_equal(get_error_unique(WADDprob), sort(abs(WADDprob)))
+  expect_equal(get_error_number(WADDprob), 3)
+  expect_equal(error_to_probB(c(.1,.25, .3), WADDprob),
+               c(.1, 1 - .3, .25))
   # baseline
-  expect_equal(get_prob_B(c(.1,.25, .3), baseline),
-               1-c(.1, .25, .3))
+  e <- c(.1 , .25, .3)
+  expect_equal(error_to_probB(e, baseline), 1 - e)
 
   # warning: baseline c=1
   expect_warning(p <- predict_multiattribute(cuesA, cuesB, v, strats))

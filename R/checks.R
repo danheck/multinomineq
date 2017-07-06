@@ -16,17 +16,13 @@ check_knp <- function(k = NULL, n = NULL, prediction = NULL){
 }
 
 
-check_cnml <- function(cnml, n = NULL){
-  if (is.list(cnml) && identical(names(cnml), c("cnml", "n", "prediction", "c", "luck", "time")) ){
-    if(!missing(n) && !identical(n, cnml$n))
-      stop("sample size 'n' not identical for 'cnml'")
+check_cnml <- function(strategy, n){
+  if(is.null(strategy$n) || !identical(n, strategy$n))
+    stop("sample size 'n' missing in 'strategy' object or not identical")
+  if (is.null(strategy$cnml))
+    stop("the NML complexity term needs to be pre-computed with ?compute_cnml")
 
-    check_luck(cnml$luck)
-  } else if (is.list(cnml)) {
-    sapply(cnml, check_cnml)
-  } else {
-    stop("Structure of 'cnml' does not fit to that returned by compute_cnml().")
-  }
+  check_luck(strategy$prior)
 }
 
 check_luck <- function (luck){
@@ -69,4 +65,18 @@ check_stepsA <- function(steps, A){
   if (any(steps <= 0) || any(steps >= nrow(A)) || any(steps != round(steps)))
     stop("'steps' must be a vector with positive integers smaller",
          "\n  than the number of rows of the matrix 'A'.")
+}
+
+check_strategy <- function (strategy){
+  if (!is.list(strategy))
+    stop("'strategy' must be a list")
+  if (!all(c("pattern", "c","ordered","prior") %in% names(strategy)))
+    stop("'strategy' must have the named elements: \n",
+         "    pattern, c, ordered, prior, label")
+
+}
+
+check_data_strategy <- function (k, n, strategy){
+  check_strategy(strategy)
+  check_knp(k, n, strategy$pattern)
 }

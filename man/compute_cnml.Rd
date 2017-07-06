@@ -4,39 +4,46 @@
 \alias{compute_cnml}
 \title{Compute NML Complexity}
 \usage{
-compute_cnml(prediction, n, c = 0.5, luck = c(1, 1), n.fit = 3,
-  cores = 1)
+compute_cnml(strategy, n, n.fit = 3, cores = 1)
 }
 \arguments{
-\item{prediction}{a vector of strategy predictions. See details and \code{\link{predict_multiattribute}}}
+\item{strategy}{a list that defines the predictions of a strategy, see\code{\link{predict_multiattribute}}}
 
 \item{n}{vector with the number of choices per item type}
-
-\item{c}{upper threshold of probabilities}
-
-\item{luck}{parameters of luckiness function of LNML (i.e., parameters of a beta distribution). \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor}
 
 \item{n.fit}{number of repeated fitting runs with random starting values}
 
 \item{cores}{number of processing units to be used}
 }
+\value{
+a \code{strategy} object (a list) with the entries:
+\itemize{
+\item{\code{pattern}: }{a numeric vector encoding the predicted choice pattern by the sign
+       (negative = Option A, positive = Option B, 0 = guessing).
+      Identical error probabilities are encoded by using the same absolute number
+      (e.g., \code{c(-1,1,1)} defines one error probability with A,B,B predictions).}
+\item{\code{c}}{upper boundary of error probabilities}
+\item{\code{ordered}: }{whether error probabilities are linearly ordered by their absolute value in \code{pattern} (largest error: smallest absolute number)}
+\item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
+\item{\code{label}: }{strategy label}
+}
+}
 \description{
 Enumerates discrete data space and sums the maximum likelihood values of all data vectors.
 }
 \details{
-The sign of the numbers indicate the prediction
-(positive = Option B, negative = Option A, zero = guessing), whereas
-absolute values indicate the ordering of the error probabilities.
-For instance, \code{c(-1,-3,2)} implies the predicted pattern (A,A,B) with error probabilities
-(e1<e2<e3<c), where the upper boundary c=.50 by default.
+Note that the prior parameters in \code{strategy} define the NML luckiness function.
+(i.e., parameters of a beta distribution).
+\code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
 }
 \examples{
-# predict: A/A/B with error probabilities e2,e3,e1<.20
-p <- c(-3, -1, +2)
-compute_cnml(p, n = c(2, 2, 2), c = .20)
+# strategy: A/A/B with error probabilities {e2,e3,e1<.20}
+s1 <- list(pattern = c(-3, -1, +2), c = .2,
+           ordered = FALSE, prior = c(1,1))
+compute_cnml(strat, n = c(2, 2, 2))
 
-# predict: A/A/B with error probabilities e2<e3<e1<.50
-p <- c(-3, -1, +2)
-attr(p, "ordered") <- TRUE
-compute_cnml(p, n = c(2, 2, 2), c = .50)
+# predict: A/A/B with ordered errors {e2<e3<e1<.50}
+s2 <- list(pattern = c(-3, -1, +2), c = .5,
+           ordered = TRUE, prior = c(1,1))
+compute_cnml(s2, n = c(2, 2, 2))
 }

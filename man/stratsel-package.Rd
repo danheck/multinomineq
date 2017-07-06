@@ -6,14 +6,21 @@
 \alias{stratsel-package}
 \title{stratsel: Strategy Classification for Binary Choice Models}
 \description{
-Strategy classification uses model selection methods
-(i.e., Bayes factors and minimum description length) to select the decision strategy that
+Strategy classification is used to select the decision strategy that
 provides the best account for a vector of observed choice frequencies.
-This method can be used for multiattribute decisions involving strategies such as
-Take-the-best (TTB) vs. weighted additive (WADD; Bröder, 2003), but also for risky decisions to
-test the transitivity of preferences and other choice axioms (Regenwetter, 2014).
+By expressing choice stratgies as statistical models for binary choices,
+model-selection methods such as the Bayes factors and minimum description length
+can be used.
 }
 \details{
+The method is implemented for two areas:
+\itemize{
+\item Multiattribute decisions for probabilistic inferences involving strategies such as
+      Take-the-best (TTB) vs. weighted additive (WADD; Bröder, 2003)
+\item Risky decisions between different gambles to test choice axioms
+      such as transitivity (Regenwetter, 2014).
+}
+
 Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}.
 }
 \references{

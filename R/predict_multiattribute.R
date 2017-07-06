@@ -1,60 +1,78 @@
 
-#' Get Predictions for Multiattribute Decisions
+#' Strategy Predictions for Multiattribute Decisions
 #'
-#' Returns a vector of predictions for choice strategies (e.g., TTB, WADD)
+#' Returns a list defining the predictions of different choice strategies (e.g., TTB, WADD)
 #'
 #' @param cueA cue values of Option A (-1/+1 = negative/positive; 0 = missing).
 #'        If a matrix is provided, each row defines one item type.
 #' @param cueB cue values of Option B (see \code{cueA}).
 #' @param v cue validities: probabilities that cues lead to correct decision.
 #'        Must be of the same length as the number of cues.
-#' @param strategy strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}. See details.
+#' @param strategy strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}.
+#'        Can be a vector. See details.
 #'
-#' @template details_prediction
-#' @return Predidcted choice pattern are encoded as negative = Option A, positive = Option B, and 0 = guessing.
-#'         Different integers are used if error probabilities are assumed to be different.
+#' @return
+#' a \code{strategy} object (a list) with the entries:
+#' \itemize{
+#' \item{\code{pattern}: }{a numeric vector encoding the predicted choice pattern by the sign
+#'        (negative = Option A, positive = Option B, 0 = guessing).
+#'       Identical error probabilities are encoded by using the same absolute number
+#'       (e.g., \code{c(-1,1,1)} defines one error probability with A,B,B predictions).}
+#' \item{\code{c}}{upper boundary of error probabilities}
+#' \item{\code{ordered}: }{whether error probabilities are linearly ordered by their absolute value in \code{pattern} (largest error: smallest absolute number)}
+#' \item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
+#' \item{\code{label}: }{strategy label}
+#' }
+#'
 #' @examples
 #' ca <- c(1, -1, -1, 1)
 #' cb <- c(-1, 1, -1, -1)
 #' v <- c(.9, .8, .7, .6)
-#' strategies <-
-#' predict_multiattribute(ca, cb, v, "TTBprob")
+#'
 #' predict_multiattribute(ca, cb, v, "TTB")
 #' predict_multiattribute(ca, cb, v, "WADDprob")
-#' predict_multiattribute(ca, cb, v, "WADD")
-#' predict_multiattribute(ca, cb, v, "EQW")
-#' predict_multiattribute(ca, cb, v, "GUESS")
+#'
+#' predict_multiattribute(rbind(c1 = ca, c2 = c(1,1,1,1)),
+#'                        rbind(cb, c(1,1,-1,1)),
+#'                        v, "WADDprob")
 #' @export
-predict_multiattribute <- function (cueA, cueB, v, strategy){
+predict_multiattribute <- function (cueA, cueB, v, strategy,
+                                    c= .50, prior = c(1, 1)){
   check_cues(cueA, cueB, v)
 
   if (length(strategy) != 1){
     # multiple strategies
-    pred <- lapply(strategy, function(s)
-                   predict_multiattribute(cueA, cueB, v, s))
-    names(pred) <- strategy
+    strat.list <- lapply(strategy, function(s)
+      predict_multiattribute(cueA, cueB, v, s, c, prior))
+    names(strat.list) <- strategy
+    return(strat.list)
 
-  } else if (is.matrix(cueA) || is.data.frame(cueA) || strategy == "baseline"){
+  } else if (!is.null(dim(cueA)) || strategy == "baseline"){
     # multiple cues
     if (!is.matrix(v))
       v <- matrix(v, nrow(cueA), length(v), byrow = TRUE)
     if (strategy == "baseline"){
-      warning ("The upper boundary of the parameters must be set to c=1 manually.")
-      pred <- 1:nrow(cueA)
+      item.list <- list(pattern = 1:nrow(cueA),
+                        c = 1, ordered = FALSE,
+                        prior = prior,
+                        label = strategy)
     } else {
-      pred <- mapply(predict_multiattribute,
-                     cueA = as.list(data.frame(t(cueA))),
-                     cueB = as.list(data.frame(t(cueB))),
-                     v = as.list(data.frame(t(v))),
-                     MoreArgs = list(strategy = strategy))
+      if (length(c) == 1) c <- rep(c, nrow(cueA))
+      tmp <- mapply(predict_multiattribute,
+                    cueA = as.list(data.frame(t(cueA))),
+                    cueB = as.list(data.frame(t(cueB))),
+                    v = as.list(data.frame(t(v))),
+                    c = c,
+                    MoreArgs = list(strategy = strategy, prior = prior),
+                    SIMPLIFY = FALSE)
+      item.list <- tmp[[1]]
+      item.list$pattern <- sapply(tmp, "[[", "pattern")
     }
-    names(pred) <- rownames(cueA)
+    names(item.list$pattern) <- rownames(cueA)
+    return(item.list)
 
-    if (strategy %in% c("WADDprob", "TTBprob"))
-      attr(pred, "ordered") <- TRUE
-    else
-      attr(pred, "ordered") <- NULL
   } else {
+    # single strategy
     pred <- switch(strategy,
                    "TTBprob" = {
                      o <- order(v, decreasing = TRUE)
@@ -64,7 +82,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy){
                      ifelse(length(d2) == 0, 0, cnt * sign(d2[1]))
                    },
                    "TTB" = {
-                     cnt <- predict_multiattribute(cueA, cueB, v, "TTBprob")
+                     cnt <- predict_multiattribute(cueA, cueB, v, "TTBprob")$pattern
                      sign(cnt)
                    },
                    "EQW" = {
@@ -77,113 +95,124 @@ predict_multiattribute <- function (cueA, cueB, v, strategy){
                        sum(logodds[cueA == 1 & cueB == -1])
                    },
                    "WADD" = {
-                     ev <- predict_multiattribute(cueA, cueB, v, "WADDprob")
+                     ev <- predict_multiattribute(cueA, cueB, v, "WADDprob")$pattern
                      sign(ev)
                    },
                    "GUESS" = {
                      0.0
-                   })
+                   },
+                   {stop("Strategy not supported.")})
+    pred.list <- list(pattern = pred,
+                      c = c,
+                      ordered = grepl("prob", strategy),
+                      prior = prior,
+                      label = strategy)
+    class(pred.list) <- "strategy"
+    return(pred.list)
   }
-  pred
 }
 
 
 
-#' Transform Vector of Predictions to Polytope
+#' Transform Pattern of Predictions to Polytope
 #'
-#' Transforms ordered item-type predictions to polytope definition. This allows to use Monte-Carlo methods to compute the Bayes factor if the number of item types is large (\code{\link{compute_bf}}).
+#' Transforms ordered item-type predictions to polytope definition.
+#' This allows to use Monte-Carlo methods to compute the Bayes factor
+#' if the number of item types is large (\code{\link{compute_bf}}).
 #'
-#' @param prediction a numeric vector with probabilistic choice predictions.
-#'   See details and \code{\link{predict_multiattribute}}.
+#' @param strategy a decision strategy returned by \code{\link{predict_multiattribute}}.
 #' @param c upper boundary of error probabilities
 #'
-#' @template details_prediction
 #' @details
-#' Computes the matrix A and the vector b that define a polytope via {x: A*x < c}.
-#' Only works for models without guessing predictions and equality constraints (i.e., different error probabilities per item type)
-#' @examples
-#' k <- c(1,7,2,5)
-#' n <- rep(10, 4)
-#' # predict: A,A,B,B
-#' pred <- c(-1,2,-3,4)
-#' poly <- as_polytope(pred, c= .5)
-#' cbind(poly$A, b = poly$b)
+#' Note: Only works for models without guessing predictions and
+#'       without equality constraints (i.e., requires separate error probabilities per item type)
 #'
-#' bf <- exp(compute_marginal(k, n, pred) - compute_marginal(k, n, 1:4, c = 1))
-#' bf
-#' compute_bf(k, n, poly$A, poly$b, prior = c(1,1), M = 2e5)
+#' @return a list containing the matrix \code{A} and the vector \code{b}
+#'      that define a polytope via \code{A*x <= b}.
+#' @examples
+#' # define a strategy:
+#' strat <- list(prediction = c(1,-2,3,4),  # B,A,B,B
+#'               c = .5, ordered = TRUE,
+#'               prior = c(1,1), label = "test")
+#' as_polytope(strat)
 #' @export
-as_polytope <- function(prediction, c = .50){
-  pu <- get_par_unique(prediction)
-  npar <- get_par_number(prediction)
-  if (any(prediction == 0) || length(unique(prediction)) != npar || npar < 2)
-    stop ("Not working for guesses or if there are less parameters than item types.")
+as_polytope <- function(strategy){
+  check_strategy(strategy)
+  pattern <- strategy$pattern
+  pu <- get_error_unique(pattern)
+  n_error <- get_error_number(pattern)
+  if (any(pattern == 0) ||
+      length(unique(pattern)) != n_error || n_error < 2)
+    stop ("Not working for guesses or if there are less errors than item types.")
 
-  # prediction negative: 0<P(b)<c ; positive: c<P(b)<1
-  s <- sign(prediction)
+  # pattern negative: 0<P(b)<c ; positive: c<P(b)<1
+  s <- sign(pattern)
   A <- rbind(diag(s), diag(-s))
-  colnames(A) <- paste0("par", pu)
-  b <- c(ifelse(s == -1, 0, 1),
-         -s * c)
+  colnames(A) <- paste0("error", pu)
+  b <- c(ifelse(s == -1, 0, 1), -s * c)
 
-  # linear order constraints:
-  Aloc <- matrix(0, npar - 1, npar)
-  bloc <- rep(0, npar - 1)
-  for (i in 2:npar){
-    # find correct indices to add order constraints
-    if (prediction[i] < 0){
-      if (prediction[i - 1] < 0){
-        # -/-   =   A/A
-        if (abs(prediction[i - 1]) < abs(prediction[i]) )  # b1 < b2
-          Aloc[i-1,c(i-1, i)] <- c(1, -1)
-        else                                               # b1 > b2
-          Aloc[i-1,c(i-1, i)] <- c(-1, 1)
-        # bloc[i - 1] <- 0
+  if (ordered){
+    # linear order constraints:
+    Aloc <- matrix(0, n_error - 1, n_error)
+    bloc <- rep(0, n_error - 1)
+    for (i in 2:n_error){
+      # find correct indices to add order constraints
+      if (pattern[i] < 0){
+        if (pattern[i - 1] < 0){
+          # -/-   =   A/A
+          if (abs(pattern[i - 1]) < abs(pattern[i]) )  # b1 < b2
+            Aloc[i-1,c(i-1, i)] <- c(1, -1)
+          else                                               # b1 > b2
+            Aloc[i-1,c(i-1, i)] <- c(-1, 1)
+          # bloc[i - 1] <- 0
 
-      } else {
-        # -/+    =  A/B
-        if (abs(prediction[i - 1]) < abs(prediction[i]) ){  # b1  < 1-b2
-          Aloc[i-1,c(i-1, i)] <- c(-1,-1)
-          bloc[i - 1] <- -1
-        }else{
-          Aloc[i-1,c(i-1, i)] <- c(1,1)                    # b1  > 1-b2
-          bloc[i - 1] <- 1
+        } else {
+          # -/+    =  A/B
+          if (abs(pattern[i - 1]) < abs(pattern[i]) ){  # b1  < 1-b2
+            Aloc[i-1,c(i-1, i)] <- c(-1,-1)
+            bloc[i - 1] <- -1
+          }else{
+            Aloc[i-1,c(i-1, i)] <- c(1,1)                    # b1  > 1-b2
+            bloc[i - 1] <- 1
+          }
         }
-      }
-
-    } else {
-      if (prediction[i - 1] > 0){
-        # +/+   =   B/B
-        if (abs(prediction[i - 1]) < abs(prediction[i]) )  # 1-b1 < 1-b2
-          Aloc[i-1,c(i-1, i)] <- c(-1, 1)
-        else
-          Aloc[i-1,c(i-1, i)] <- c(1, -1)                  # 1-b1 > 1-b2
-        # bloc[i - 1] <- 0
 
       } else {
-        # +/-   = B/A
-        if (abs(prediction[i - 1]) < abs(prediction[i]) ){   # 1-b1  < b2
-          Aloc[i-1,c(i-1, i)] <- c(1,1)
-          bloc[i - 1] <- 1
-        }else{
-          Aloc[i-1,c(i-1, i)] <- c(-1,-1)                    # 1-b1  > b2
-          bloc[i - 1] <- -1
+        if (pattern[i - 1] > 0){
+          # +/+   =   B/B
+          if (abs(pattern[i - 1]) < abs(pattern[i]) )  # 1-b1 < 1-b2
+            Aloc[i-1,c(i-1, i)] <- c(-1, 1)
+          else
+            Aloc[i-1,c(i-1, i)] <- c(1, -1)                  # 1-b1 > 1-b2
+          # bloc[i - 1] <- 0
+
+        } else {
+          # +/-   = B/A
+          if (abs(pattern[i - 1]) < abs(pattern[i]) ){   # 1-b1  < b2
+            Aloc[i-1,c(i-1, i)] <- c(1,1)
+            bloc[i - 1] <- 1
+          }else{
+            Aloc[i-1,c(i-1, i)] <- c(-1,-1)                    # 1-b1  > b2
+            bloc[i - 1] <- -1
+          }
         }
       }
     }
+    A <- rbind(A, Aloc)
+    b <- c(b, bloc)
   }
-  list(A = rbind(A, Aloc), b = c(b, bloc))
+  list(A = A, b = b)
 }
 
-# proB   <- estimate_par(k, n, - prediction, prob = FALSE)
-# proA <- estimate_par(k, n,   prediction, prob = FALSE)
-# k <- ifelse(sign(prediction) == -1, proB, proA)
+# proB   <- estimate_error(k, n, - pattern, prob = FALSE)
+# proA <- estimate_error(k, n,   pattern, prob = FALSE)
+# k <- ifelse(sign(pattern) == -1, proB, proA)
 # n_poly <- proA + proB
-# k <- k[order(abs(prediction))]
-# if (npar > 1 && c != 1){
-#   Aloc <- diag(1, npar - 1, npar) - cbind(0, diag(npar - 1))
+# k <- k[order(abs(pattern))]
+# if (n_error > 1 && c != 1){
+#   Aloc <- diag(1, n_error - 1, n_error) - cbind(0, diag(n_error - 1))
 #   A <- rbind(A, Aloc)
-#   b <- c(b, rep(0, npar - 1))
+#   b <- c(b, rep(0, n_error - 1))
 # }
 # s1 <- stratsel:::encompassing_stepwise(k, n, poly$A, poly$b, c(1,1), 5e4, 9)
 # s2 <- stratsel:::encompassing_stepwise(rep(0,4),rep(0,4), poly$A, poly$b, c(1,1), 5e4, 7)

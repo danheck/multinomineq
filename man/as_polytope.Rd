@@ -2,38 +2,32 @@
 % Please edit documentation in R/predict_multiattribute.R
 \name{as_polytope}
 \alias{as_polytope}
-\title{Transform Vector of Predictions to Polytope}
+\title{Transform Pattern of Predictions to Polytope}
 \usage{
-as_polytope(prediction, c = 0.5)
+as_polytope(strategy)
 }
 \arguments{
-\item{prediction}{a numeric vector with probabilistic choice predictions.
-See details and \code{\link{predict_multiattribute}}.}
+\item{strategy}{a decision strategy returned by \code{\link{predict_multiattribute}}.}
 
 \item{c}{upper boundary of error probabilities}
 }
+\value{
+a list containing the matrix \code{A} and the vector \code{b}
+     that define a polytope via \code{A*x <= b}.
+}
 \description{
-Transforms ordered item-type predictions to polytope definition. This allows to use Monte-Carlo methods to compute the Bayes factor if the number of item types is large (\code{\link{compute_bf}}).
+Transforms ordered item-type predictions to polytope definition.
+This allows to use Monte-Carlo methods to compute the Bayes factor
+if the number of item types is large (\code{\link{compute_bf}}).
 }
 \details{
-The sign of the numbers indicate the prediction
-(positive = Option B, negative = Option A, zero = guessing), whereas
-absolute values indicate the ordering of the error probabilities.
-For instance, \code{c(-1,-3,2)} implies the predicted pattern (A,A,B) with error probabilities
-(e1<e2<e3<c), where the upper boundary c=.50 by default.
-
-Computes the matrix A and the vector b that define a polytope via {x: A*x < c}.
-Only works for models without guessing predictions and equality constraints (i.e., different error probabilities per item type)
+Note: Only works for models without guessing predictions and
+      without equality constraints (i.e., requires separate error probabilities per item type)
 }
 \examples{
-k <- c(1,7,2,5)
-n <- rep(10, 4)
-# predict: A,A,B,B
-pred <- c(-1,2,-3,4)
-poly <- as_polytope(pred, c= .5)
-cbind(poly$A, b = poly$b)
-
-bf <- exp(compute_marginal(k, n, pred) - compute_marginal(k, n, 1:4, c = 1))
-bf
-compute_bf(k, n, poly$A, poly$b, prior = c(1,1), M = 2e5)
+# define a strategy:
+strat <- list(prediction = c(1,-2,3,4),  # B,A,B,B
+              c = .5, ordered = TRUE,
+              prior = c(1,1), label = "test")
+as_polytope(strat)
 }

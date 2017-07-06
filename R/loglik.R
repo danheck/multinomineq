@@ -1,46 +1,52 @@
-#' Get Probabilities Predicted by Strategy
+#' Choice Probabilities Implied by Strategy Predictions
 #'
-#' Returns a vector with probabilities of choosing Option B for the different item types.
+#' Returns a vector with probabilities of choosing Option B for a given set
+#' of predictions and corresponding error probabilities.
 #'
-#' @param par parameter vector (i.e., error probabilities)
+#' @param error parameter vector of error probabilities (depending on \code{prediction}).
+#'   A single value for deterministic strategies and an
+#'   order vector of probabilities for probabilistic strategies (cf. examples).
 #' @inheritParams compute_cnml
 #' @examples
-#' # Predicted: B, B, [guess], A
+#' # Predicted:  B,B,[guess],A
+#' # (deterministic: with constant error = .10)
 #' pred <- c(1, 1, 0, -1)
-#' # error probability = .10
-#' get_prob_B(par = .10, pred)
+#' error_to_probB(error = .10, pred)
 #'
-#' # Predicted: B,B,A with errors: e1 < e2 < e3
-#' pred2 <- c(1, 2, -3)
-#' get_prob_B(par = c(.10, .15,.20), pred2)
+#' # Predicted:  B,B,A,[guess]
+#' # (probabilistic: with ordered errors e1<e2<e3)
+#' pred2 <- c(1, 2, -3, 0)
+#' error_to_probB(error = c(.10, .15,.20), pred2)
 #' @export
-get_prob_B <- function(par, prediction){
-  pb <- rep(NA, length(prediction))
-  pb[prediction == 0] <- .50  # Guess = 0
-
-  par_label <- get_par_unique(prediction)
-
-  # replace pareter labels by current pareter values
-  idxB <- match(prediction, par_label, nomatch = 0)
-  pb[idxB != 0] <- 1 - par[idxB]
-  idxA <- match(prediction, - par_label, nomatch = 0)
-  pb[idxA != 0] <- par[idxA]
-  pb
+error_to_probB <- function(error, prediction){
+  # error per item type:
+  if (!is.null(attr(prediction, "ordered"))){
+    error_label <- rev(get_error_unique(prediction))
+    error_per_type <- error[match(abs(prediction), error_label)]
+  } else {
+    error_per_type <- error
+  }
+  # reversed items and guessing:
+  probB <- ifelse(prediction < 0, error_per_type,
+                  ifelse(prediction > 0, 1 - error_per_type, .5))
+  probB
 }
 
-# unique parameter indices/labels
-get_par_unique <- function(prediction){
+
+
+# unique error indices/labels
+get_error_unique <- function(prediction){
   pred <- prediction[prediction != 0]
   sort(unique(abs(pred)))
 }
 
-get_par_number <- function(prediction){
-  length(get_par_unique(prediction))
+get_error_number <- function(prediction){
+  length(get_error_unique(prediction))
 }
 
 # product binomial loglikelihood
-loglik <- function (par, k, n, prediction){
-  pb <- get_prob_B(par, prediction)
+loglik <- function (error, k, n, prediction){
+  pb <- error_to_probB(error, prediction)
   ll <- sum(dbinom(x = k, size = n, prob = pb, log = TRUE))
   if (ll == - Inf && all(k <= n))
     ll <- MIN_LL
@@ -49,14 +55,14 @@ loglik <- function (par, k, n, prediction){
 
 # count adherence/error rates
 # used to get ML estimate : adherence/n
-estimate_par <- function (k, n, prediction, luck = c(1,1), prob = TRUE){
+estimate_error <- function (k, n, prediction, luck = c(1,1), prob = TRUE){
   # reversed items:
   tmp <- k
   pred_B <- prediction > 0
   tmp[pred_B] <- n[pred_B] - k[pred_B]
 
-  par_label <- get_par_unique(prediction)
-  idx <- match(abs(prediction), par_label, nomatch = NA)
+  error_label <- get_error_unique(prediction)
+  idx <- match(abs(prediction), error_label, nomatch = NA)
   cnt_predicted <- tapply(tmp, list(idx), sum) + luck[1] - 1
   if (prob){
     cnt_total <-  tapply(n, list(idx), sum) + sum(luck) - 2
@@ -66,22 +72,21 @@ estimate_par <- function (k, n, prediction, luck = c(1,1), prob = TRUE){
 }
 
 # move analytical estimate into interior of parameter space
-adjust_par <- function(par, prediction, c = .50, bound = 1e-10){
-  par_adj <- par
+adjust_error <- function(error, prediction, c = .50, bound = 1e-10){
+  error_adj <- error
   o <- attr(prediction, "ordered")
   if (!is.null(o) && is.logical(o)){
     # simple linear order constraints
     if (o){
-      par_adj <- adj_iterative(par, c, bound)
-      par_adj <- sort(par_adj + runif(length(par), 0, bound/4))
+      error_adj <- adj_iterative(error, c, bound)
+      error_adj <- sort(error_adj + runif(length(error), 0, bound/4))
     }
   } else if (!is.null(o)){
     #### complex order constraints (ui, ci)
-    stop("complex order constraints (ui, ci) not yet implemented")
-  } else if (length(par) > 0) {
-    par_adj <- pmax(bound, pmin(c - bound, par))
+    stop("complex order constraints (A, b) not yet implemented")
+  } else if (length(error) > 0) {
+    error_adj <- pmax(bound, pmin(c - bound, error))
   }
-  par_adj
+  error_adj
 }
-
 

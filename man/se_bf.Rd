@@ -4,22 +4,28 @@
 \alias{se_bf}
 \title{Standard Error for Bayes Factor Estimate}
 \usage{
-se_bf(npost, nprior, M, prior = c(0.5, 0.5), samples = 1000)
+se_bf(npost, nprior, Mpost, Mprior = Mpost, prior = c(0.5, 0.5),
+  samples = 5000)
 }
 \arguments{
 \item{npost}{number of posterior samples that satisfy order constraints
 (in the stepwise procedure: a vector of integers)}
 
-\item{M}{total number of posterior samples that have been drawn to compute the BF.
-In the stepwise procedure: if the length of \code{M} is one,
+\item{nprior}{number of prior samples that satisfy order constraints (see \code{npost})}
+
+\item{Mpost}{total number of posterior samples that have been drawn to compute the BF.
+In the stepwise procedure: if the length of \code{Mpost} is one,
 it is assumed that the same number of draws was used for each step}
+
+\item{Mprior}{total number of prior samples (cf. \code{Mpost})}
 
 \item{prior}{prior parameters of the beta distribution of the posterior/prior counts.
 The default is Jeffreys' prior.}
 
 \item{samples}{number of samples from beta distributions used to approximate the standard error}
-
-\item{npior}{number of prior samples that satisfy order constraints (see \code{npost})}
+}
+\value{
+a vector with standard errors for the Bayes factor (and log BF) of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
 }
 \description{
 Computes the standard error of the (stepwise) encompassing Bayes factor by sampling
@@ -30,7 +36,7 @@ ratios from beta distributions, with parameters defined by the posterior/prior c
 npost <- 2453
 nprior <- 153
 M <- 10000
-# Bayes factor in favor of order constraint:
+# Bayes factor in favor of order constraint (bf_0e):
 npost / nprior
 
 # standard error of estimate:

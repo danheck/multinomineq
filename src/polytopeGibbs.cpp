@@ -1,5 +1,5 @@
 # include <RcppArmadillo.h>
-# include <omp.h>
+// # include <omp.h>
 using namespace Rcpp;
 
 // sample from truncated beta distribution

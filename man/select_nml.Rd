@@ -4,7 +4,7 @@
 \alias{select_nml}
 \title{Strategy Selection Using NML}
 \usage{
-select_nml(k, n, cnml, n.fit = 5, cores = 1)
+select_nml(k, n, strategy.list, n.fit = 5, cores = 1)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -12,13 +12,26 @@ Either a vector or a matrix/data frame (one person per row)}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{cnml}{NML complexity values computed with \code{\link{compute_cnml}}.
+\item{strategy.list}{list with strategies including the pre-computed
+NML complexity values (see \code{\link{compute_cnml}}).
 Note that the sample size \code{n} must match.}
-
-\item{n.fit}{number of repeated fitting runs with random starting values}
 
 \item{cores}{number of processing units to be used}
 }
 \description{
 Compute (L)NML for observed frequencies.
+}
+\examples{
+n <- c(2, 2, 2)
+# strategy: A/A/B with error probabilities {e2,e3,e1<.20}
+s1 <- list(pattern = c(-3, -1, +2), c = .2,
+           ordered = FALSE, prior = c(1,1))
+s1n <- compute_cnml(s1, n = n)
+
+# predict: A/A/B with ordered errors {e2<e3<e1<.50}
+s2 <- list(pattern = c(-3, -1, +2), c = .5,
+           ordered = TRUE, prior = c(1,1))
+s2n <- compute_cnml(s2, n = n)
+
+select_nml(c(0,2,2), n, list(s1n, s2n))
 }
