@@ -7,8 +7,7 @@
 compute_bf(k, n, A, b, prior = c(1, 1), M = 5e+05, steps, batch = 5000)
 }
 \arguments{
-\item{k}{observed frequencies of Option B.
-Either a vector or a matrix/data frame (one person per row)}
+\item{k}{vector with observed frequencies for Option B}
 
 \item{n}{vector with the number of choices per item type}
 

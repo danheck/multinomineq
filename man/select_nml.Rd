@@ -7,14 +7,15 @@
 select_nml(k, n, strategy.list, n.fit = 5, cores = 1)
 }
 \arguments{
-\item{k}{observed frequencies of Option B.
-Either a vector or a matrix/data frame (one person per row)}
+\item{k}{vector with observed frequencies for Option B}
 
 \item{n}{vector with the number of choices per item type}
 
 \item{strategy.list}{list with strategies including the pre-computed
 NML complexity values (see \code{\link{compute_cnml}}).
 Note that the sample size \code{n} must match.}
+
+\item{n.fit}{number of repeated fitting runs with random starting values}
 
 \item{cores}{number of processing units to be used}
 }

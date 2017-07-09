@@ -1,3 +1,10 @@
+# make list with default strategy options
+as_strategy <- function(pattern, c = .50, ordered = TRUE, prior = c(1,1)){
+  strategy <- list(pattern = pattern, c = c, ordered = ordered, prior = prior)
+  # class(strategy) <- "strategy"
+  strategy
+}
+
 
 #' Strategy Predictions for Multiattribute Decisions
 #'
@@ -10,6 +17,9 @@
 #'        Must be of the same length as the number of cues.
 #' @param strategy strategy label, e.g., \code{"TTB"}, \code{"WADD"}, or \code{"WADDprob"}.
 #'        Can be a vector. See details.
+#' @param c defines the upper boundary for the error probabilities
+#' @param prior defines the prior distribution for the error probabilities
+#'          (i.e., truncated independent beta distributions \code{dbeta(prior[1], prior[2])} )
 #'
 #' @return
 #' a \code{strategy} object (a list) with the entries:
@@ -18,7 +28,7 @@
 #'        (negative = Option A, positive = Option B, 0 = guessing).
 #'       Identical error probabilities are encoded by using the same absolute number
 #'       (e.g., \code{c(-1,1,1)} defines one error probability with A,B,B predictions).}
-#' \item{\code{c}}{upper boundary of error probabilities}
+#' \item{\code{c}: }{upper boundary of error probabilities}
 #' \item{\code{ordered}: }{whether error probabilities are linearly ordered by their absolute value in \code{pattern} (largest error: smallest absolute number)}
 #' \item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
 #' \item{\code{label}: }{strategy label}
@@ -47,33 +57,32 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
     names(strat.list) <- strategy
     return(strat.list)
 
-  } else if (!is.null(dim(cueA)) || strategy == "baseline"){
-    # multiple cues
+  } else if (!is.null(dim(cueA))){
+    # multiple item types
     if (!is.matrix(v))
       v <- matrix(v, nrow(cueA), length(v), byrow = TRUE)
+    if (length(c) == 1)
+      c <- rep(c, nrow(cueA))
+    tmp <- mapply(predict_multiattribute,
+                  cueA = as.list(data.frame(t(cueA))),
+                  cueB = as.list(data.frame(t(cueB))),
+                  v = as.list(data.frame(t(v))),
+                  c = c,
+                  MoreArgs = list(strategy = strategy, prior = prior),
+                  SIMPLIFY = FALSE)
+    item.list <- tmp[[1]]
     if (strategy == "baseline"){
-      item.list <- list(pattern = 1:nrow(cueA),
-                        c = 1, ordered = FALSE,
-                        prior = prior,
-                        label = strategy)
+      item.list$pattern <- 1:length(tmp)
     } else {
-      if (length(c) == 1) c <- rep(c, nrow(cueA))
-      tmp <- mapply(predict_multiattribute,
-                    cueA = as.list(data.frame(t(cueA))),
-                    cueB = as.list(data.frame(t(cueB))),
-                    v = as.list(data.frame(t(v))),
-                    c = c,
-                    MoreArgs = list(strategy = strategy, prior = prior),
-                    SIMPLIFY = FALSE)
-      item.list <- tmp[[1]]
       item.list$pattern <- sapply(tmp, "[[", "pattern")
     }
     names(item.list$pattern) <- rownames(cueA)
     return(item.list)
 
   } else {
-    # single strategy
+    # single strategy and item type
     pred <- switch(strategy,
+                   "baseline" = NA,
                    "TTBprob" = {
                      o <- order(v, decreasing = TRUE)
                      diff <- cueB[o] - cueA[o]
@@ -103,11 +112,11 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
                    },
                    {stop("Strategy not supported.")})
     pred.list <- list(pattern = pred,
-                      c = c,
+                      c = ifelse(strategy == "baseline", 1, c),
                       ordered = grepl("prob", strategy),
                       prior = prior,
                       label = strategy)
-    class(pred.list) <- "strategy"
+    # class(pred.list) <- "strategy"
     return(pred.list)
   }
 }
@@ -121,7 +130,6 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
 #' if the number of item types is large (\code{\link{compute_bf}}).
 #'
 #' @param strategy a decision strategy returned by \code{\link{predict_multiattribute}}.
-#' @param c upper boundary of error probabilities
 #'
 #' @details
 #' Note: Only works for models without guessing predictions and
@@ -131,14 +139,15 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
 #'      that define a polytope via \code{A*x <= b}.
 #' @examples
 #' # define a strategy:
-#' strat <- list(prediction = c(1,-2,3,4),  # B,A,B,B
+#' strat <- list(pattern = c(1,-2,3,4),  # B,A,B,B
 #'               c = .5, ordered = TRUE,
-#'               prior = c(1,1), label = "test")
+#'               prior = c(1,1))
 #' as_polytope(strat)
 #' @export
-as_polytope <- function(strategy){
+as_polytope <- function (strategy){
   check_strategy(strategy)
   pattern <- strategy$pattern
+  c <- strategy$c
   pu <- get_error_unique(pattern)
   n_error <- get_error_number(pattern)
   if (any(pattern == 0) ||
@@ -151,7 +160,7 @@ as_polytope <- function(strategy){
   colnames(A) <- paste0("error", pu)
   b <- c(ifelse(s == -1, 0, 1), -s * c)
 
-  if (ordered){
+  if (strategy$ordered){
     # linear order constraints:
     Aloc <- matrix(0, n_error - 1, n_error)
     bloc <- rep(0, n_error - 1)

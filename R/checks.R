@@ -1,18 +1,17 @@
 
-check_knp <- function(k = NULL, n = NULL, prediction = NULL){
+check_knp <- function(k = NULL, n = NULL, pattern = NULL){
   if(any(n < 0) || any(n != round(n)))
     stop("'n' must contain positive integers.")
 
   if(any(k < 0) || any(k > n) || any(k != round(k)))
     stop("'k' must contain positive integers smaller or equal to 'n'.")
 
-  if(any(is.na(prediction))) # || any(prediction<0) || any(prediction>1) )
-    stop("'prediction' must not contain missings.")
-
+  if(any(is.na(pattern))) # || any(pattern<0) || any(pattern>1) )
+    stop("'pattern' must not contain missings.")
 
   l <- length(n)
-  if( l != length(k) || l != length(k) || l != length(prediction))
-    stop("Length of 'k', 'n', and 'prediction' does not match.")
+  if( l != length(k) || l != length(k) || l != length(pattern))
+    stop("Length of 'k', 'n', and 'pattern' does not match.")
 }
 
 
@@ -22,12 +21,12 @@ check_cnml <- function(strategy, n){
   if (is.null(strategy$cnml))
     stop("the NML complexity term needs to be pre-computed with ?compute_cnml")
 
-  check_luck(strategy$prior)
+  check_prior(strategy$prior)
 }
 
-check_luck <- function (luck){
-  if (length(luck) != 2 || any(luck <= 0))
-    stop ("cnml$luck must be a vector with two positive values.")
+check_prior <- function (prior){
+  if (length(prior) != 2 || any(prior <= 0))
+    stop ("strategy$prior must be a vector with two positive values.")
 }
 
 check_cues <- function (cueA, cueB, v){
@@ -69,10 +68,11 @@ check_stepsA <- function(steps, A){
 
 check_strategy <- function (strategy){
   if (!is.list(strategy))
-    stop("'strategy' must be a list")
+    stop("'strategy' must be a list (?predict_multiattribute) such as: \n",
+         "    list(pattern=c(-1,2,0), c=.5, ordered=TRUE, prior=c(1,1))")
   if (!all(c("pattern", "c","ordered","prior") %in% names(strategy)))
-    stop("'strategy' must have the named elements: \n",
-         "    pattern, c, ordered, prior, label")
+    stop("the list 'strategy' must include named elements, e.g.: \n",
+         "    list(pattern=c(-1,2,0), c=.5, ordered=TRUE, prior=c(1,1))")
 
 }
 

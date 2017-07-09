@@ -32,18 +32,19 @@ a \code{strategy} object (a list) with the entries:
 Enumerates discrete data space and sums the maximum likelihood values of all data vectors.
 }
 \details{
-Note that the prior parameters in \code{strategy} define the NML luckiness function.
+Note that the prior parameters in \code{strategy} actually define the NML luckiness function.
 (i.e., parameters of a beta distribution).
-\code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
+For luckiness NML, \code{prior = c(1.5, 1.5)} is asymptotically equivalent to
+a uniform prior \code{prior = c(1, 1)} for the Bayes factor
 }
 \examples{
 # strategy: A/A/B with error probabilities {e2,e3,e1<.20}
 s1 <- list(pattern = c(-3, -1, +2), c = .2,
            ordered = FALSE, prior = c(1,1))
-compute_cnml(strat, n = c(2, 2, 2))
+compute_cnml(s1, n = c(2, 1, 1))
 
 # predict: A/A/B with ordered errors {e2<e3<e1<.50}
 s2 <- list(pattern = c(-3, -1, +2), c = .5,
            ordered = TRUE, prior = c(1,1))
-compute_cnml(s2, n = c(2, 2, 2))
+compute_cnml(s2, n = c(2, 1, 1))
 }

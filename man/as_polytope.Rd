@@ -8,8 +8,6 @@ as_polytope(strategy)
 }
 \arguments{
 \item{strategy}{a decision strategy returned by \code{\link{predict_multiattribute}}.}
-
-\item{c}{upper boundary of error probabilities}
 }
 \value{
 a list containing the matrix \code{A} and the vector \code{b}
@@ -26,8 +24,8 @@ Note: Only works for models without guessing predictions and
 }
 \examples{
 # define a strategy:
-strat <- list(prediction = c(1,-2,3,4),  # B,A,B,B
+strat <- list(pattern = c(1,-2,3,4),  # B,A,B,B
               c = .5, ordered = TRUE,
-              prior = c(1,1), label = "test")
+              prior = c(1,1))
 as_polytope(strat)
 }

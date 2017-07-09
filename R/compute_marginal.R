@@ -35,8 +35,8 @@ compute_marginal <- function (k, n, strategy){
   c <- strategy$c
 
   n_error <- get_error_number(strategy$pattern)
-  error     <- estimate_error(k, n,   strategy$pattern, prob = FALSE)
-  adherence <- estimate_error(k, n, - strategy$pattern, prob = FALSE)
+  error     <- count_errors(k, n,   strategy$pattern, prob = FALSE)
+  adherence <- count_errors(k, n, - strategy$pattern, prob = FALSE)
   pm <- 0
 
   if (!strategy$ordered || n_error == 1){
@@ -60,7 +60,7 @@ compute_marginal <- function (k, n, strategy){
     #   - pbeta(c, prior[1], prior[2], log.p = TRUE) - lbeta(prior[1], prior[2])
     # (normalization of order-constrained prior)
 
-  } else if (n_error <= 6){
+  } else if (n_error <= 6 && n_error != 0){
     # probabilistic (linear order constraint; nested unidimensional integration)
     ff <- function(e, idx = 1){
       if (idx == 1){

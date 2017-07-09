@@ -2,21 +2,6 @@
 # Compute NML complexity for decision strategies
 #########################
 
-# -log(a(theta)); luckiness not normalized
-# => complexity of order-constrained models can be compared
-# default:    standard NML; luck=c(1,1)
-# uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
-luckiness <- function(par, luck = c(1, 1)){
-  dd <- 0
-  if (length(par) > 0)
-    dd <- sum(dbeta(par, luck[1], luck[2], log = TRUE))
-  dd
-}
-
-ll_luckiness <- function(error, k, n, pattern, luck = c(1,1)){
-  loglik(error, k, n, pattern) + luckiness(error, luck)
-}
-
 #' Maximum-likelihood Estimate
 #'
 #' Get ML estimate (possible weighted by luckinesss function).
@@ -40,35 +25,32 @@ ll_luckiness <- function(error, k, n, pattern, luck = c(1,1)){
 #' @export
 maximize_ll <- function(k, n, strategy, n.fit = 5){
   check_strategy(strategy)
-  luck <- strategy$prior
-  pattern <- strategy$pattern
-  c <- strategy$c
 
   # analytic ML estimate, boundary correction and order constraints
-  est <- estimate_error(k, n, pattern, luck = luck)
-  start <- adjust_error(est, pattern, c)
+  est <- count_errors(k, n, strategy$pattern, strategy$prior)
+  start <- adjust_error(est, strategy)
   n_error <- length(est)
-
   # check for unordered models (EQW, TTB, WADD, baseline)
   # oo <- optim(ll_luckiness, lower=0, upper=c, control = list(fn=-1),
   #                k = k, n = n, pattern=pattern, luck = luck)
-  if (n_error > 1 && !is.null(attr(pattern, "ordered"))){
-    start <- adjust_error(est, pattern, c, BOUND)
-    # pt <- as_polytope(pattern, c)
+
+  if (n_error > 1 && strategy$ordered){
+    start <- adjust_error(est, strategy, BOUND)
+    # pt <- as_polytope(strategy)
     # ui <- - pt$A
     # ci <- - pt$b
     ui <- rbind(diag(n_error), 0) - rbind(0, diag(n_error))
-    ci <- c(rep(0, n_error), -c)
-    tryCatch (oo <- constrOptim(start, ll_luckiness, grad = NULL,
-                                k = k, n = n, pattern = pattern, luck = luck,
+    ci <- c(rep(0, n_error), - strategy$c)
+    tryCatch (oo <- constrOptim(start, loglik, grad = NULL,
+                                k = k, n = n, strategy = strategy,
                                 ui = ui, ci = ci, control = list(fnscale = -1)),
               error = function(e) {print(e);
                 cat("\n\n  (optimization failed with start values =", start, ")\n")})
     cnt <- 1
     while (cnt < n.fit){
-      start <- sort(runif(n_error, 0, c))
-      oo2 <- constrOptim(start, ll_luckiness, grad = NULL,
-                         k = k, n = n, pattern = pattern, luck = luck,
+      start <- sort(runif(n_error, 0, strategy$c))
+      oo2 <- constrOptim(start, loglik, grad = NULL,
+                         k = k, n = n, strategy = strategy,
                          ui = ui, ci = ci, control = list(fnscale = -1))
       oo2
       cnt <- cnt + 1
@@ -76,8 +58,8 @@ maximize_ll <- function(k, n, strategy, n.fit = 5){
     }
     start <- oo$par
   }
-  ll <- ll_luckiness(start, k, n, pattern, luck)
-  list(loglik = ll, est = start, luck = luck)
+  ll <- loglik(start, k, n, strategy)
+  list("loglik" = ll, "error" = start, "strategy" = strategy)
 }
 
 #' Compute NML Complexity
@@ -89,21 +71,22 @@ maximize_ll <- function(k, n, strategy, n.fit = 5){
 #' @param cores number of processing units to be used
 #'
 #' @details
-#' Note that the prior parameters in \code{strategy} define the NML luckiness function.
+#' Note that the prior parameters in \code{strategy} actually define the NML luckiness function.
 #' (i.e., parameters of a beta distribution).
-#' \code{luck = c(1.5, 1.5)} is equivalent to uniform prior for the Bayes factor
+#' For luckiness NML, \code{prior = c(1.5, 1.5)} is asymptotically equivalent to
+#' a uniform prior \code{prior = c(1, 1)} for the Bayes factor
 #'
 #' @template details_strategy
 #' @examples
 #' # strategy: A/A/B with error probabilities {e2,e3,e1<.20}
 #' s1 <- list(pattern = c(-3, -1, +2), c = .2,
 #'            ordered = FALSE, prior = c(1,1))
-#' compute_cnml(strat, n = c(2, 2, 2))
+#' compute_cnml(s1, n = c(2, 1, 1))
 #'
 #' # predict: A/A/B with ordered errors {e2<e3<e1<.50}
 #' s2 <- list(pattern = c(-3, -1, +2), c = .5,
 #'            ordered = TRUE, prior = c(1,1))
-#' compute_cnml(s2, n = c(2, 2, 2))
+#' compute_cnml(s2, n = c(2, 1, 1))
 #' @export
 compute_cnml <- function(strategy, n, n.fit = 3, cores = 1){
   check_data_strategy(n, n, strategy)
@@ -137,6 +120,7 @@ compute_cnml <- function(strategy, n, n.fit = 3, cores = 1){
 #'
 #' Compute (L)NML for observed frequencies.
 #'
+#' @inheritParams maximize_ll
 #' @inheritParams compute_marginal
 #' @inheritParams select_bf
 #' @param strategy.list list with strategies including the pre-computed
