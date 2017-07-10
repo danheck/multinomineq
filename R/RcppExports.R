@@ -13,8 +13,8 @@ encompassing_bf <- function(k, n, A, b, prior, M, batch = 5000L) {
     .Call(stratsel_encompassing_bf, k, n, A, b, prior, M, batch)
 }
 
-sampling_posterior <- function(k, n, A, b, prior, M, start) {
-    .Call(stratsel_sampling_posterior, k, n, A, b, prior, M, start)
+sampling_binary_cpp <- function(k, n, A, b, prior, M, start) {
+    .Call(stratsel_sampling_binary_cpp, k, n, A, b, prior, M, start)
 }
 
 encompassing_stepwise <- function(k, n, A, b, prior, M, steps, batch = 5000L) {

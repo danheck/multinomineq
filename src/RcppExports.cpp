@@ -49,9 +49,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sampling_posterior
-arma::mat sampling_posterior(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start);
-RcppExport SEXP stratsel_sampling_posterior(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP) {
+// sampling_binary_cpp
+arma::mat sampling_binary_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start);
+RcppExport SEXP stratsel_sampling_binary_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,7 +62,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampling_posterior(k, n, A, b, prior, M, start));
+    rcpp_result_gen = Rcpp::wrap(sampling_binary_cpp(k, n, A, b, prior, M, start));
     return rcpp_result_gen;
 END_RCPP
 }

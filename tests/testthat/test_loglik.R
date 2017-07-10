@@ -30,16 +30,16 @@ test_that('predictions work as expected', {
 
 test_that('loglik works', {
 
-  expect_lte(loglik(runif(1), k ,n, as_strategy(TTB)), 0)
+  expect_lte(loglik(runif(1,0.1,.5), k ,n, as_strategy(TTB)), 0)
   expect_gte(loglik(sum(k)/sum(n), k ,n, as_strategy(TTB)),
-             loglik(runif(1), k ,n, as_strategy(TTB)))
+             loglik(runif(1,0,.5), k ,n, as_strategy(TTB)))
 
-  expect_lte(loglik(runif(3), k ,n, as_strategy(WADD)), 0)
-  expect_lte(loglik(runif(3), k ,n, as_strategy(baseline, c=1, ordered = FALSE)), 0)
+  expect_lte(loglik(runif(1,0,.5), k ,n, as_strategy(WADD)), 0)
+  expect_lte(loglik(runif(3,0,1), k ,n, as_strategy(baseline, c=1, ordered = FALSE)), 0)
   expect_lte(loglik(c(), k ,n, as_strategy(GUESS)), 0)
 
   # expected errors
-  expect_identical(loglik(runif(1), k_false , n, as_strategy(TTB)), -Inf)
+  expect_identical(loglik(runif(1,0,.5), k_false , n, as_strategy(TTB)), -Inf)
   # inadmissible parameters
   expect_identical(loglik(1.5, k , n, as_strategy(TTB)), NA_real_)
   expect_identical(loglik(-.1, k , n, as_strategy(TTB)), NA_real_)
@@ -61,7 +61,7 @@ test_that('loglik works', {
                  sum(dbinom(k, n, est, log = TRUE)))
 
   # baseline luckiness
-  expect_silent(ml <- maximize_ll(k, n, list(pattern = seq_along(k), c = 1,
+  expect_silent(ml <- maximize_ll(k, n, list(pattern = - seq_along(k), c = 1,
                                              ordered = FALSE, prior = c(1.5, 1.5))))
   est <- (k + .5)/(n + 1)
   expect_equal(ml$error, est)

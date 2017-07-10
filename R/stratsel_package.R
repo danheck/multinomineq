@@ -15,6 +15,7 @@
 #' }
 #'
 #' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}.
+#' For convex polytopes, the transformation of vertex to inequality representation requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 #'
 #' @author Daniel W. Heck
 #' @docType package

@@ -35,7 +35,7 @@ test_that('predictions work for one item type', {
   expect_equal(get_error_unique(TTB), 1)
   expect_length(get_error_unique(GUESS), 0)
   expect_equal(get_error_number(TTB), 1)
-  expect_equal(error_to_prob(.123, TTB), rep(.123, 3))
+  expect_equal(error_to_prob(.123, as_strategy(TTB)), rep(.123, 3))
 
   # probabilistic models
   expect_equal(get_error_unique(WADDprob), sort(abs(WADDprob)))

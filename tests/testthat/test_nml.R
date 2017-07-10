@@ -14,8 +14,8 @@ n <- c(10, 15, 12)
 
 test_that('ML estimation works', {
 
-  expect_length(estimate_error(k, n, GUESS), 0)
-  expect_equivalent(estimate_error(k, n, baseline), 1 - k/n)
+  expect_length(count_errors(k, n, GUESS), 0)
+  expect_equivalent(count_errors(k, n, baseline), 1 - k/n)
 
 
   expect_silent(est_ttb <- maximize_ll(k, n, as_strategy(TTB)))

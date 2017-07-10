@@ -11,7 +11,7 @@
 #' @param b a vector of the same length as the number of rows of \code{A}
 #' @param M number of posterior samples drawn from the encompassing model
 #' @param batch size of the batches into which computations are split to reduce memory load
-#' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details).
+#' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling
 #' @param prior a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter
 #' @details
 #'
@@ -45,8 +45,7 @@
 #' @export
 compute_bf <- function(k, n, A, b, prior = c(1, 1),
                        M = 5e5, steps, batch = 5000){
-  check_knpcp(k, n, k, .5, prior)
-  check_kAb(k, A, b)
+  check_knAbprior(k, n, A, b, prior)
 
   if (missing(steps) || is.null(steps)){
     bfe <- as.list(encompassing_bf(k, n, A, b, prior, M, batch))

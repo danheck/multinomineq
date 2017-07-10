@@ -23,7 +23,7 @@ Note that the sample size \code{n} must match.}
 Compute (L)NML for observed frequencies.
 }
 \examples{
-n <- c(2, 2, 2)
+n <- c(2, 1, 1)
 # strategy: A/A/B with error probabilities {e2,e3,e1<.20}
 s1 <- list(pattern = c(-3, -1, +2), c = .2,
            ordered = FALSE, prior = c(1,1))
@@ -34,5 +34,5 @@ s2 <- list(pattern = c(-3, -1, +2), c = .5,
            ordered = TRUE, prior = c(1,1))
 s2n <- compute_cnml(s2, n = n)
 
-select_nml(c(0,2,2), n, list(s1n, s2n))
+select_nml(c(0,1,1), n, list(s1n, s2n))
 }

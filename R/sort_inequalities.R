@@ -1,7 +1,7 @@
 #' Sort Inequalities by Predictive Strength
 #'
 #' Uses uniform sampling to order the inequalities by their predictive strength.
-#' The constraint that constrains the paramters most is placed at the first position.
+#' The constraint that restricts the paramter space most strongly is placed at the first position.
 #'
 #' @inheritParams compute_bf
 #' @param M number of uniform samples from the unit cube
@@ -15,12 +15,12 @@
 #' sort_inequalities(A, b)
 #' @export
 sort_inequalities <- function (A, b, M = 1e5){
-  check_kAb(rep(1, ncol(A)), A, b)
+  check_Ab(A, b)
   S <- ncol(A)
   x <- matrix(runif(M * S), S)
   test <- A %*% x <= b
 
   volume = rowMeans(test)
-  o <- order(volume)
+  o <- order(volume, decreasing = FALSE)
   list("A" = A[o,], "b" = b[o], "volume" = volume[o])
 }

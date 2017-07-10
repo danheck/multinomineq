@@ -1,17 +1,29 @@
 
-check_knp <- function(k = NULL, n = NULL, pattern = NULL){
+check_kn <- function(k = NULL, n = NULL){
+  if(length(k) != length(n))
+    stop("Length of 'k' and 'n' does not match.")
+
   if(any(n < 0) || any(n != round(n)))
     stop("'n' must contain positive integers.")
 
   if(any(k < 0) || any(k > n) || any(k != round(k)))
     stop("'k' must contain positive integers smaller or equal to 'n'.")
+}
 
-  if(any(is.na(pattern))) # || any(pattern<0) || any(pattern>1) )
+
+check_prior <- function (prior){
+  if (is.null(prior) || length(prior) != 2 || !is.numeric(prior) || any(prior <= 0))
+    stop ("strategy$prior must be a vector with two positive values.")
+}
+
+check_knp <- function(k = NULL, n = NULL, pattern = NULL){
+  check_kn(k, n)
+  if(any(is.na(pattern)))
     stop("'pattern' must not contain missings.")
 
   l <- length(n)
-  if( l != length(k) || l != length(k) || l != length(pattern))
-    stop("Length of 'k', 'n', and 'pattern' does not match.")
+  if( l != length(pattern))
+    stop("Length of 'k'/'n', and 'pattern' does not match.")
 }
 
 
@@ -24,10 +36,6 @@ check_cnml <- function(strategy, n){
   check_prior(strategy$prior)
 }
 
-check_prior <- function (prior){
-  if (length(prior) != 2 || any(prior <= 0))
-    stop ("strategy$prior must be a vector with two positive values.")
-}
 
 check_cues <- function (cueA, cueB, v){
   if (is.matrix(cueA) || is.data.frame(cueA)){
@@ -52,12 +60,24 @@ check_knpcp <- function(k, n, pred, c, prior = c(1, 1)){
     stop("'prior' must be a numeric vector with two postive numbers.")
 }
 
-check_kAb <- function (k, A, b){
-  if (is.null(dim(A)) || ncol(A) != length(k) || nrow(A) != length(b))
-    stop("'A' must be a matrix with number of rows equal to the length of 'b'",
-         "\n  and number of columns equal to the length/column number of 'k'.")
+check_knAbprior <- function (k, n, A, b, prior = c(1, 1)){
+  check_prior(prior)
+  check_kn(k, n)
+  check_Ab(A, b)
+  if (ncol(A) != length(k))
+    stop("'A' must be a matrix with number of columns equal to the length of 'k'.")
+}
+
+check_Ab <- function(A, b){
+  if (is.null(dim(A)) ||  nrow(A) != length(b))
+    stop("'A' must be a matrix with number of rows equal to the length of 'b'.")
   if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
     stop ("'A' and 'b' must be numeric.")
+}
+
+check_V <- function(V){
+  if(is.null(dim(V)) ||  any(V < 0, V > 1))
+    stop("The vertex representation 'V' must be provided as a numeric matrix with values in [0,1].")
 }
 
 check_stepsA <- function(steps, A){
@@ -73,7 +93,13 @@ check_strategy <- function (strategy){
   if (!all(c("pattern", "c","ordered","prior") %in% names(strategy)))
     stop("the list 'strategy' must include named elements, e.g.: \n",
          "    list(pattern=c(-1,2,0), c=.5, ordered=TRUE, prior=c(1,1))")
-
+  check_prior(strategy$prior)
+  c <- strategy$c
+  if (length(c) != 1 || c < 0 || c > 1)
+    stop("'c' must be a single numeric value in [0,1]")
+  ordered <- strategy$ordered
+  if (is.null(ordered) || length(ordered) != 1 || !is.logical(ordered))
+    stop("'strategy$ordered' must be a logical value")
 }
 
 check_data_strategy <- function (k, n, strategy){

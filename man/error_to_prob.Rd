@@ -28,5 +28,5 @@ error_to_prob(error = .10, s1)
 # (probabilistic: with ordered errors e1<e2<e3<.50)
 s2 <- list(pattern = c(1, 2, -3, 0),
            ordered = TRUE, c = .5, prior = c(1,1))
-error_to_prob(error = c(.10, .15,.20), pattern2, ordered = TRUE)
+error_to_prob(error = c(.10, .15,.20), s2)
 }

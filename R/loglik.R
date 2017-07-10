@@ -18,11 +18,13 @@
 #' # (probabilistic: with ordered errors e1<e2<e3<.50)
 #' s2 <- list(pattern = c(1, 2, -3, 0),
 #'            ordered = TRUE, c = .5, prior = c(1,1))
-#' error_to_prob(error = c(.10, .15,.20), pattern2, ordered = TRUE)
+#' error_to_prob(error = c(.10, .15,.20), s2)
 #' @export
 error_to_prob <- function(error, strategy){
   pattern <- strategy$pattern
-  if (any(error > strategy$c, error < 0))
+  if (all(pattern == 0))
+    return(rep(.5, length(pattern)))
+  if (!is.null(error) && any(error > strategy$c, error < 0))
     return(rep(NA, length(pattern)))
   # error per item type:
   if (strategy$ordered){
@@ -58,9 +60,9 @@ get_error_number <- function(pattern){
 # uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
 loglik <- function (error, k, n, strategy){
   pb <- error_to_prob(error, strategy)
-  ll <-
-    sum(dbinom(x = k, size = n, prob = pb, log = TRUE)) +                # likelihood
-    sum(dbeta(error, strategy$prior[1], strategy$prior[2], log = TRUE))  # luckiness
+  ll <- sum(dbinom(x = k, size = n, prob = pb, log = TRUE))             # likelihood
+  if (!is.null(error))
+    ll <- ll + sum(dbeta(error, strategy$prior[1], strategy$prior[2], log = TRUE))  # luckiness
   if (!is.na(ll) && ll == - Inf && all(k <= n))
     ll <- MIN_LL
   ll

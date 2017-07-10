@@ -16,7 +16,7 @@
 #' strat <- list(pattern = c(-1, -1, 1),
 #'               c = .5, ordered = FALSE,
 #'               prior = c(1,1))
-#' m1 <- compute_marginal(strat)
+#' m1 <- compute_marginal(k, n, strat)
 #' m1
 #'
 #' # pattern: A, B, B with ordered error e1<e3<e2<.50

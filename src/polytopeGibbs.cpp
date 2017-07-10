@@ -86,7 +86,7 @@ NumericVector encompassing_bf(arma::vec k, arma::vec n,
 // => uniform prior sampling if  k=n=b(0,...,0)
 // start: permissible starting values (randomly drawn if start[1]==-1)
 // [[Rcpp::export]]
-arma::mat sampling_posterior(arma::vec k, arma::vec n,
+arma::mat sampling_binary_cpp(arma::vec k, arma::vec n,
                              arma::mat A, arma::vec b, arma::vec prior,
                              int M, arma::vec start)
 {
@@ -99,12 +99,14 @@ arma::mat sampling_posterior(arma::vec k, arma::vec n,
   if (start(0) == -1)
   {
     bool search = true;
-    while (search && cnt < M)
+    while (search && cnt < fmax(M, 1000))
     {
       cnt++;
       start.randu(D);
       search = any(A * start > b);
     }
+    if (cnt == fmax(M, 1000))
+      stop("Could not find starting values within the polytope");
   }
   spost.row(0) = start.t();
 
@@ -166,7 +168,7 @@ List encompassing_stepwise(arma::vec k, arma::vec n,
   {
     // prior/posterior sampling from constrained polytope
     sample =
-      sampling_posterior(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
+      sampling_binary_cpp(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
                          prior, int(M(s)), -arma::ones(1));
     if (s < S - 1)
       cnt(s) = cnt(s) +

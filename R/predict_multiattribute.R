@@ -35,15 +35,16 @@ as_strategy <- function(pattern, c = .50, ordered = TRUE, prior = c(1,1)){
 #' }
 #'
 #' @examples
+#' v <- c(.9, .8, .7, .6)
 #' ca <- c(1, -1, -1, 1)
 #' cb <- c(-1, 1, -1, -1)
-#' v <- c(.9, .8, .7, .6)
-#'
 #' predict_multiattribute(ca, cb, v, "TTB")
 #' predict_multiattribute(ca, cb, v, "WADDprob")
 #'
-#' predict_multiattribute(rbind(c1 = ca, c2 = c(1,1,1,1)),
-#'                        rbind(cb, c(1,1,-1,1)),
+#' # multiple cues
+#' data(heck2017_raw)
+#' predict_multiattribute(heck2017_raw[1:10, c("a1","a2","a3","a4")],
+#'                        heck2017_raw[1:10, c("b1","b2","b3","b4")],
 #'                        v, "WADDprob")
 #' @export
 predict_multiattribute <- function (cueA, cueB, v, strategy,

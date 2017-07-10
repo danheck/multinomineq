@@ -21,7 +21,7 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details).}
+\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
 
 \item{batch}{size of the batches into which computations are split to reduce memory load}
 }
