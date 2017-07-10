@@ -25,17 +25,19 @@ Detailed explanations and examples can be found in the package vignette, accessi
 For convex polytopes, the transformation of vertex to inequality representation requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 }
 \references{
-Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. https://doi.org/10.1002/bdm.442
+Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. \url{https://doi.org/10.1002/bdm.442}
 
-Bröder, A., & Schiffer, S. (2003). Take The Best versus simultaneous feature matching: Probabilistic inferences from memory and effects of reprensentation format. Journal of Experimental Psychology: General, 132, 277-293. https://doi.org/10.1037/0096-3445.132.2.277
+Bröder, A., & Schiffer, S. (2003). Take The Best versus simultaneous feature matching: Probabilistic inferences from memory and effects of reprensentation format. Journal of Experimental Psychology: General, 132, 277-293. \url{https://doi.org/10.1037/0096-3445.132.2.277}
 
-Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. https://doi.org/10.1016/j.cogpsych.2017.05.003
+Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \url{https://doi.org/10.1016/j.cogpsych.2017.05.003}
 
-Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. https://doi.org/10.3758/s13423-014-0643-0
+Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \url{https://doi.org/10.3758/s13423-014-0643-0}
 
-Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. https://doi.org/10.1016/j.jmp.2004.11.001
+Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}
 
-Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. https://doi.org/10.1037/dec0000007
+Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
+
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
 }
 \seealso{
 Useful links:

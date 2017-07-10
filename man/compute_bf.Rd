@@ -59,7 +59,7 @@ compute_bf(k, n, A, b, c(1, 1), M = 2e5)
 compute_bf(k, n, A, b, c(1, 1), M = 1e4, steps = c(2,4,5))
 }
 \references{
-Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. https://doi.org/10.1016/j.jmp.2004.11.001
+Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}
 
-Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. https://doi.org/10.1037/dec0000007
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
 }

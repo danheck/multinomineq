@@ -1,1 +1,1 @@
-#' @references Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. https://doi.org/10.1016/j.jmp.2004.11.001
+#' @references Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}

@@ -29,6 +29,7 @@
 #' @template ref_heck2017
 #' @template ref_hilbig2014
 #' @template ref_karabatsos2005
+#' @template ref_myung2005
 #' @template ref_regenwetter2014
 
 "_PACKAGE"

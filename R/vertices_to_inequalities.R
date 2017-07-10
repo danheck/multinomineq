@@ -27,7 +27,7 @@
 #' }
 #' @export
 vertex_to_ineq <- function (V){
-  if (!requireNamespace("rPorta"), quietly = TRUE)
+  if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
             call. = FALSE)
   check_V(V)
@@ -46,7 +46,7 @@ vertex_to_ineq <- function (V){
 #' @rdname vertex_to_ineq
 #' @export
 ineq_to_vertex <- function (A, b){
-  if (!requireNamespace("rPorta"), quietly = TRUE)
+  if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
   check_Ab(A, b)

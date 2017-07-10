@@ -1,6 +1,6 @@
 Package: stratsel
 Type: Package
-Title: Outcome-Based Strategy Selection for Binary Choice Models
+Title: Strategy Classification for Binary Choice Models
 Version: 0.0.0.9000
 Date: 2017-06-27
 Author: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")))
