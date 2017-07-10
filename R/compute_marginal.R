@@ -61,6 +61,7 @@ compute_marginal <- function (k, n, strategy){
     # (normalization of order-constrained prior)
 
   } else if (n_error <= 6 && n_error != 0){
+    e_idx <- get_error_idx(strategy$pattern)
     # probabilistic (linear order constraint; nested unidimensional integration)
     ff <- function(e, idx = 1){
       if (idx == 1){
@@ -97,12 +98,12 @@ compute_marginal <- function (k, n, strategy){
 #' @inheritParams compute_cnml
 #' @inheritParams select_nml
 #' @inheritParams compute_marginal
-#' @param strategy.list list of strategies. See \link{predict_multiattribute}
+#' @param strategies list of strategies. See \link{predict_multiattribute}
 # @param c upper boundary for parameters/error probabilities.
-#   A vector of the same length as \code{strategy.list}
+#   A vector of the same length as \code{strategies}
 #   can be provided to use a different upper bound per model.
 # @param ordered whether error probabilities are assumed to be ordered.
-#   Similar as for \code{c}, a vector of the same length as \code{strategy.list}
+#   Similar as for \code{c}, a vector of the same length as \code{strategies}
 #   can be provided to define which models have ordered error probabilities.
 #'
 #' @seealso \code{\link{compute_marginal}} and \code{\link{model_weights}}
@@ -123,24 +124,26 @@ compute_marginal <- function (k, n, strategy){
 #' n <- c(20, 20, 20)             # number of choices
 #' select_bf(k, n, list(strat1, strat2, baseline))
 #' @export
-select_bf <- function (k, n, strategy.list, cores = 1){
+select_bf <- function (k, n, strategies, cores = 1){
 
   if (!is.null(dim(k))){
-    if (is.null(dim(n)))
+    if (is.null(dim(n)) || is.table(n))
       n <- matrix(n, nrow(k), length(n), byrow = TRUE)
+    if (is.table(k))
+      k <- unclass(k)
     if (cores > 1){
       cl <- makeCluster(cores)
       pp <- clusterMap(cl, select_bf,
                        k = as.list(data.frame(t(k))),
                        n = as.list(data.frame(t(n))),
-                       MoreArgs = list(strategy.list = strategy.list),
+                       MoreArgs = list(strategies = strategies),
                        SIMPLIFY = TRUE, .scheduling = "dynamic")
       stopCluster(cl)
     } else {
       pp <- mapply(select_bf,
                    k = as.list(data.frame(t(k))),
                    n = as.list(data.frame(t(n))),
-                   MoreArgs = list(strategy.list = strategy.list))
+                   MoreArgs = list(strategies = strategies))
     }
     if (is.matrix(pp)){
       pp <- t(pp)
@@ -148,7 +151,7 @@ select_bf <- function (k, n, strategy.list, cores = 1){
     }
 
   } else {
-    marginal <- sapply(strategy.list, function(strat)
+    marginal <- sapply(strategies, function(strat)
       compute_marginal(k, n, strat))
     pp <- model_weights(marginal)
   }

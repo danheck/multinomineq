@@ -30,7 +30,7 @@ error_to_prob <- function(error, strategy){
   if (strategy$ordered){
     if (any(sort(error) != error))
       return(rep(NA, length(pattern)))
-    error_label <- rev(get_error_unique(pattern))
+    error_label <- get_error_unique(pattern)
     error_per_type <- error[match(abs(pattern), error_label)]
   } else {
     error_per_type <- error
@@ -45,7 +45,15 @@ error_to_prob <- function(error, strategy){
 # unique error indices/labels
 get_error_unique <- function(pattern){
   pred <- pattern[pattern != 0]
-  sort(unique(abs(pred)))
+  rev(sort(unique(abs(pred))))
+}
+
+get_error_idx <- function (pattern){
+  n_error <- get_error_number(pattern)
+  e_idx <- rank(-abs(pattern), ties.method = "min")
+  e_idx <- match(e_idx, sort(unique(e_idx[pattern != 0])))
+  e_idx[pattern == 0] <- .50
+  e_idx
 }
 
 get_error_number <- function(pattern){

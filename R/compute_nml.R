@@ -123,7 +123,7 @@ compute_cnml <- function(strategy, n, n.fit = 3, cores = 1){
 #' @inheritParams maximize_ll
 #' @inheritParams compute_marginal
 #' @inheritParams select_bf
-#' @param strategy.list list with strategies including the pre-computed
+#' @param strategies list with strategies including the pre-computed
 #'           NML complexity values (see \code{\link{compute_cnml}}).
 #'           Note that the sample size \code{n} must match.
 #' @examples
@@ -140,17 +140,17 @@ compute_cnml <- function(strategy, n, n.fit = 3, cores = 1){
 #'
 #' select_nml(c(0,1,1), n, list(s1n, s2n))
 #' @export
-select_nml <- function(k, n, strategy.list, n.fit = 5, cores = 1){
+select_nml <- function(k, n, strategies, n.fit = 5, cores = 1){
 
   if (is.matrix(k) || is.data.frame(k)){
     if (cores > 1){
       cl <- makeCluster(cores)
       nml <- parApply(cl = cl, k, 1, select_nml, n = n,
-                      strategy.list = strategy.list, n.fit = n.fit)
+                      strategies = strategies, n.fit = n.fit)
       stopCluster(cl)
     } else {
       nml <- apply(k, 1, select_nml, n = n,
-                   strategy.list = strategy.list, n.fit = n.fit)
+                   strategies = strategies, n.fit = n.fit)
     }
     if (is.matrix(nml)) nml <- t(nml)
 
@@ -158,12 +158,12 @@ select_nml <- function(k, n, strategy.list, n.fit = 5, cores = 1){
     k <- unlist(k)
     n <- unlist(n)
     check_knp(k, n, n)
-    sapply(strategy.list, check_cnml, n = n)
-    lls <- sapply(strategy.list, function(ss)
+    sapply(strategies, check_cnml, n = n)
+    lls <- sapply(strategies, function(ss)
       maximize_ll(k = k, n = n, ss, n.fit = n.fit)$loglik)
 
-    nml <- - lls + sapply(strategy.list, "[[", "cnml")
-    strat_names <- sapply(strategy.list, function(ss) attr(ss, "label"))
+    nml <- - lls + sapply(strategies, "[[", "cnml")
+    strat_names <- sapply(strategies, function(ss) attr(ss, "label"))
     sel <- !sapply(strat_names, is.null)
     names(nml)[sel] <- strat_names[sel]
   }

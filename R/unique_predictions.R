@@ -1,33 +1,68 @@
-# #' Find Unique Predictions
-# #'
-# #' Allows to find unique item types, which are defined as patterns of cue values
-# #' that lead to identical strategy predictions.
-# #' @param predictions a matrix or data frame with predictions (one strategy/model per column).
-# #'   Negative value = strength of preference for Option A.
-# #'   Positive value = strength of preference for Option B.
-# #'   0 = guessing with probability .50. See \code{\link{predict_multiattribute}}
-# #' @param reversed whether to exclude reversed patterns
-# #'    (i.e., those that are identical after switching Option A and B)
-# #' @param return whether to return \code{"subset"} of input matrix of predictions or the \code{"index"} of unique lines
-# #' @export
-# unique_predictions <- function (predictions, reversed = TRUE,
-#                                 return = "subset"){
-#
-#   if (return == "subset"){
-#     res <- unique(predictions)
-#     # if (reversed){
-#     #   apply(res, 1, function(p) any(duplicated()))
-#     # }
-#   } else {
-#     res <- which(!duplicated(predictions))
-#   }
-#
-#   # if (reversed){
-#   #   find
-#   #   r <- apply(predictions == - predictions, 1, all)
-#   #   r <- duplicated(predictions, - predictions)
-#   # } else {
-#   #   r <- 1:nrow(predictions)
-#   # }
-#   res
-# }
+#' Find Unique Patterns
+#'
+#' Find unique item types, which are defined as patterns of cue values
+#' that lead to identical strategy predictions.
+#' @param strategies a list of strategy predictions with the same length of
+#'     the vector \code{pattern}, see \link{predict_multiattribute}.
+#' @param add_baseline whether to add a baseline model which assumes one probability in [0,1] for each item type.
+#' @param reversed whether reversed patterns are treated separately
+#'    (default: automatically switch Option A and B if \code{pattern=c(-1,1,1,1)})
+#' @return a list including:
+#' \itemize{
+#'    \item \code{unique}: a matrix with the unique strategy patterns
+#'    \item \code{item_type}: a vector that maps the original predictions to item types (negative: reversed items)
+#'    \item \code{strategies}: a list with strategy predictions with \code{pattern} adapted to the unique item types
+#'  }
+#'
+#' @examples
+#' data(heck2017_raw)
+#' ca <- heck2017_raw[1:100, c("a1","a2","a3","a4")]
+#' cb <- heck2017_raw[1:100, c("b1","b2","b3","b4")]
+#' v <- c(.9, .8, .7, .6)
+#' wp <- predict_multiattribute(ca,cb, v, "WADDprob")
+#' ttb <- predict_multiattribute(ca,cb, v, "TTB")
+#' unique_predictions(list(wp, ttb))
+#' @export
+unique_predictions <- function (strategies,
+                                add_baseline = TRUE, reversed = FALSE){
+  sapply(strategies, check_strategy)
+  n_strat <- length(strategies)
+   if(is.null(names(strategies)))
+     for (s in 1:n_strat)
+        if(!is.null(strategies[[s]]$label))
+          names(strategies)[s] <- strategies[[s]]$label
+  patterns <- matrix(sapply(strategies, "[[", "pattern"), ncol = n_strat)
+  colnames(patterns) <- names(strategies)
+  p_sign <- sign(patterns)
+  n_unique <- apply(patterns, 2, function(p) length(unique))
+  if (max(n_unique) == nrow(patterns))
+    warning ("Number of item types cannot be reduced. Check that 'baseline' model is not included in list.")
+
+  p_unique <- unique(patterns)
+  if (!reversed){
+    p_rev <- - p_unique
+    p_reduced <- p_unique[p_unique[,1] >= 0,]
+    idx_rev <- match_pattern(- p_reduced, p_unique)
+    p_unique <- p_reduced
+  }
+  rownames(p_unique) <- paste0("item_type_", 1:nrow(p_unique))
+  item_type <- match_pattern(patterns, p_unique)
+  if (!reversed){
+    sel_rev <- is.na(item_type)
+    item_type[sel_rev] <- - match_pattern(- patterns[sel_rev,], p_unique)
+  }
+  for (s in 1:n_strat)
+    strategies[[s]]$pattern <- p_unique[,s]
+  if (add_baseline)
+    strategies$baseline <- as_strategy(1:nrow(p_unique), 1, FALSE)
+  list("unique" = p_unique, "item_type" = item_type,
+       "strategies" = strategies)
+}
+
+match_pattern <- function(patterns, mat){
+ apply(patterns, 1, function(p){
+   idx <- which(apply(p == t(mat), 2, all))
+   if (length(idx) == 0) idx <- NA
+   idx
+ })
+}

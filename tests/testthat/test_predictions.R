@@ -69,3 +69,30 @@ test_that('predictions work for multiple item types', {
   expect_equivalent(heck2017_raw$ttbsteps, abs(ttbp$pattern))
 
 })
+
+test_that("predictions/frequency table matches for Heck et al. (2017)", {
+
+  cueA <- heck2017_raw[,paste0("a",1:4)]
+  cueB <- heck2017_raw[,paste0("b",1:4)]
+  v <- c(.9, .8, .7, .6)
+
+  strat_labels <- c("TTB", "TTBprob", "WADD",
+                    "WADDprob", "EQW", "GUESS")
+  strat <- predict_multiattribute(cueA, cueB, v, strat_labels)
+  types <- unique_predictions(strat)
+
+  item_rev <- paste(heck2017_raw$itemtype,
+                    heck2017_raw$reversedorder)
+  expect_equal(unique(table(item_rev, types$item_type)), c(0, 2080))
+
+  freq <- with(heck2017_raw,
+               table(vp, types$item_type, choice))
+  freqB <- freq[,4:1,1] + # reversed items: Option A
+    freq[,5:8,2]   # non-rev. items: Option B
+  expect_true( all( (40 - freqB)[,c(3,2,4,1)] - heck2017 == 0))
+
+  pp <- select_bf(freqB[1:5,], rep(40, 4),
+                  types$strategies)
+
+  expect_equivalent(pp[,strat_labels], pp_heck2017[,strat_labels])
+})

@@ -48,8 +48,33 @@ head(heck2017_raw)
 cueA <- heck2017_raw[,paste0("a",1:4)]
 cueB <- heck2017_raw[,paste0("b",1:4)]
 v <- c(.9, .8, .7, .6)
-ttb <- predict_multiattribute(cueA, cueB, v, "TTB")
-table(ttb, heck2017_raw$ttb)
+
+# get predictions:
+strat <- predict_multiattribute(cueA, cueB, v,
+                     c("TTB", "TTBprob", "WADD",
+                       "WADDprob", "EQW", "GUESS"))
+
+# get unique item types
+types <- unique_predictions(strat)
+types$unique
+
+# check classification:
+item_rev <- paste(heck2017_raw$itemtype,
+                  heck2017_raw$reversedorder)
+table(item_rev, types$item_type)
+
+# get table of chocie frequencies for analysis
+freq <- with(heck2017_raw,
+             table(vp, types$item_type, choice))
+freqB <- freq[,4:1,1] + # reversed items: Option A
+         freq[,5:8,2]   # non-rev. items: Option B
+head(40 - freqB)
+head(heck2017)  # same frequencies (reversed)
+
+# strategy classification
+pp <- select_bf(freqB[1:4,], rep(40, 4),
+                types$strategies)
+round(pp, 3)
 }
 }
 \references{

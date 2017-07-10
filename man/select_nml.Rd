@@ -4,14 +4,14 @@
 \alias{select_nml}
 \title{Strategy Selection Using NML}
 \usage{
-select_nml(k, n, strategy.list, n.fit = 5, cores = 1)
+select_nml(k, n, strategies, n.fit = 5, cores = 1)
 }
 \arguments{
 \item{k}{vector with observed frequencies for Option B}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{strategy.list}{list with strategies including the pre-computed
+\item{strategies}{list with strategies including the pre-computed
 NML complexity values (see \code{\link{compute_cnml}}).
 Note that the sample size \code{n} must match.}
 

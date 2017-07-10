@@ -50,15 +50,14 @@ cueB <- matrix(c(-1, -1, -1, -1,
 # get predictions
 strategies <- c("baseline", "WADDprob", "WADD",
                 "TTBprob", "TTB", "EQW", "GUESS")
-preds <- predict_multiattribute(cueA, cueB, v, strategies)
-c <- c(1, rep(.5, 6))  # upper bound of error probabilities
+strats <- predict_multiattribute(cueA, cueB, v, strategies)
 
 # strategy classification with Bayes factor
-select_bf(heck2017[1:4,], n, preds, c)
+select_bf(heck2017[1:4,], n, strats)
 
 \dontrun{
 # strategy classification by NML (can take hours)
-cnmls <- compute_cnml(preds, n, c = c, cores = 3)
+cnmls <- compute_cnml(preds, n, cores = 3)
 select_nml(heck2017[1:4,], n, cnmls)
 }
 }

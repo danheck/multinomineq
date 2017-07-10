@@ -92,15 +92,14 @@
 #' # get predictions
 #' strategies <- c("baseline", "WADDprob", "WADD",
 #'                 "TTBprob", "TTB", "EQW", "GUESS")
-#' preds <- predict_multiattribute(cueA, cueB, v, strategies)
-#' c <- c(1, rep(.5, 6))  # upper bound of error probabilities
+#' strats <- predict_multiattribute(cueA, cueB, v, strategies)
 #'
 #' # strategy classification with Bayes factor
-#' select_bf(heck2017[1:4,], n, preds, c)
+#' select_bf(heck2017[1:4,], n, strats)
 #'
 #' \dontrun{
 #' # strategy classification by NML (can take hours)
-#' cnmls <- compute_cnml(preds, n, c = c, cores = 3)
+#' cnmls <- compute_cnml(preds, n, cores = 3)
 #' select_nml(heck2017[1:4,], n, cnmls)
 #' }
 "heck2017"
@@ -150,8 +149,33 @@
 #' cueA <- heck2017_raw[,paste0("a",1:4)]
 #' cueB <- heck2017_raw[,paste0("b",1:4)]
 #' v <- c(.9, .8, .7, .6)
-#' ttb <- predict_multiattribute(cueA, cueB, v, "TTB")
-#' table(ttb, heck2017_raw$ttb)
+#'
+#' # get predictions:
+#' strat <- predict_multiattribute(cueA, cueB, v,
+#'                      c("TTB", "TTBprob", "WADD",
+#'                        "WADDprob", "EQW", "GUESS"))
+#'
+#' # get unique item types
+#' types <- unique_predictions(strat)
+#' types$unique
+#'
+#' # check classification:
+#' item_rev <- paste(heck2017_raw$itemtype,
+#'                   heck2017_raw$reversedorder)
+#' table(item_rev, types$item_type)
+#'
+#' # get table of chocie frequencies for analysis
+#' freq <- with(heck2017_raw,
+#'              table(vp, types$item_type, choice))
+#' freqB <- freq[,4:1,1] + # reversed items: Option A
+#'          freq[,5:8,2]   # non-rev. items: Option B
+#' head(40 - freqB)
+#' head(heck2017)  # same frequencies (reversed)
+#'
+#' # strategy classification
+#' pp <- select_bf(freqB[1:4,], rep(40, 4),
+#'                 types$strategies)
+#' round(pp, 3)
 #' }
 "heck2017_raw"
 

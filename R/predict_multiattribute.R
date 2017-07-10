@@ -1,7 +1,7 @@
 # make list with default strategy options
 as_strategy <- function(pattern, c = .50, ordered = TRUE, prior = c(1,1)){
   strategy <- list(pattern = pattern, c = c, ordered = ordered, prior = prior)
-  # class(strategy) <- "strategy"
+  class(strategy) <- "strategy"
   strategy
 }
 
@@ -89,7 +89,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
                      diff <- cueB[o] - cueA[o]
                      d2 <- diff[diff != 0]
                      cnt <- which.max(diff != 0)
-                     ifelse(length(d2) == 0, 0, cnt * sign(d2[1]))
+                     ifelse(length(d2) == 0, 0, 1 / cnt * sign(d2[1]))
                    },
                    "TTB" = {
                      cnt <- predict_multiattribute(cueA, cueB, v, "TTBprob")$pattern
@@ -117,11 +117,27 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
                       ordered = grepl("prob", strategy),
                       prior = prior,
                       label = strategy)
-    # class(pred.list) <- "strategy"
+    class(pred.list) <- "strategy"
     return(pred.list)
   }
 }
 
+#' @rdname print
+#' @export
+print.strategy <- function(x, ...){
+  p <- x$pattern
+  lp <- length(x$pattern)
+  e_idx <- get_error_idx(x$pattern)
+  cat("## Strategy prediction ",x$label , "\n")
+  cat("## (length of 'pattern': " , lp,
+      "; errors ordered: ", x$ordered, " ; prior = Beta(",
+      paste(x$prior, collapse = ","),")\n" , sep = "")
+  print(head(data.frame(Pattern = p,
+                   Prediction = ifelse(p < 0, "A", ifelse(p > 0, "B", "GUESS")),
+                   Error = ifelse(e_idx == .5, .5,
+                                  paste0("e",e_idx, " <= ", x$c)))))
+  if (lp > 6) cat("... [",lp - 6," predictions omitted]", sep = "")
+}
 
 
 #' Transform Pattern of Predictions to Polytope

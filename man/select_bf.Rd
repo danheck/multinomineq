@@ -4,7 +4,7 @@
 \alias{select_bf}
 \title{Strategy Selection Using the Bayes Factor}
 \usage{
-select_bf(k, n, strategy.list, cores = 1)
+select_bf(k, n, strategies, cores = 1)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -12,7 +12,7 @@ Either a vector or a matrix/data frame (one person per row)}
 
 \item{n}{vector with the number of choices per item type}
 
-\item{strategy.list}{list of strategies. See \link{predict_multiattribute}}
+\item{strategies}{list of strategies. See \link{predict_multiattribute}}
 
 \item{cores}{number of processing units to be used}
 }
