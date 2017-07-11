@@ -156,7 +156,7 @@ print.strategy <- function(x, ...){
 #'      that define a polytope via \code{A*x <= b}.
 #' @examples
 #' # define a strategy:
-#' strat <- list(pattern = c(1,-2,3,4),  # B,A,B,B
+#' strat <- list(pattern = c(5,-2,3,4),  # B,A,B,B
 #'               c = .5, ordered = TRUE,
 #'               prior = c(1,1))
 #' as_polytope(strat)

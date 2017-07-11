@@ -35,8 +35,10 @@ compute_marginal <- function (k, n, strategy){
   c <- strategy$c
 
   n_error <- get_error_number(strategy$pattern)
-  error     <- count_errors(k, n,   strategy$pattern, prob = FALSE)
-  adherence <- count_errors(k, n, - strategy$pattern, prob = FALSE)
+  error     <- count_errors(k, n,   strategy$pattern,
+                            ordered = strategy$ordered, prob = FALSE)
+  adherence <- count_errors(k, n, - strategy$pattern,
+                            ordered = strategy$ordered, prob = FALSE)
   pm <- 0
 
   if (!strategy$ordered || n_error == 1){

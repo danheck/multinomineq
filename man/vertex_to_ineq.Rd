@@ -7,7 +7,7 @@
 \usage{
 vertex_to_ineq(V)
 
-ineq_to_vertex(A, b)
+ineq_to_vertex(A, b, options = 2)
 }
 \arguments{
 \item{V}{a matrix with one vertex of a polytope per row
@@ -18,30 +18,78 @@ column for each of the binomial parameters. The parameter space is defined
 as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}}
+
+\item{options}{number of choice options.
+For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
+to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
+For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
+for pairwise columns (1+2, 3+4, 5+6, ...)}
 }
 \description{
 For convex polytopes: Uses \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 to transform the vertex representation to/from the inequality representation.
 }
 \details{
-When defining a polytope via \code{A} and \code{b}, constraints are automatically
-added to ensure that all parameters are probabilities:  0 <= x <= 1.
+Choice models can be represented as polytopes if they assume a latent
+mixture over a finite number preference patterns (random preference model).
+For the general approach and theory underlying binary and ternary choice models,
+see Regenwetter et al. (2012, 2014).
+
 Note that the transformation can be very slow and might require days of computing.
 }
 \examples{
 \dontrun{
-V <- matrix(c(0, 0, 0,
-              1, 0, 0,
-              0, .5, 0,
-              0, 0, .5,
-              .5, .5, .5,
-              0, .5, 0), ncol = 3, byrow = TRUE)
+
+### binary choice:
+# linear order: x1 < x2 < x3 < .50
+# (cf. WADDprob in ?predict_multiattribute)
+A <- matrix(c(1, -1,  0,
+              0,  1, -1,
+              0,  0,  1),
+            ncol = 3, byrow = TRUE)
+b <- c(0, 0, .50)
+ineq_to_vertex(A, b)
+
+
+### binary choice polytope:
+# choice options: {prefer_a, prefer_b}
+# column order of vertices: (ab, ac, bc)
+# with:  ij = 1  <=>  utility(i) > utility(j)
+V <- matrix(c(1, 1, 1,  # c < b < a
+              1, 1, 0,  # b < c < a
+              0, 1, 1,  # c < a < b
+              0, 0, 1   # a < c < b
+            ), ncol = 3, byrow = TRUE)
 vertex_to_ineq(V)
 
-A <- matrix(c(1, -1, 0,   # x1 < x2
-              0, 1, -1),  # x2 < x3
-            ncol = 3, byrow = TRUE)
-b <- c(0, 0)
-ineq_to_vertex(A, b)
+
+### ternary choice (Regenwetter & Davis-Stober, 2012)
+# choice options:  {prefer_a, indifferent, prefer_b}
+# column order:    (ab,ba,  ac,ca,  bc,cb)
+# with:            ij = 1  <=> utility(i) > utility(j)
+V <- matrix(c(
+  # strict weak orders
+  0, 1, 0, 1, 0, 1,  # a < b < c
+  1, 0, 0, 1, 0, 1,  # b < a < c
+  0, 1, 0, 1, 1, 0,  # a < c < b
+  0, 1, 1, 0, 1, 0,  # c < a < b
+  1, 0, 1, 0, 1, 0,  # c < b < a
+  1, 0, 1, 0, 0, 1,  # b < c < a
+
+  0, 0, 0, 1, 0, 1,  # a ~ b < c
+  0, 1, 0, 0, 1, 0,  # a ~ c < b
+  1, 0, 1, 0, 0, 0,  # c ~ b < a
+  0, 1, 0, 1, 0, 0,  # a < b ~ c
+  1, 0, 0, 0, 0, 1,  # b < a ~ c
+  0, 0, 1, 0, 1, 0,  # c < a ~ b
+
+  0, 0, 0, 0, 0, 0   # a ~ b ~ c
+), byrow = TRUE, ncol = 6)
+vertex_to_ineq(V)
 }
+}
+\references{
+Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
 }

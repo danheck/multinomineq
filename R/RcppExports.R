@@ -5,19 +5,19 @@ adj_iterative <- function(par, c = .50, DIFF_BOUND = 0.0) {
     .Call(stratsel_adj_iterative, par, c, DIFF_BOUND)
 }
 
-count_samples <- function(x, A, b) {
-    .Call(stratsel_count_samples, x, A, b)
-}
-
-encompassing_bf <- function(k, n, A, b, prior, M, batch = 5000L) {
-    .Call(stratsel_encompassing_bf, k, n, A, b, prior, M, batch)
+count_samples <- function(X, A, b) {
+    .Call(stratsel_count_samples, X, A, b)
 }
 
 sampling_binary_cpp <- function(k, n, A, b, prior, M, start) {
     .Call(stratsel_sampling_binary_cpp, k, n, A, b, prior, M, start)
 }
 
-encompassing_stepwise <- function(k, n, A, b, prior, M, steps, batch = 5000L) {
-    .Call(stratsel_encompassing_stepwise, k, n, A, b, prior, M, steps, batch)
+count_polytope_cpp <- function(k, n, A, b, prior, M, batch = 5000L) {
+    .Call(stratsel_count_polytope_cpp, k, n, A, b, prior, M, batch)
+}
+
+count_stepwise <- function(k, n, A, b, prior, M, steps, batch = 5000L) {
+    .Call(stratsel_count_stepwise, k, n, A, b, prior, M, steps, batch)
 }
 

@@ -30,7 +30,7 @@ error_to_prob <- function(error, strategy){
   if (strategy$ordered){
     if (any(sort(error) != error))
       return(rep(NA, length(pattern)))
-    error_label <- get_error_unique(pattern)
+    error_label <- rev(get_error_unique(pattern))
     error_per_type <- error[match(abs(pattern), error_label)]
   } else {
     error_per_type <- error
@@ -45,7 +45,7 @@ error_to_prob <- function(error, strategy){
 # unique error indices/labels
 get_error_unique <- function(pattern){
   pred <- pattern[pattern != 0]
-  rev(sort(unique(abs(pred))))
+  sort(unique(abs(pred)))
 }
 
 get_error_idx <- function (pattern){
@@ -80,13 +80,15 @@ loglik <- function (error, k, n, strategy){
 # used to get ML estimate : adherence/n
 #
 # do not use strategy as input: priors for BF are counted elsewhere (clearer)
-count_errors <- function (k, n, pattern, luck = c(1,1), prob = TRUE){
+count_errors <- function (k, n, pattern, luck = c(1,1), ordered = FALSE, prob = TRUE){
   # reversed items:
   tmp <- k
   pred_B <- pattern > 0
   tmp[pred_B] <- n[pred_B] - k[pred_B]
 
   error_label <- get_error_unique(pattern)
+  if (ordered)
+    error_label <- rev(error_label)
   idx <- match(abs(pattern), error_label, nomatch = NA)
   cnt_predicted <- tapply(tmp, list(idx), sum) + luck[1] - 1
   if (prob){

@@ -12,8 +12,9 @@ check_kn <- function(k = NULL, n = NULL){
 
 
 check_prior <- function (prior){
-  if (is.null(prior) || length(prior) != 2 || !is.numeric(prior) || any(prior <= 0))
-    stop ("strategy$prior must be a vector with two positive values.")
+  if (is.null(prior) || length(prior) != 2 ||
+      !is.numeric(prior) || any(prior <= 0))
+    stop ("prior must be a vector with two positive values.")
 }
 
 check_knp <- function(k = NULL, n = NULL, pattern = NULL){
@@ -68,11 +69,14 @@ check_knAbprior <- function (k, n, A, b, prior = c(1, 1)){
     stop("'A' must be a matrix with number of columns equal to the length of 'k'.")
 }
 
-check_Ab <- function(A, b){
+check_Ab <- function(A, b, options = 2){
   if (is.null(dim(A)) ||  nrow(A) != length(b))
     stop("'A' must be a matrix with number of rows equal to the length of 'b'.")
   if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
     stop ("'A' and 'b' must be numeric.")
+
+  if (ncol(A) %% (options - 1) != 0)
+    stop ("The number of columns in 'A' must be a multiple of (options-1).' ")
 }
 
 check_V <- function(V){
@@ -105,4 +109,22 @@ check_strategy <- function (strategy){
 check_data_strategy <- function (k, n, strategy){
   check_strategy(strategy)
   check_knp(k, n, strategy$pattern)
+}
+
+check_Mbatch <- function(M, batch){
+  if(any(M < 0) ||  any(M != round(M)))
+    stop("'M' must contain positive integers.")
+  if(length(batch) != 1 || batch < 0 ||  batch != round(batch))
+    stop("'batch' must be a positive integer.")
+}
+
+check_count <- function(count){
+  if (!is.list(count) || ! c("count", "M") %in% names(count))
+    stop ("'prior' / 'posterior' msut be a list with the entries 'count' and 'M")
+  if(any(count$M < 0) ||  any(count$M != round(count$M)))
+    stop ("'M' must contain positive integers.")
+  if(any(count$count < 0) ||  any(count$count != round(count$count)))
+    stop ("'count' must contain positive integers.")
+  if (length(count$count) != length(count$M))
+    stop ("in 'prior'/'posterior': 'count' and 'M' must have equal length.")
 }

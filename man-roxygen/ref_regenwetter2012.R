@@ -1,0 +1,1 @@
+#' @references Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}

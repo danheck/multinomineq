@@ -27,7 +27,8 @@ maximize_ll <- function(k, n, strategy, n.fit = 5){
   check_strategy(strategy)
 
   # analytic ML estimate, boundary correction and order constraints
-  est <- count_errors(k, n, strategy$pattern, strategy$prior)
+  est <- count_errors(k, n, strategy$pattern, strategy$prior,
+                      ordered = strategy$ordered)
   start <- adjust_error(est, strategy)
   n_error <- length(est)
   # check for unordered models (EQW, TTB, WADD, baseline)

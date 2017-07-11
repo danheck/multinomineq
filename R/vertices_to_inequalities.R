@@ -6,30 +6,70 @@
 #' @param V a matrix with one vertex of a polytope per row
 #'        (i.e., the admissible preference orders of a random utility model)
 #' @details
-#' When defining a polytope via \code{A} and \code{b}, constraints are automatically
-#' added to ensure that all parameters are probabilities:  0 <= x <= 1.
+#' Choice models can be represented as polytopes if they assume a latent
+#' mixture over a finite number preference patterns (random preference model).
+#' For the general approach and theory underlying binary and ternary choice models,
+#' see Regenwetter et al. (2012, 2014).
+#'
 #' Note that the transformation can be very slow and might require days of computing.
+#'
+#' @template ref_regenwetter2012
+#' @template ref_regenwetter2014
 #' @examples
 #' \dontrun{
-#' V <- matrix(c(0, 0, 0,
-#'               1, 0, 0,
-#'               0, .5, 0,
-#'               0, 0, .5,
-#'               .5, .5, .5,
-#'               0, .5, 0), ncol = 3, byrow = TRUE)
+#'
+#' ### binary choice:
+#' # linear order: x1 < x2 < x3 < .50
+#' # (cf. WADDprob in ?predict_multiattribute)
+#' A <- matrix(c(1, -1,  0,
+#'               0,  1, -1,
+#'               0,  0,  1),
+#'             ncol = 3, byrow = TRUE)
+#' b <- c(0, 0, .50)
+#' ineq_to_vertex(A, b)
+#'
+#'
+#' ### binary choice polytope:
+#' # choice options: {prefer_a, prefer_b}
+#' # column order of vertices: (ab, ac, bc)
+#' # with:  ij = 1  <=>  utility(i) > utility(j)
+#' V <- matrix(c(1, 1, 1,  # c < b < a
+#'               1, 1, 0,  # b < c < a
+#'               0, 1, 1,  # c < a < b
+#'               0, 0, 1   # a < c < b
+#'             ), ncol = 3, byrow = TRUE)
 #' vertex_to_ineq(V)
 #'
-#' A <- matrix(c(1, -1, 0,   # x1 < x2
-#'               0, 1, -1),  # x2 < x3
-#'             ncol = 3, byrow = TRUE)
-#' b <- c(0, 0)
-#' ineq_to_vertex(A, b)
+#'
+#' ### ternary choice (Regenwetter & Davis-Stober, 2012)
+#' # choice options:  {prefer_a, indifferent, prefer_b}
+#' # column order:    (ab,ba,  ac,ca,  bc,cb)
+#' # with:            ij = 1  <=> utility(i) > utility(j)
+#' V <- matrix(c(
+#'   # strict weak orders
+#'   0, 1, 0, 1, 0, 1,  # a < b < c
+#'   1, 0, 0, 1, 0, 1,  # b < a < c
+#'   0, 1, 0, 1, 1, 0,  # a < c < b
+#'   0, 1, 1, 0, 1, 0,  # c < a < b
+#'   1, 0, 1, 0, 1, 0,  # c < b < a
+#'   1, 0, 1, 0, 0, 1,  # b < c < a
+#'
+#'   0, 0, 0, 1, 0, 1,  # a ~ b < c
+#'   0, 1, 0, 0, 1, 0,  # a ~ c < b
+#'   1, 0, 1, 0, 0, 0,  # c ~ b < a
+#'   0, 1, 0, 1, 0, 0,  # a < b ~ c
+#'   1, 0, 0, 0, 0, 1,  # b < a ~ c
+#'   0, 0, 1, 0, 1, 0,  # c < a ~ b
+#'
+#'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
+#' ), byrow = TRUE, ncol = 6)
+#' vertex_to_ineq(V)
 #' }
 #' @export
 vertex_to_ineq <- function (V){
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
-            call. = FALSE)
+          call. = FALSE)
   check_V(V)
   # use rPorta
   poi <- rPorta::as.poiFile(V)
@@ -44,15 +84,23 @@ vertex_to_ineq <- function (V){
 
 #' @inheritParams compute_bf
 #' @rdname vertex_to_ineq
+#' @param options number of choice options.
+#'    For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
+#'    to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
+#'    For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
+#'    for pairwise columns (1+2, 3+4, 5+6, ...)
 #' @export
-ineq_to_vertex <- function (A, b){
+ineq_to_vertex <- function (A, b, options = 2){
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
-  check_Ab(A, b)
+  check_Ab(A, b, options)
   S <- ncol(A)
-  A <- rbind(A, diag(S), -diag(S))
-  b <- c(b, rep(1, S), rep(0, S))
+  suppressWarnings(
+    sum_to_one <- matrix(rep(c(1,0), c(options - 1, S)),
+                         nrow = S / (options - 1), ncol = S, byrow = TRUE))
+  A <- rbind(A, - diag(S), sum_to_one)
+  b <- c(b, rep(0, S), rep(1, nrow(sum_to_one)))
 
   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
   poi <- rPorta::traf(ieq)

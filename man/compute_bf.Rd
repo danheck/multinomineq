@@ -26,14 +26,18 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 \item{batch}{size of the batches into which computations are split to reduce memory load}
 }
 \value{
-a list with the Bayes factor (and log BF) of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model, and the number of posterior/prior samples that satisfied the order-constraints.
+a matrix with estiamtes (first column) and standard errors (second column) for the Bayes factor and log BF of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
 }
 \description{
 Computes the Bayes factor for order-constrained product-binomial models
 that are specified as a polytope via:  A*x <= b (see details).
 }
 \details{
-The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2)  inequalities in \code{A[1:5,]} vs \code{A[1:10,]}; (3)  inequalities in \code{A[1:10,]} vs. all inequalities in \code{A}.
+The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]}; (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
+
+For more control how many samples should be drawn from the prior/posterior, use \code{\link{count_polytope}}.
+This is especially recommended if the same prior distribution (and thus the same integral)
+is used for computing BFs for multiple data sets that differ only in \code{k} and \code{n}.
 }
 \examples{
 k <- c(0, 3, 2, 5, 3, 7)

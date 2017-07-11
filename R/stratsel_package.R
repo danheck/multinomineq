@@ -22,6 +22,7 @@
 #' @importFrom stats sd dbeta rbinom dbinom pbeta integrate runif constrOptim rbeta
 #' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply parSapplyLB clusterMap
 #' @importFrom Rcpp evalCpp sourceCpp
+#' @importFrom utils head
 #' @useDynLib "stratsel", .registration=TRUE
 #'
 #' @template ref_broder2003
@@ -30,6 +31,7 @@
 #' @template ref_hilbig2014
 #' @template ref_karabatsos2005
 #' @template ref_myung2005
+#' @template ref_regenwetter2012
 #' @template ref_regenwetter2014
 
 "_PACKAGE"

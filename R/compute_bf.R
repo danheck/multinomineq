@@ -13,13 +13,17 @@
 #' @param batch size of the batches into which computations are split to reduce memory load
 #' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling
 #' @param prior a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter
+#'
 #' @details
+#' The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]}; (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
 #'
+#' For more control how many samples should be drawn from the prior/posterior, use \code{\link{count_polytope}}.
+#' This is especially recommended if the same prior distribution (and thus the same integral)
+#' is used for computing BFs for multiple data sets that differ only in \code{k} and \code{n}.
 #'
-#' The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2)  inequalities in \code{A[1:5,]} vs \code{A[1:10,]}; (3)  inequalities in \code{A[1:10,]} vs. all inequalities in \code{A}.
 #' @template ref_karabatsos2005
 #' @template ref_regenwetter2014
-#' @return a list with the Bayes factor (and log BF) of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model, and the number of posterior/prior samples that satisfied the order-constraints.
+#' @template return_bf
 #' @examples
 #' k <- c(0, 3, 2, 5, 3, 7)
 #' n <- rep(10, 6)
@@ -45,34 +49,8 @@
 #' @export
 compute_bf <- function(k, n, A, b, prior = c(1, 1),
                        M = 5e5, steps, batch = 5000){
-  check_knAbprior(k, n, A, b, prior)
 
-  if (missing(steps) || is.null(steps)){
-    bfe <- as.list(encompassing_bf(k, n, A, b, prior, M, batch))
-    res <- c(list("bf" = get_all_bfs(bfe$posterior, bfe$prior, M),
-                  "se" = se_bf(bfe$posterior, bfe$prior, bfe$M)),
-             bfe[2:4])
-  } else {
-    check_stepsA(steps, A)
-    zeros <- rep(0, length(k))
-    mpost <- encompassing_stepwise(k, n, A, b, prior, M, steps, batch)
-    mprior <- encompassing_stepwise(zeros, zeros, A, b, prior, M, steps, batch)
-    res <- list("bf" = get_all_bfs(mpost$counts, mprior$counts, M),
-                "se" = se_bf(mpost$counts, mprior$counts, M),
-                "posterior" = c(mpost$counts),
-                "prior" = c(mprior$counts), "M" = M)
-  }
-  res
-}
-
-get_all_bfs <- function (post, prior, Mpost = 1, Mprior = Mpost){
-  if (!is.null(dim(post)) && ncol(post) > 1){
-    bf_0e <- apply(post / prior * matrix(Mprior / Mpost,
-                                         nrow(post), ncol(post), byrow = TRUE),
-                   1, prod)
-  } else {
-    bf_0e <- prod(post / prior * Mprior / Mpost)
-  }
-  c("bf_0e" = bf_0e, "bf_e0" = 1 / bf_0e,
-    "log_bf_0e" = log(bf_0e), "log_bf_e0" = - log(bf_0e))
+  pr <- count_polytope (A, b, 0, 0, prior, M, steps, batch)
+  po <- count_polytope (A, b, k, n, prior, M, steps, batch)
+  count_to_bf(po, pr)
 }

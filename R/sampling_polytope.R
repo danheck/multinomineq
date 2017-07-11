@@ -12,6 +12,7 @@
 #' preference orders/vertices that jointly define a convex polytope via (A * x <= b).
 #' @return a matrix with posterior samples for the probabilities to choose Option B for each item type
 #' @template ref_myung2005
+#' @seealso \code{\link{count_polytope}}
 #' @examples
 #' A <- matrix(c(1, 0, 0,   # x1 < .50
 #'               1, 1, 1,   # x1+x2+x3 < 1

@@ -37,6 +37,8 @@ Karabatsos, G. (2005). The exchangeable multinomial model as an approach to test
 
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
 
+Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+
 Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
 }
 \seealso{

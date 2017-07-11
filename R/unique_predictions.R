@@ -19,9 +19,9 @@
 #' ca <- heck2017_raw[1:100, c("a1","a2","a3","a4")]
 #' cb <- heck2017_raw[1:100, c("b1","b2","b3","b4")]
 #' v <- c(.9, .8, .7, .6)
-#' wp <- predict_multiattribute(ca,cb, v, "WADDprob")
-#' ttb <- predict_multiattribute(ca,cb, v, "TTB")
-#' unique_predictions(list(wp, ttb))
+#' strats <- predict_multiattribute(ca,cb, v,
+#'                                  c("WADDprob","WADD","TTB"))
+#' unique_predictions(strats)
 #' @export
 unique_predictions <- function (strategies,
                                 add_baseline = TRUE, reversed = FALSE){

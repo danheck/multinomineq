@@ -20,32 +20,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // count_samples
-int count_samples(arma::mat x, arma::mat A, arma::vec b);
-RcppExport SEXP stratsel_count_samples(SEXP xSEXP, SEXP ASEXP, SEXP bSEXP) {
+int count_samples(arma::mat X, arma::mat A, arma::vec b);
+RcppExport SEXP stratsel_count_samples(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
     Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_samples(x, A, b));
-    return rcpp_result_gen;
-END_RCPP
-}
-// encompassing_bf
-NumericVector encompassing_bf(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
-RcppExport SEXP stratsel_encompassing_bf(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(encompassing_bf(k, n, A, b, prior, M, batch));
+    rcpp_result_gen = Rcpp::wrap(count_samples(X, A, b));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -66,9 +49,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// encompassing_stepwise
-List encompassing_stepwise(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch);
-RcppExport SEXP stratsel_encompassing_stepwise(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP) {
+// count_polytope_cpp
+NumericVector count_polytope_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
+RcppExport SEXP stratsel_count_polytope_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_polytope_cpp(k, n, A, b, prior, M, batch));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_stepwise
+List count_stepwise(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch);
+RcppExport SEXP stratsel_count_stepwise(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -80,7 +80,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type steps(stepsSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(encompassing_stepwise(k, n, A, b, prior, M, steps, batch));
+    rcpp_result_gen = Rcpp::wrap(count_stepwise(k, n, A, b, prior, M, steps, batch));
     return rcpp_result_gen;
 END_RCPP
 }

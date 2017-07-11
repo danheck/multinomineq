@@ -1,0 +1,1 @@
+#' @return a matrix with estiamtes (first column) and standard errors (second column) for the Bayes factor and log BF of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
