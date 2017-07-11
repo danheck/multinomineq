@@ -5,7 +5,7 @@
 \title{Count Number of Prior/Posterior Samples in Polytope}
 \usage{
 count_polytope(A, b, k = 0, n = 0, prior = c(1, 1), M = 10000, steps,
-  batch = 5000)
+  batch = 10000)
 }
 \arguments{
 \item{A}{a matrix with one row for each linear inequality constraint and one
@@ -58,13 +58,13 @@ n <- rep(10, 6)
 A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
 
 # count prior samples and compare to analytical result
-prior <- count_polytope(A, b, M = 3e5)
+prior <- count_polytope(A, b, M = 5e5)
 prior
 (.50)^6 / factorial(6)
 
 # count posterior samples and get Bayes factor
 posterior <- count_polytope(A, b, k, n,
-                      M=c(1e5, 1e4), steps = 2)
+                      M=c(1e5, 2e4), steps = 2)
 posterior$integral / prior$integral  # BF for constraints
 count_to_bf(posterior, prior)
 }

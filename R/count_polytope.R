@@ -32,18 +32,18 @@
 #' A %*% c(.05, .1, .12, .16, .19, .23) <= b
 #'
 #' # count prior samples and compare to analytical result
-#' prior <- count_polytope(A, b, M = 3e5)
+#' prior <- count_polytope(A, b, M = 5e5)
 #' prior
 #' (.50)^6 / factorial(6)
 #'
 #' # count posterior samples and get Bayes factor
 #' posterior <- count_polytope(A, b, k, n,
-#'                       M=c(1e5, 1e4), steps = 2)
+#'                       M=c(1e5, 2e4), steps = 2)
 #' posterior$integral / prior$integral  # BF for constraints
 #' count_to_bf(posterior, prior)
 #' @export
 count_polytope <- function (A, b, k = 0, n = 0, prior = c(1, 1),
-                            M = 10000, steps, batch = 5000){
+                            M = 10000, steps, batch = 10000){
   if (length(k) == 1 && k == 0)
     k <- rep(0, ncol(A))
   if (length(n) == 1 && n == 0)
@@ -84,7 +84,7 @@ count_polytope <- function (A, b, k = 0, n = 0, prior = c(1, 1),
 #' prior <- list(count = 152, M = 5000)
 #' count_to_bf(post, prior)
 #' @export
-count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 2000){
+count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 3000){
   check_count(posterior)
   check_count(prior)
   est <- prod(posterior$count / posterior$M)  / prod(prior$count / prior$M)
@@ -102,7 +102,7 @@ count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 2000){
   bf
 }
 
-sampling_beta <- function (count, M, beta = c(.5, .5), samples = 5000){
+sampling_beta <- function (count, M, beta = c(.5, .5), samples = 10000){
   S <- length(count)
   if (length(M) == 1)
     M <- rep(M, S)

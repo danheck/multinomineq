@@ -4,7 +4,7 @@
 \alias{count_to_bf}
 \title{Compute Bayes Factor Using Prior/Posterior Counts}
 \usage{
-count_to_bf(posterior, prior, beta = c(0.5, 0.5), samples = 2000)
+count_to_bf(posterior, prior, beta = c(0.5, 0.5), samples = 3000)
 }
 \arguments{
 \item{posterior}{a list with the entries \code{count} (number of samples within polytope)

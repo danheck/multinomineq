@@ -22,7 +22,7 @@ test_that('predictions work for one item type', {
   ca <- c(1, 1, -1, 1)
   cb <- c(-1, -1, -1, -1)
   expect_named(p1 <- predict_multiattribute(ca, cb, v, "TTBprob"),
-                c("pattern", "c"   ,    "ordered", "prior",   "label"))
+               c("pattern", "c"   ,    "ordered", "prior",   "label"))
   expect_equivalent(p1$pattern, -1)
   expect_equivalent(predict_multiattribute(ca, cb, v, "WADDprob")$pattern,
                     sum(log( 1/c(.9,.8,.6)-1 )))
@@ -113,4 +113,38 @@ test_that("predictions/frequency table matches for Heck et al. (2017)", {
                   types$strategies)
 
   expect_equivalent(pp[,strat_labels], pp_heck2017[,strat_labels])
+})
+
+
+test_that("as_polytope transforms to the correct A/b representation",{
+  # compare results to encompassing BF method:
+  b <- list(pattern = 1:4, c = 1,
+            ordered = FALSE, prior = c(1,1))
+  k <- c(5, 4, 2, 0)
+  n <- rep(10, 4)
+
+
+  strat <- list(pattern =-c(1:4),  # A,A,A,A  e4<e3<e2<e1<.5
+                c = .5, ordered = TRUE,
+                prior = c(1,1))
+  pt <- as_polytope(strat)
+  m1 <- select_bf(k, n, list(strat, b))
+  expect_equal(log(m1[1] / m1[2]),
+               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .1)
+
+  strat <- list(pattern =-c(4:1),  # A,A,A,A  e1<e2<e3<e4<.5
+                c = .5, ordered = TRUE,
+                prior = c(1,1))
+  pt <- as_polytope(strat)
+  m1 <- select_bf(k, n, list(strat, b))
+  expect_equal(log(m1[1] / m1[2]),
+               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .2)
+
+  strat <- list(pattern =c(1,-5,2,-3),  # A,A,A,A  e1<e2<e3<e4<.5
+                c = .5, ordered = TRUE,
+                prior = c(1,1))
+  pt <- as_polytope(strat)
+  m1 <- select_bf(k, n, list(strat, b))
+  expect_equal(log(m1[1] / m1[2]),
+               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .2)
 })

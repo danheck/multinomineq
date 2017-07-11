@@ -48,7 +48,7 @@
 #' compute_bf(k, n, A, b, c(1, 1), M = 1e4, steps = c(2,4,5))
 #' @export
 compute_bf <- function(k, n, A, b, prior = c(1, 1),
-                       M = 5e5, steps, batch = 5000){
+                       M = 5e5, steps, batch = 10000){
 
   pr <- count_polytope (A, b, 0, 0, prior, M, steps, batch)
   po <- count_polytope (A, b, k, n, prior, M, steps, batch)

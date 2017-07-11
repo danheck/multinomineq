@@ -133,9 +133,9 @@ print.strategy <- function(x, ...){
       "; errors ordered: ", x$ordered, " ; prior = Beta(",
       paste(x$prior, collapse = ","),")\n" , sep = "")
   print(head(data.frame(Pattern = p,
-                   Prediction = ifelse(p < 0, "A", ifelse(p > 0, "B", "GUESS")),
-                   Error = ifelse(e_idx == .5, .5,
-                                  paste0("e",e_idx, " <= ", x$c)))))
+                        Prediction = ifelse(p < 0, "A", ifelse(p > 0, "B", "GUESS")),
+                        Error = ifelse(e_idx == .5, .5,
+                                       paste0("e",e_idx, " <= ", x$c)))))
   if (lp > 6) cat("... [",lp - 6," predictions omitted]", sep = "")
 }
 
@@ -155,77 +155,73 @@ print.strategy <- function(x, ...){
 #' @return a list containing the matrix \code{A} and the vector \code{b}
 #'      that define a polytope via \code{A*x <= b}.
 #' @examples
-#' # define a strategy:
-#' strat <- list(pattern = c(5,-2,3,4),  # B,A,B,B
+#' # strategy:  A,B,B,A   e2<e3<e4<e1<.50
+#' strat <- list(pattern = c(-1,4,3,-2),
 #'               c = .5, ordered = TRUE,
 #'               prior = c(1,1))
-#' as_polytope(strat)
+#' pt <- as_polytope(strat)
+#' pt
+#'
+#' # compare results to encompassing BF method:
+#' b <- list(pattern = 1:4, c = 1,
+#'           ordered = FALSE, prior = c(1,1))
+#' k <- c(2, 20, 18, 0)
+#' n <- rep(20, 4)
+#' m1 <- select_bf(k, n, list(strat, b))
+#' log(m1[1] / m1[2])
+#' compute_bf(k, n, pt$A, pt$b)["log_bf_0e",]
 #' @export
 as_polytope <- function (strategy){
   check_strategy(strategy)
   pattern <- strategy$pattern
   c <- strategy$c
-  pu <- get_error_unique(pattern)
+  # pu <- rev(get_error_unique(pattern))
   n_error <- get_error_number(pattern)
   if (any(pattern == 0) ||
       length(unique(pattern)) != n_error || n_error < 2)
     stop ("Not working for guesses or if there are less errors than item types.")
 
-  # pattern negative: 0<P(b)<c ; positive: c<P(b)<1
+  # error in pattern negative: 0<P(b)<c ; positive: c<P(b)<1
+  abs_p <- abs(pattern)
   s <- sign(pattern)
   A <- rbind(diag(s), diag(-s))
-  colnames(A) <- paste0("error", pu)
+  colnames(A) <- paste0("p", abs(pattern))
   b <- c(ifelse(s == -1, 0, 1), -s * c)
 
   if (strategy$ordered){
     # linear order constraints:
-    Aloc <- matrix(0, n_error - 1, n_error)
-    bloc <- rep(0, n_error - 1)
-    for (i in 2:n_error){
-      # find correct indices to add order constraints
-      if (pattern[i] < 0){
-        if (pattern[i - 1] < 0){
-          # -/-   =   A/A
-          if (abs(pattern[i - 1]) < abs(pattern[i]) )  # b1 < b2
-            Aloc[i-1,c(i-1, i)] <- c(1, -1)
-          else                                               # b1 > b2
-            Aloc[i-1,c(i-1, i)] <- c(-1, 1)
-          # bloc[i - 1] <- 0
-
-        } else {
-          # -/+    =  A/B
-          if (abs(pattern[i - 1]) < abs(pattern[i]) ){  # b1  < 1-b2
-            Aloc[i-1,c(i-1, i)] <- c(-1,-1)
-            bloc[i - 1] <- -1
-          }else{
-            Aloc[i-1,c(i-1, i)] <- c(1,1)                    # b1  > 1-b2
-            bloc[i - 1] <- 1
-          }
-        }
-
-      } else {
-        if (pattern[i - 1] > 0){
-          # +/+   =   B/B
-          if (abs(pattern[i - 1]) < abs(pattern[i]) )  # 1-b1 < 1-b2
-            Aloc[i-1,c(i-1, i)] <- c(-1, 1)
-          else
-            Aloc[i-1,c(i-1, i)] <- c(1, -1)                  # 1-b1 > 1-b2
-          # bloc[i - 1] <- 0
-
-        } else {
-          # +/-   = B/A
-          if (abs(pattern[i - 1]) < abs(pattern[i]) ){   # 1-b1  < b2
-            Aloc[i-1,c(i-1, i)] <- c(1,1)
-            bloc[i - 1] <- 1
-          }else{
-            Aloc[i-1,c(i-1, i)] <- c(-1,-1)                    # 1-b1  > b2
-            bloc[i - 1] <- -1
-          }
+    Ao <- matrix(0, factorial(n_error - 1), n_error)
+    bo <- rep(0, factorial(n_error - 1))
+    cnt <- 0
+    for (i in 1:(n_error - 1)){
+      for (j in (i+1):n_error){
+        cnt <- cnt + 1
+        Ai <- pattern[i] < 0
+        Aj <- pattern[j] < 0
+        ij <- abs_p[i] > abs_p[j]  # TRUE <=> ei<ej
+        if (Ai && Aj){  # A/A
+          Ao[cnt,c(i,j)] <- ifelse(rep(ij, 2),   # <=> bi<bj
+                                   c(1, -1),
+                                   c(-1, 1))
+        } else if (!Ai && !Aj){  # B/B
+          Ao[cnt,c(i,j)] <- ifelse(rep(ij, 2),   # <=> 1-bi<1-bj
+                                   c(-1, 1),
+                                   c(1, -1))
+        } else if (Ai && !Aj){  # A/B
+          Ao[cnt,c(i,j)] <- ifelse(rep(ij, 2),
+                                   c(1, 1),      # <=> bi<1-bj
+                                   c(-1, -1))    # <=> bi>1-bj
+          bo[cnt] <- ifelse(ij, 1, -1)
+        } else if (!Ai && Aj){  # B/A
+          Ao[cnt,c(i,j)] <- ifelse(rep(ij, 2),
+                                   c(-1, -1),     # <=> 1-bi<bj
+                                   c(1, 1))       # <=> 1-bi>bj
+          bo[cnt] <- ifelse(ij, -1, 1)
         }
       }
     }
-    A <- rbind(A, Aloc)
-    b <- c(b, bloc)
+    A <- rbind(A, Ao)
+    b <- c(b, bo)
   }
   list(A = A, b = b)
 }

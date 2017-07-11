@@ -4,7 +4,7 @@
 \alias{compute_bf}
 \title{Encompassing Bayes Factor}
 \usage{
-compute_bf(k, n, A, b, prior = c(1, 1), M = 5e+05, steps, batch = 5000)
+compute_bf(k, n, A, b, prior = c(1, 1), M = 5e+05, steps, batch = 10000)
 }
 \arguments{
 \item{k}{vector with observed frequencies for Option B}

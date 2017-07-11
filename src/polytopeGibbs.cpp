@@ -37,11 +37,9 @@ int count_samples(arma::mat X, arma::mat A, arma::vec b)
 {
   int cnt = 0, idx = 0;
   bool inside;
-  // omp_set_num_threads(4);
-  // #pragma omp for
   for (int m = 0 ; m < X.n_rows ; m++)
   {
-    bool inside = true;
+    inside = true;
     idx = 0;
     while (inside && idx < b.n_elem)
     {
@@ -119,7 +117,7 @@ arma::mat sampling_binary_cpp(arma::vec k, arma::vec n,
 // [[Rcpp::export]]
 NumericVector count_polytope_cpp(arma::vec k, arma::vec n,
                                  arma::mat A, arma::vec b, arma::vec prior,
-                                 int M, int batch = 5000)
+                                 int M, int batch = 10000)
 {
   int count = 0, todo = M;
   arma::mat X;
@@ -135,52 +133,50 @@ NumericVector count_polytope_cpp(arma::vec k, arma::vec n,
                                Named("M") = M);
 }
 
+// add the last order constraint and sort "steps" vector
+arma::vec sort_steps(arma::vec steps, int max)
+{
+  steps = arma::resize(steps, steps.n_elem + 1, 1);
+  steps(steps.n_elem - 1) = max;
+  return arma::sort(arma::unique(steps - 1));  // C++ indexing
+}
 
 // count samples to get volume of polytope
 // (splits M samples into batches of size "batch" to decrease memory usage)
 // [[Rcpp::export]]
 List count_stepwise(arma::vec k, arma::vec n,
                     arma::mat A, arma::vec b, arma::vec prior,
-                    arma::vec M, arma::vec steps, int batch = 5000){
-  // int cores = omp_get_max_threads();
-  // omp_set_num_threads(cores);
-
-  steps = arma::sort(arma::unique(steps - 1));  // C++ indexing
-  unsigned int D = A.n_cols;   // number of dimensions/parameters
-  int S = steps.n_elem + 1;    // number of steps
+                    arma::vec M, arma::vec steps, int batch = 5000)
+{
+  steps = sort_steps(steps, A.n_rows);
+  int S = steps.n_elem;    // number of unique steps
+  int D = A.n_cols;        // number of dimensions/parameters
   if (M.n_elem == 1)
-    M = double(M(0)) * arma::ones(S);
-  int m = M(0);
+    M = M(0) * arma::ones(S);
   arma::mat sample;
   arma::vec cnt = arma::zeros(S);
 
-  while (m > 0)
+  int todo = M(0);
+  while (todo > 0)
   {
     // sampling from unit cube and go to first polytope
-    sample = rbeta_mat(fmin(m,batch), k + prior(0), n - k + prior(1));
+    sample = rbeta_mat(fmin(todo,batch), k + prior(0), n - k + prior(1));
     cnt(0) = cnt(0) +
       count_samples(sample, A.rows(0, steps(0)), b.subvec(0, steps(0)));
-    m = m - batch;
+    todo = todo - batch;
   }
 
   for (int s = 1; s < S ; s++)
   {
-    // prior/posterior sampling from constrained polytope
     sample =
       sampling_binary_cpp(k, n,
                           A.rows(0, steps(s-1)),
                           b.subvec(0, steps(s-1)),
-                          prior, int(M(s)), -arma::ones(1));
-    if (s < S - 1)
-      cnt(s) = cnt(s) +
-        count_samples(sample,
-                      A.rows(steps(s-1) + 1, steps(s)),
-                      b.subvec(steps(s-1) + 1, steps(s)));
-    else
-      cnt(s) = cnt(s) +  count_samples(sample,
-          A.rows(steps(s-1) + 1, A.n_rows - 1),
-          b.subvec(steps(s-1) + 1, b.n_elem - 1));
-    // count_samples(sample, A, b);
+                          prior, (int)M(s), -arma::ones(1));
+    cnt(s) = cnt(s) +
+      count_samples(sample,
+                    A.rows(steps(s-1) + 1, steps(s)),
+                    b.subvec(steps(s-1) + 1, steps(s)));
   }
   return Rcpp::List::create(Named("integral") = prod(cnt/M),
                             Named("count") = as<NumericVector>(wrap(cnt)),

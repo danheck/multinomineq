@@ -23,9 +23,19 @@ Note: Only works for models without guessing predictions and
       without equality constraints (i.e., requires separate error probabilities per item type)
 }
 \examples{
-# define a strategy:
-strat <- list(pattern = c(5,-2,3,4),  # B,A,B,B
+# strategy:  A,B,B,A   e2<e3<e4<e1<.50
+strat <- list(pattern = c(-1,4,3,-2),
               c = .5, ordered = TRUE,
               prior = c(1,1))
-as_polytope(strat)
+pt <- as_polytope(strat)
+pt
+
+# compare results to encompassing BF method:
+b <- list(pattern = 1:4, c = 1,
+          ordered = FALSE, prior = c(1,1))
+k <- c(2, 20, 18, 0)
+n <- rep(20, 4)
+m1 <- select_bf(k, n, list(strat, b))
+log(m1[1] / m1[2])
+compute_bf(k, n, pt$A, pt$b)["log_bf_0e",]
 }

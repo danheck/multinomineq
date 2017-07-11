@@ -13,7 +13,7 @@ sampling_binary_cpp <- function(k, n, A, b, prior, M, start) {
     .Call(stratsel_sampling_binary_cpp, k, n, A, b, prior, M, start)
 }
 
-count_polytope_cpp <- function(k, n, A, b, prior, M, batch = 5000L) {
+count_polytope_cpp <- function(k, n, A, b, prior, M, batch = 10000L) {
     .Call(stratsel_count_polytope_cpp, k, n, A, b, prior, M, batch)
 }
 

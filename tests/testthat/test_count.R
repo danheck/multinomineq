@@ -22,5 +22,8 @@ test_that("counting methods work", {
   c3 <- count_polytope(A, b, M = M, batch = M)
   expect_equal(c3$integral, V, tol = .002)
 
+  c4 <- count_polytope(A, b, M = 1e5, batch = 10000, steps = 2:3)
+  c4
+  expect_equal(c3$integral, V, tol = .0005)
 })
 
