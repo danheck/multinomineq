@@ -225,18 +225,3 @@ as_polytope <- function (strategy){
   }
   list(A = A, b = b)
 }
-
-# proB   <- estimate_error(k, n, - pattern, prob = FALSE)
-# proA <- estimate_error(k, n,   pattern, prob = FALSE)
-# k <- ifelse(sign(pattern) == -1, proB, proA)
-# n_poly <- proA + proB
-# k <- k[order(abs(pattern))]
-# if (n_error > 1 && c != 1){
-#   Aloc <- diag(1, n_error - 1, n_error) - cbind(0, diag(n_error - 1))
-#   A <- rbind(A, Aloc)
-#   b <- c(b, rep(0, n_error - 1))
-# }
-# s1 <- stratsel:::encompassing_stepwise(k, n, poly$A, poly$b, c(1,1), 5e4, 9)
-# s2 <- stratsel:::encompassing_stepwise(rep(0,4),rep(0,4), poly$A, poly$b, c(1,1), 5e4, 7)
-# s1$int  /s2$int
-# log(s1$int  /s2$int)

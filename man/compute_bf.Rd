@@ -7,9 +7,10 @@
 compute_bf(k, n, A, b, prior = c(1, 1), M = 5e+05, steps, batch = 10000)
 }
 \arguments{
-\item{k}{vector with observed frequencies for Option B}
+\item{k}{the number of Option B choices.
+The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
 
-\item{n}{vector with the number of choices per item type}
+\item{n}{the number of choices per item type.}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
 column for each of the binomial parameters. The parameter space is defined
@@ -33,9 +34,7 @@ Computes the Bayes factor for order-constrained product-binomial models
 that are specified as a polytope via:  A*x <= b (see details).
 }
 \details{
-The stepwise computation of the Bayes factor proceeds as follows: If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing: (1) Unconstrained model vs. inequalities in \code{A[1:5,]}; (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]}; (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
-
-For more control how many samples should be drawn from the prior/posterior, use \code{\link{count_polytope}}.
+For more control how many samples should be drawn from the prior/posterior, use \code{\link{count_binomial}}.
 This is especially recommended if the same prior distribution (and thus the same integral)
 is used for computing BFs for multiple data sets that differ only in \code{k} and \code{n}.
 }

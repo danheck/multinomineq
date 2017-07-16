@@ -5,19 +5,59 @@ adj_iterative <- function(par, c = .50, DIFF_BOUND = 0.0) {
     .Call(stratsel_adj_iterative, par, c, DIFF_BOUND)
 }
 
+rbeta_trunc <- function(shape1, shape2, min, max) {
+    .Call(stratsel_rbeta_trunc, shape1, shape2, min, max)
+}
+
 count_samples <- function(X, A, b) {
     .Call(stratsel_count_samples, X, A, b)
 }
 
-sampling_binary_cpp <- function(k, n, A, b, prior, M, start) {
-    .Call(stratsel_sampling_binary_cpp, k, n, A, b, prior, M, start)
+start_random <- function(A, b, M, start) {
+    .Call(stratsel_start_random, A, b, M, start)
 }
 
-count_polytope_cpp <- function(k, n, A, b, prior, M, batch = 10000L) {
-    .Call(stratsel_count_polytope_cpp, k, n, A, b, prior, M, batch)
+sampling_binomial_cpp <- function(A, b, k, n, prior, M, start, burnin = 5L) {
+    .Call(stratsel_sampling_binomial_cpp, A, b, k, n, prior, M, start, burnin)
 }
 
-count_stepwise <- function(k, n, A, b, prior, M, steps, batch = 5000L) {
-    .Call(stratsel_count_stepwise, k, n, A, b, prior, M, steps, batch)
+count_binomial_cpp <- function(A, b, k, n, prior, M, batch = 10000L) {
+    .Call(stratsel_count_binomial_cpp, A, b, k, n, prior, M, batch)
+}
+
+count_stepwise <- function(A, b, k, n, prior, M, steps, batch = 5000L) {
+    .Call(stratsel_count_stepwise, A, b, k, n, prior, M, steps, batch)
+}
+
+rdirichlet <- function(n, alpha) {
+    .Call(stratsel_rdirichlet, n, alpha)
+}
+
+rpdirichlet <- function(n, alpha, options) {
+    .Call(stratsel_rpdirichlet, n, alpha, options)
+}
+
+rpdirichlet_free <- function(n, alpha, options) {
+    .Call(stratsel_rpdirichlet_free, n, alpha, options)
+}
+
+count_multinomial_cpp <- function(A, b, options, k, prior, M, batch = 10000L) {
+    .Call(stratsel_count_multinomial_cpp, A, b, options, k, prior, M, batch)
+}
+
+shed_options <- function(x, options) {
+    .Call(stratsel_shed_options, x, options)
+}
+
+rep_options <- function(x, options) {
+    .Call(stratsel_rep_options, x, options)
+}
+
+sum_options <- function(k, options) {
+    .Call(stratsel_sum_options, k, options)
+}
+
+sampling_multinomial_cpp <- function(A, b, options, k, prior, M, start, burnin = 5L) {
+    .Call(stratsel_sampling_multinomial_cpp, A, b, options, k, prior, M, start, burnin)
 }
 

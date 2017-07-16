@@ -3,7 +3,7 @@
 \name{vertex_to_ineq}
 \alias{vertex_to_ineq}
 \alias{ineq_to_vertex}
-\title{Transform Vertex/Inequality Representations of Polytopes}
+\title{Transform Vertex/Inequality Representation of Polytope}
 \usage{
 vertex_to_ineq(V)
 
@@ -13,17 +13,15 @@ ineq_to_vertex(A, b, options = 2)
 \item{V}{a matrix with one vertex of a polytope per row
 (i.e., the admissible preference orders of a random utility model)}
 
-\item{A}{a matrix with one row for each linear inequality constraint and one
-column for each of the binomial parameters. The parameter space is defined
-as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
+\item{A}{a matrix defining the convex polytope via A*x <= b.
+The columns of A do not include the last choice option per item type and
+thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
+for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}}
 
-\item{options}{number of choice options.
-For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
-to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
-For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
-for pairwise columns (1+2, 3+4, 5+6, ...)}
+\item{options}{number of choice options per item type.
+Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.}
 }
 \description{
 For convex polytopes: Uses \code{rPorta} (\url{https://github.com/TasCL/rPorta})
@@ -36,6 +34,11 @@ For the general approach and theory underlying binary and ternary choice models,
 see Regenwetter et al. (2012, 2014).
 
 Note that the transformation can be very slow and might require days of computing.
+
+For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
+to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
+For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
+for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{ineq_probabilities}}
 }
 \examples{
 \dontrun{

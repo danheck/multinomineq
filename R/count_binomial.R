@@ -1,12 +1,28 @@
-#' Count Number of Prior/Posterior Samples in Polytope
+#' Number of Product-Binomial Prior/Posterior Samples in Polytope
 #'
-#' Fast C++ function to count the number of prior/posterior samples that fall into
+#' Counts the number of prior/posterior samples for product-binomial data  that fall into
 #' the polytope defined via A*x <= b. Useful to compute the encompassing Bayes factor.
 #'
 #' @param k the number of Option B choices.
 #'     The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.
 #' @param n the number of choices per item type.
-#' @inheritParams compute_bf
+#' @inheritParams select_nml
+#' @param A a matrix with one row for each linear inequality constraint and one
+#'   column for each of the binomial parameters. The parameter space is defined
+#'   as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.
+#' @param b a vector of the same length as the number of rows of \code{A}
+#' @param M number of posterior samples drawn from the encompassing model
+#' @param batch size of the batches into which computations are split to reduce memory load
+#' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling
+#' @param prior a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter
+#'
+#' @details
+#' The stepwise computation of the Bayes factor proceeds as follows:
+#' If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing:
+#' (1) Unconstrained model vs. inequalities in \code{A[1:5,]};
+#' (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]};
+#' (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
+#'
 #' @return a list with the elements
 #' \itemize{
 #'     \item\code{integral}: estimated probability that samples are in polytope
@@ -32,30 +48,31 @@
 #' A %*% c(.05, .1, .12, .16, .19, .23) <= b
 #'
 #' # count prior samples and compare to analytical result
-#' prior <- count_polytope(A, b, M = 5e5)
+#' prior <- count_binomial(A, b, M = 5e5)
 #' prior
 #' (.50)^6 / factorial(6)
 #'
 #' # count posterior samples and get Bayes factor
-#' posterior <- count_polytope(A, b, k, n,
-#'                       M=c(1e5, 2e4), steps = 2)
+#' posterior <- count_binomial(A, b, k, n,
+#'                             M=c(1e5, 2e4), steps = 2)
 #' posterior$integral / prior$integral  # BF for constraints
 #' count_to_bf(posterior, prior)
+#' @template ref_hoijtink2011
 #' @export
-count_polytope <- function (A, b, k = 0, n = 0, prior = c(1, 1),
+count_binomial <- function (A, b, k = 0, n = 0, prior = c(1, 1),
                             M = 10000, steps, batch = 10000){
   if (length(k) == 1 && k == 0)
     k <- rep(0, ncol(A))
   if (length(n) == 1 && n == 0)
     n <- rep(0, ncol(A))
-  check_knAbprior(k, n, A, b, prior)
+  check_Abknprior(A, b, k, n, prior)
   check_Mbatch(M, batch)
 
   if (missing(steps) || is.null(steps) || length(steps) == 0){
-    cnt <- as.list(count_polytope_cpp(k, n, A, b, prior, M, batch))
+    cnt <- as.list(count_binomial_cpp(A, b, k, n, prior, M, batch))
   } else {
     check_stepsA(steps, A)
-    cnt <- count_stepwise(k, n, A, b, prior, M, steps, batch)
+    cnt <- count_stepwise(A, b, k, n, prior, M, steps, batch)
   }
   cnt
 }
@@ -67,7 +84,7 @@ count_polytope <- function (A, b, k = 0, n = 0, prior = c(1, 1),
 #'
 #' @param posterior a list with the entries \code{count} (number of samples within polytope)
 #'     and \code{M} (total number of samples). Both can be vectors in the stepwise procedure.
-#'     See \code{\link{count_polytope}}.
+#'     See \code{\link{count_binomial}}.
 #' @param prior a list similar as \code{posterior} but based on prior samples.
 #' @param beta prior parameters of beta distributions for estimating the standard error
 #' @param samples number of samples from beta distributions used to approximate the standard error.
@@ -79,6 +96,7 @@ count_polytope <- function (A, b, k = 0, n = 0, prior = c(1, 1),
 #'
 #' @template ref_hoijtink2011
 #' @template return_bf
+#' @seealso \code{\link{count_binomial}}, \code{\link{count_multinomial}}
 #' @examples
 #' post  <- list(count = 1447, M = 5000)
 #' prior <- list(count = 152, M = 5000)

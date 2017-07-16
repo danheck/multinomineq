@@ -14,7 +14,7 @@
 #'                ncol = 3, byrow = 2)
 #' sort_inequalities(A, b)
 #' @export
-sort_inequalities <- function (A, b, M = 1e5){
+sort_inequalities <- function (A, b, M = 1000){
   check_Ab(A, b)
   S <- ncol(A)
   x <- matrix(runif(M * S), S)

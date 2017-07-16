@@ -1,4 +1,4 @@
-#' Transform Vertex/Inequality Representations of Polytopes
+#' Transform Vertex/Inequality Representation of Polytope
 #'
 #' For convex polytopes: Uses \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 #' to transform the vertex representation to/from the inequality representation.
@@ -82,29 +82,70 @@ vertex_to_ineq <- function (V){
 }
 
 
-#' @inheritParams compute_bf
+#' @inheritParams count_multinomial
 #' @rdname vertex_to_ineq
-#' @param options number of choice options.
-#'    For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
-#'    to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
-#'    For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
-#'    for pairwise columns (1+2, 3+4, 5+6, ...)
+#' @param options number of choice options per item type.
+#'    Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.
+#' @details
+#' For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
+#' to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
+#' For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
+#' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{ineq_probabilities}}
 #' @export
 ineq_to_vertex <- function (A, b, options = 2){
+  if (length(options) == 1)
+    options <- rep(options, ncol(A) / (options - 1))
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
   check_Ab(A, b, options)
-  S <- ncol(A)
-  suppressWarnings(
-    sum_to_one <- matrix(rep(c(1,0), c(options - 1, S)),
-                         nrow = S / (options - 1), ncol = S, byrow = TRUE))
-  A <- rbind(A, - diag(S), sum_to_one)
-  b <- c(b, rep(0, S), rep(1, nrow(sum_to_one)))
-
+  tmp <- ineq_probabilities(options, A, b)
+  A <- tmp$A
+  b <- tmp$b
   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
   poi <- rPorta::traf(ieq)
   unlink("porta.log")
   V <- poi@convex_hull@num / poi@convex_hull@den
   V
 }
+
+
+#' Inequality Constraints for Product-Multinomial Probabilities
+#'
+#' Get or add inequality constraints that multinomial probabilities are
+#' positive and sum to one for all choice options within each item type.
+#'
+#' @inheritParams count_multinomial
+#' @inheritParams ineq_to_vertex
+#' @param nonneg whether to add constraints that probabilities must be nonnegative
+#' @details
+#' If \code{A} and \code{b} are provided, the constraints are added to these inequality constraints.
+#' @examples
+#' # three binary and two ternary choices:
+#' options <- c(2,2,2, 3,3)
+#' ineq_probabilities(options)
+#' ineq_probabilities(options, nonneg = TRUE)
+#' @export
+ineq_probabilities <- function (options, A = NULL, b = NULL, nonneg = FALSE){
+  S <- sum(options - 1)
+  sum_to_one <- matrix(0, length(options), S)
+  cnt <- 0
+  for (i in 1:length(options)){
+    idx <- seq.int(1, options[i] - 1) + cnt
+    sum_to_one[i,idx] <- 1
+    cnt <- cnt + options[i] - 1
+  }
+  if (nonneg){
+    A_new <- rbind(A, - diag(S), sum_to_one)
+    b_new <- c(b, rep(0, S), rep(1, length(options)))
+  } else {
+    A_new <- rbind(A, sum_to_one)
+    b_new <- c(b, rep(1, length(options)))
+  }
+  list("A" = A_new, "b" = b_new)
+}
+
+# Vertices For Possible Product-Multinomial Probabilities
+# Get or add vertices that constraints the multinomial probabilities to be
+# positive and sum to one for all choice options within each item type.
+

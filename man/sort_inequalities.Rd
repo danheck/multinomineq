@@ -4,7 +4,7 @@
 \alias{sort_inequalities}
 \title{Sort Inequalities by Predictive Strength}
 \usage{
-sort_inequalities(A, b, M = 1e+05)
+sort_inequalities(A, b, M = 1000)
 }
 \arguments{
 \item{A}{a matrix with one row for each linear inequality constraint and one

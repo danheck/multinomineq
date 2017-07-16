@@ -61,7 +61,7 @@ check_knpcp <- function(k, n, pred, c, prior = c(1, 1)){
     stop("'prior' must be a numeric vector with two postive numbers.")
 }
 
-check_knAbprior <- function (k, n, A, b, prior = c(1, 1)){
+check_Abknprior <- function (A, b, k, n, prior = c(1, 1)){
   check_prior(prior)
   check_kn(k, n)
   check_Ab(A, b)
@@ -69,14 +69,28 @@ check_knAbprior <- function (k, n, A, b, prior = c(1, 1)){
     stop("'A' must be a matrix with number of columns equal to the length of 'k'.")
 }
 
-check_Ab <- function(A, b, options = 2){
+check_Abokprior <- function (A, b, options, k, prior){
+  check_Ab(A, b, options)
+  if (length(k) != sum(options))
+    stop("'k' must have the same length as sum(options).")
+  if (length(prior) != length(k))
+    stop("'prior' must have the same length as 'k'.")
+  if (any(prior != round(prior), prior <0))
+    stop ("'prior' must contain positive integers.")
+}
+
+
+
+check_Ab <- function(A, b, options = rep(2, ncol(A))){
   if (is.null(dim(A)) ||  nrow(A) != length(b))
     stop("'A' must be a matrix with number of rows equal to the length of 'b'.")
   if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
     stop ("'A' and 'b' must be numeric.")
+  if (any(options != round(options), options <0))
+    stop ("'options' must contain positive integers.")
 
-  if (ncol(A) %% (options - 1) != 0)
-    stop ("The number of columns in 'A' must be a multiple of (options-1).' ")
+  if (ncol(A) != sum(options - 1))
+    stop ("The number of columns in 'A' must be identical to sum(options-1).' ")
 }
 
 check_V <- function(V){
