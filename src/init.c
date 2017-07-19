@@ -12,7 +12,9 @@ extern SEXP stratsel_adj_iterative(SEXP, SEXP, SEXP);
 extern SEXP stratsel_count_binomial_cpp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP stratsel_count_multinomial_cpp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP stratsel_count_samples(SEXP, SEXP, SEXP);
-extern SEXP stratsel_count_stepwise(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP stratsel_count_stepwise(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP stratsel_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP stratsel_inside_Ab(SEXP, SEXP, SEXP);
 extern SEXP stratsel_rbeta_trunc(SEXP, SEXP, SEXP, SEXP);
 extern SEXP stratsel_rdirichlet(SEXP, SEXP);
 extern SEXP stratsel_rep_options(SEXP, SEXP);
@@ -29,7 +31,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"stratsel_count_binomial_cpp",       (DL_FUNC) &stratsel_count_binomial_cpp,       7},
     {"stratsel_count_multinomial_cpp",    (DL_FUNC) &stratsel_count_multinomial_cpp,    7},
     {"stratsel_count_samples",            (DL_FUNC) &stratsel_count_samples,            3},
-    {"stratsel_count_stepwise",           (DL_FUNC) &stratsel_count_stepwise,           8},
+    {"stratsel_count_stepwise",           (DL_FUNC) &stratsel_count_stepwise,           9},
+    {"stratsel_count_stepwise_multi",     (DL_FUNC) &stratsel_count_stepwise_multi,     9},
+    {"stratsel_inside_Ab",                (DL_FUNC) &stratsel_inside_Ab,                3},
     {"stratsel_rbeta_trunc",              (DL_FUNC) &stratsel_rbeta_trunc,              4},
     {"stratsel_rdirichlet",               (DL_FUNC) &stratsel_rdirichlet,               2},
     {"stratsel_rep_options",              (DL_FUNC) &stratsel_rep_options,              2},

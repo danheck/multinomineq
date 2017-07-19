@@ -99,7 +99,7 @@ ineq_to_vertex <- function (A, b, options = 2){
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
   check_Ab(A, b, options)
-  tmp <- ineq_probabilities(options, A, b)
+  tmp <- ineq_probabilities(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))

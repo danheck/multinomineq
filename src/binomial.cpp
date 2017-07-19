@@ -33,11 +33,11 @@ arma::mat rbeta_mat(int n, int D, double shape1, double shape2)
 
 // count number of samples that adhere to constraint A*x <= b
 // X: samples (rows: replications; cols: D dimensions)
-// [Rcpp]
 // [[Rcpp::export]]
-int count_samples(arma::mat X, arma::mat A, arma::vec b)
+arma::vec inside_Ab(arma::mat X, arma::mat A, arma::vec b)
 {
-  int cnt = 0, idx = 0;
+  vec i(X.n_rows);
+  int idx = 0;
   bool inside;
   for (int m = 0 ; m < X.n_rows ; m++)
   {
@@ -48,9 +48,28 @@ int count_samples(arma::mat X, arma::mat A, arma::vec b)
       inside = dot(X.row(m), A.row(idx)) <= b(idx);
       idx += 1;
     }
-    cnt = cnt + (int)inside;
+    i(m) = inside;
   }
-  return cnt;
+  return i;
+}
+
+// [[Rcpp::export]]
+int count_samples(arma::mat X, arma::mat A, arma::vec b)
+{
+  // int cnt = 0, idx = 0;
+  // bool inside;
+  // for (int m = 0 ; m < X.n_rows ; m++)
+  // {
+  //   inside = true;
+  //   idx = 0;
+  //   while (inside && idx < b.n_elem)
+  //   {
+  //     inside = dot(X.row(m), A.row(idx)) <= b(idx);
+  //     idx += 1;
+  //   }
+  //   cnt = cnt + (int)inside;
+  // }
+  return accu(inside_Ab(X, A, b));
 }
 
 int count_samples(arma::vec X, arma::mat A, arma::vec b)
@@ -91,8 +110,8 @@ arma::vec start_random(arma::mat A, arma::vec b, int M, arma::vec start)
 // => uniform prior sampling if  k=n=b(0,...,0)
 // start: permissible starting values (randomly drawn if start[1]==-1)
 // [[Rcpp::export]]
-arma::mat sampling_binomial_cpp(arma::mat A, arma::vec b,
-                                arma::vec k, arma::vec n,
+arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
+                                arma::mat A, arma::vec b,
                                 arma::vec prior, int M, arma::vec start,
                                 int burnin = 5)
 {
@@ -132,9 +151,9 @@ arma::mat sampling_binomial_cpp(arma::mat A, arma::vec b,
 
 
 // [[Rcpp::export]]
-NumericVector count_binomial_cpp(arma::mat A, arma::vec b,
-                                 arma::vec k, arma::vec n,
-                                 arma::vec prior, int M, int batch = 10000)
+NumericVector count_binomial_cpp(arma::vec k, arma::vec n,
+                                 arma::mat A, arma::vec b,
+                                 arma::vec prior, int M, int batch)
 {
   int count = 0, todo = M;
   mat X;
@@ -161,9 +180,10 @@ arma::vec sort_steps(arma::vec steps, int max)
 // count samples to get volume of polytope
 // (splits M samples into batches of size "batch" to decrease memory usage)
 // [[Rcpp::export]]
-List count_stepwise(arma::mat A, arma::vec b,
-                    arma::vec k, arma::vec n, arma::vec prior,
-                    arma::vec M, arma::vec steps, int batch = 5000)
+List count_stepwise(arma::vec k, arma::vec n,
+                    arma::mat A, arma::vec b, arma::vec prior,
+                    arma::vec M, arma::vec steps, int batch,
+                    arma::vec start)
 {
   steps = sort_steps(steps, A.n_rows);
   int S = steps.n_elem;    // number of unique steps
@@ -173,15 +193,15 @@ List count_stepwise(arma::mat A, arma::vec b,
   mat sample;
 
   vec cnt = zeros(S);
-  cnt(0) = count_binomial_cpp(A.rows(0, steps(0)),
-      b.subvec(0, steps(0)),
-      k, n, prior, M(0), batch)["count"];
+  cnt(0) = count_binomial_cpp(k, n,
+      A.rows(0, steps(0)),
+      b.subvec(0, steps(0)), prior, M(0), batch)["count"];
 
   for (int s = 1; s < S ; s++)
   {
     sample =
-      sampling_binomial_cpp(A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                            k, n, prior, (int)M(s), - ones(1));
+      sampling_binomial_cpp(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
+                            prior, (int)M(s), start);
     cnt(s) = cnt(s) +
       count_samples(sample,
                     A.rows(steps(s-1) + 1, steps(s)),

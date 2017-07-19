@@ -82,7 +82,7 @@ compute_marginal <- function (k, n, strategy){
       lfactorial(n_error) - n_error* (pbeta(c, prior[1], prior[2], log.p = TRUE) +
                                     lbeta(prior[1], prior[2]))
   } else if (n_error > 6){
-    stop("For more than 6 item types, use ?as_polytope and ?compute_bf.")
+    stop("For more than 6 item types, use ?as_polytope and ?bf_binomial.")
   }
 
   if (any(strategy$pattern == 0)){

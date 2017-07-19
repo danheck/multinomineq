@@ -44,12 +44,10 @@ data(heck2017_raw)
 head(heck2017_raw)
 
 \dontrun{
-# check predictions
+# get cue values, validities, and predictions
 cueA <- heck2017_raw[,paste0("a",1:4)]
 cueB <- heck2017_raw[,paste0("b",1:4)]
 v <- c(.9, .8, .7, .6)
-
-# get predictions:
 strat <- predict_multiattribute(cueA, cueB, v,
                      c("TTB", "TTBprob", "WADD",
                        "WADDprob", "EQW", "GUESS"))
@@ -69,7 +67,7 @@ freq <- with(heck2017_raw,
 freqB <- freq[,4:1,1] + # reversed items: Option A
          freq[,5:8,2]   # non-rev. items: Option B
 head(40 - freqB)
-head(heck2017)  # same frequencies (reversed)
+head(heck2017)  # same frequencies (different order)
 
 # strategy classification
 pp <- select_bf(freqB[1:4,], rep(40, 4),

@@ -27,6 +27,26 @@ check_knp <- function(k = NULL, n = NULL, pattern = NULL){
     stop("Length of 'k'/'n', and 'pattern' does not match.")
 }
 
+check_theta <- function  (theta){
+  if (is.null(dim(theta)))
+    stop("'theta' must be a matrix with posterior samples")
+  if (any(theta < 0, theta > 1))
+    stop("'theta' must contain probabilities in [0,1].")
+}
+check_thetakn <- function (theta, k, n){
+  check_kn(k, n)
+  check_theta(theta)
+  if (ncol(theta) != length(k))
+    stop("length(k)  must be identical to  ncol(theta).")
+}
+
+check_thetako <- function (theta, k, options){
+  check_ko(k, options)
+  check_theta(theta)
+  if (ncol(theta) != sum(options - 1))
+    stop("ncol(theta)  must be identical to  sum(options-1).")
+}
+
 
 check_cnml <- function(strategy, n){
   if(is.null(strategy$n) || !identical(n, strategy$n))
@@ -69,10 +89,16 @@ check_Abknprior <- function (A, b, k, n, prior = c(1, 1)){
     stop("'A' must be a matrix with number of columns equal to the length of 'k'.")
 }
 
-check_Abokprior <- function (A, b, options, k, prior){
-  check_Ab(A, b, options)
+check_ko <- function(k, options){
+  if (any(options != round(options), options <0))
+    stop ("'options' must contain positive integers.")
   if (length(k) != sum(options))
     stop("'k' must have the same length as sum(options).")
+}
+
+check_Abokprior <- function (A, b, options, k, prior){
+  check_Ab(A, b, options)
+  check_ko(k, options)
   if (length(prior) != length(k))
     stop("'prior' must have the same length as 'k'.")
   if (any(prior != round(prior), prior <0))
@@ -86,16 +112,36 @@ check_Ab <- function(A, b, options = rep(2, ncol(A))){
     stop("'A' must be a matrix with number of rows equal to the length of 'b'.")
   if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
     stop ("'A' and 'b' must be numeric.")
-  if (any(options != round(options), options <0))
-    stop ("'options' must contain positive integers.")
-
+  check_ko(rep(0, sum(options)), options)
   if (ncol(A) != sum(options - 1))
     stop ("The number of columns in 'A' must be identical to sum(options-1).' ")
+}
+
+check_Abx <- function (A, b, x){
+  check_Ab(A, b)
+  if (is.null(dim(x)) || length(dim(x)) == 1){
+    if (length(x) != ncol(A))
+      stop ("Probability vector 'x' must have the same length as ncol(A).")
+  } else {
+    if (ncol(x) != ncol(A))
+      stop ("Matrix with vertices 'x' must have the same number of columns as ncol(A).")
+  }
 }
 
 check_V <- function(V){
   if(is.null(dim(V)) ||  any(V < 0, V > 1))
     stop("The vertex representation 'V' must be provided as a numeric matrix with values in [0,1].")
+}
+
+check_Vx <- function (V, x){
+  check_V(V)
+  if (is.null(dim(x)) || length(dim(x)) == 1){
+    if (length(x) != ncol(V))
+      stop ("Probability vector 'x' must have the same length as ncol(V).")
+  } else {
+    if (ncol(x) != ncol(V))
+      stop ("Matrix with vertices 'x' must have the same number of columns as ncol(V).")
+  }
 }
 
 check_stepsA <- function(steps, A){

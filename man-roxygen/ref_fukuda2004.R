@@ -1,0 +1,1 @@
+#' @references Fukuda, K. (2004). Is there an efficient way of determining whether a given point q is in the convex hull of a given finite set S of points in Rd? Retrieved from \url{http://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}

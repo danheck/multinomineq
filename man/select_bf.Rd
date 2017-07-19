@@ -7,8 +7,7 @@
 select_bf(k, n, strategies, cores = 1)
 }
 \arguments{
-\item{k}{observed frequencies of Option B.
-Either a vector or a matrix/data frame (one person per row)}
+\item{k}{vector with observed frequencies for Option B}
 
 \item{n}{vector with the number of choices per item type}
 

@@ -4,7 +4,7 @@
 \name{stratsel-package}
 \alias{stratsel}
 \alias{stratsel-package}
-\title{stratsel: Strategy Classification for Binary Choice Models}
+\title{stratsel: Bayesian Inference for Order-Constrained Multinomial Choice Models}
 \description{
 Strategy classification is used to select the decision strategy that
 provides the best account for a vector of observed choice frequencies.

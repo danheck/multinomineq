@@ -30,8 +30,19 @@ Individual choice freqeuncies are available as \code{\link{heck2017}}
 data(regenwetter2012)
 head(regenwetter2012)
 
+# check: strict weak order polytope (SWOP):
+data(swop5)
+tail(swop5$A, 3)
+p1 <- regenwetter2012[1,-c(1:2)]
+inside_multinomial(p1, swop5$options, swop5$A, swop5$b)
+
 \dontrun{
-# check predictions
+# posterior samples
+p <- sampling_multinomial(regenwetter2012[1,-c(1:2)],
+                          swop5$options, swop5$A, swop5$b,
+                          M=1000, start = swop5$start)
+colMeans(p)
+apply(p[,1:5], 2, plot, type = "l")
 }
 }
 \references{

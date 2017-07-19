@@ -4,22 +4,22 @@
 \alias{sampling_binomial}
 \title{Posterior Samples for Ordered-Constrained Product-Binomial Models}
 \usage{
-sampling_binomial(A, b, k, n, prior = c(1, 1), M = 5000, start,
+sampling_binomial(k, n, A, b, prior = c(1, 1), M = 5000, start,
   burnin = 10)
 }
 \arguments{
-\item{A}{a matrix with one row for each linear inequality constraint and one
-column for each of the binomial parameters. The parameter space is defined
-as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
-
-\item{b}{a vector of the same length as the number of rows of \code{A}}
-
 \item{k}{the number of Option B choices.
 The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
 
 \item{n}{the number of choices per item type.}
 
-\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter}
+\item{A}{a matrix with one row for each linear inequality constraint and one
+column for each of the free parameters. The parameter space is defined
+as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
+
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
+
+\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples}
 
@@ -45,10 +45,10 @@ A <- matrix(c(1, 0, 0,   # x1 < .50
               0, 0, 1),  # x3 < .1
             ncol = 3, byrow = TRUE)
 b <- c(.5, 1, 1, -.2, .1)
-samp <- sampling_binomial(A, b, c(5,12,7), c(20,20,20))
+samp <- sampling_binomial(c(5,12,7), c(20,20,20), A, b)
 head(samp)
 colMeans(samp)
-apply(samp, 2, plot, type = "l", ylim = c(0, 1))
+apply(samp, 2, plot, type = "l", ylim = c(0,.6))
 }
 \references{
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}

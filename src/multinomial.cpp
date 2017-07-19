@@ -36,6 +36,8 @@ arma::mat rpdirichlet(int n, arma::vec alpha, arma::vec options)
   return X;
 }
 
+
+
 // omit last column for each item type
 //  [a1 a2 a3  b1 b2]  => [a1 a2  b1]
 // [[Rcpp::export]]
@@ -53,9 +55,9 @@ arma::mat rpdirichlet_free(int n, arma::vec alpha, arma::vec options)
 
 
 // [[Rcpp::export]]
-NumericVector count_multinomial_cpp(arma::mat A, arma::vec b,
-                                    arma::vec options, arma::vec k,
-                                    arma::vec prior, int M, int batch = 10000)
+NumericVector count_multinomial_cpp(arma::vec k, arma::vec options,
+                                    arma::mat A, arma::vec b,
+                                    arma::vec prior, int M, int batch)
 {
   int count = 0, todo = M;
   mat X(batch, k.n_elem);
@@ -116,10 +118,26 @@ arma::vec sum_options(arma::vec k, arma::vec options)
   return rep_options(n, options);
 }
 
+// / [[Rcpp::export]]
+// arma::mat rpmultinom(arma::vec theta_full, arma::vec k, arma::vec options)
+// {
+//   arma::vec n = sum_options(k, options);
+//   arma::vec k_pred(accu(options));
+//   // for (int i = 0; i < ; i++)
+//   // {
+//     for(int o = 0; o < options.n_elem)
+//     {
+//     k_pred() = rmultinom(n(o), theta());
+//     // inline void rmultinom(int n, double* prob, int k, int* rn)
+//       // IntegerVector rmultinom(int size,  NumericVector prob )
+//     }
+//   // }
+//   return kp;
+// }
 
 // [[Rcpp::export]]
-arma::mat sampling_multinomial_cpp(arma::mat A, arma::vec b,
-                                   arma::vec options, arma::vec k,
+arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
+                                   arma::mat A, arma::vec b,
                                    arma::vec prior, int M, arma::vec start,
                                    int burnin = 5)
 {
@@ -162,4 +180,39 @@ arma::mat sampling_multinomial_cpp(arma::mat A, arma::vec b,
   }
   X.shed_cols(0,burnin - 1);
   return X.t();
+}
+
+// [[Rcpp::export]]
+List count_stepwise_multi(arma::vec k, arma::vec options,
+                          arma::mat A, arma::vec b, arma::vec prior,
+                          arma::vec M, arma::vec steps, int batch,
+                          arma::vec start)
+{
+  steps = sort_steps(steps, A.n_rows);
+  int S = steps.n_elem;    // number of unique steps
+  int D = A.n_cols;        // number of dimensions/parameters
+  if (M.n_elem == 1)
+    M = M(0) * ones(S);
+  mat X;
+
+  vec cnt = zeros(S);
+  cnt(0) = count_multinomial_cpp(k, options,
+      A.rows(0, steps(0)),
+      b.subvec(0, steps(0)), prior, (int)M(0), batch)["count"];
+
+  for (int s = 1; s < S ; s++)
+  {
+    X =
+      sampling_multinomial_cpp(k, options,
+                               A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
+                               prior, (int)M(s), start);
+    cnt(s) = cnt(s) +
+      count_samples(X,
+                    A.rows(steps(s-1) + 1, steps(s)),
+                    b.subvec(steps(s-1) + 1, steps(s)));
+  }
+  return List::create(Named("integral") = prod(cnt/M),
+                      Named("count") = as<NumericVector>(wrap(cnt)),
+                      Named("M") = as<NumericVector>(wrap(M)),
+                      Named("steps") = steps + 1);  // R indexing
 }

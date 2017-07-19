@@ -17,13 +17,66 @@ test_that("counting methods work", {
   expect_equal(cnt, cntr(X, A, b))
   expect_equal(cnt / M, V, tol = .002)
 
-  c2 <- count_polytope(A, b, M = M, batch = M/10)
+  c2 <- count_binomial(A=A, b=b, M = M, batch = M/10)
   expect_equal(c2$integral, V, tol = .002)
-  c3 <- count_polytope(A, b, M = M, batch = M)
+  c3 <- count_binomial(A=A, b=b, M = M, batch = M)
   expect_equal(c3$integral, V, tol = .002)
 
-  c4 <- count_polytope(A, b, M = 1e5, batch = 10000, steps = 2:3)
+  c4 <- count_binomial(A=A, b=b, M = 1e5, batch = 10000, steps = 2:3)
   c4
   expect_equal(c3$integral, V, tol = .0005)
 })
 
+test_that("counting is equivalent for: A/b-method and V-method", {
+  skip_on_cran()
+  skip_if_not_installed("rPorta")
+
+  A <- matrix(c(1,-1, 0,
+                0, 1,-1,
+                0, 0, 1), ncol = 3, byrow = TRUE)
+  b <- c(0, 0, .50)
+  V <- matrix(c( 0, 0, 0,
+                 0, 0,.5,
+                 0,.5,.5,
+                 .5,.5,.5), ncol = 3, byrow = TRUE)
+
+  xin <- c(.1, .2, .45)  # inside
+  expect_true(inside(xin, A, b))
+  expect_true(inside(xin, V = V))
+  xout <- c(.4, .1, .55)  # outside
+  expect_false(inside(xout, A, b))
+  expect_false(inside(xout, V = V))
+  expect_equal(inside(rbind(xin, xout), A, b), c(TRUE, FALSE))
+  expect_equal(inside(rbind(xin, xout), V = V), c(TRUE, FALSE))
+
+
+  V <- matrix(c(1,0,0,0,0,1,
+                0,1,1,0,0,0,
+                1,0,0,1,0,0,
+                1,1,1,1,1,0,
+                1,0,0,1,1,0,
+                0,1,1,1,0,1,
+                0,0,1,1,1,1,
+                0,0,0,0,0,0,
+                0,1,1,1,0,1,
+                1,1,1,1,1,1,
+                0,1,0,1,0,1,
+                0,0,0,0,0,1), ncol=6, byrow=TRUE)
+  tmp <- vertex_to_ineq(V)
+  A <- tmp$A
+  b <- tmp$b
+
+  X <- matrix(runif(2000 * ncol(V)), ncol = ncol(V))
+  vertex <- stratsel:::inside_V(X, V)
+  ineq <- apply(X, 1, function(x) all(A %*% x <= b))
+  expect_equal(vertex, ineq)
+  table(data.frame(vertex, ineq))
+
+})
+
+test_that("transformation of A/b to V representation works",{
+  skip_on_cran()
+  skip_if_not_installed("rPorta")
+
+
+})

@@ -4,30 +4,31 @@
 \alias{count_multinomial}
 \title{Number of Product-Multinomial Prior/Posterior Samples in Polytope}
 \usage{
-count_multinomial(A, b, options, k = 0, prior = rep(1, sum(options)), M,
-  batch = 10000)
+count_multinomial(k = 0, options, A, b, V, prior = rep(1, sum(options)), M,
+  steps, batch = 10000)
 }
 \arguments{
+\item{k}{the number of choices for each alternative ordered by item type, e.g.
+\code{c(a1,a2,a3, b1,b2)}.
+The default \code{k=0} is equivalent to sampling from the prior.}
+
+\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
+The sum of \code{options} must be equal to the length of \code{k}.}
+
 \item{A}{a matrix defining the convex polytope via A*x <= b.
 The columns of A do not include the last choice option per item type and
 thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
 for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
 
-\item{b}{a vector of the same length as the number of rows of \code{A}}
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
 
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
-
-\item{k}{the number of choices for each alternative ordered by item type, e.g.
-\code{c(a1,a2,a3, b1,b2)}.
-The default \code{k=0} is equivalent to sampling from the prior.}
+\item{V}{a matrix of vertices (one per row) that define the polytope of
+admissible parameters as the convex hull over these points
+(if provided, \code{A} and \code{b} are ignored). Note that this method
+is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
 
 \item{prior}{the prior parameters of the Dirichlet-shape parameters.
 Must have the same length as \code{k}.}
-
-\item{M}{number of posterior samples drawn from the encompassing model}
-
-\item{batch}{size of the batches into which computations are split to reduce memory load}
 }
 \value{
 a list with the elements
@@ -38,8 +39,10 @@ a list with the elements
 }
 }
 \description{
-Counts the number of prior/posterior samples for product-multininomial data that fall into
-the polytope defined via A*x <= b. Useful to compute the encompassing Bayes factor.
+Draws prior/posterior samples for product-multinomial data and counts how many samples are
+inside the convex polytope defined by
+(1) the inequalities A*x <= b or
+(2) the convex hull over the vertices V.
 }
 \examples{
 ### frequencies:
@@ -60,10 +63,12 @@ A <- matrix(c(1, -1, 0,  0,  0,
 b <- c(0, 1, 0, .50)
 
 # count prior and posterior samples and get BF
-prior <- count_multinomial(A, b, options, M = 2e5)
-posterior <- count_multinomial(A, b, options, k, M=c(2e5))
+prior <- count_multinomial(0, options, A, b, M = 2e5)
+posterior <- count_multinomial(k, options, A, b, M = c(2e5))
 posterior$integral / prior$integral  # BF for constraints
 count_to_bf(posterior, prior)
+
+bf_multinomial(k, options, A, b, M=1000)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

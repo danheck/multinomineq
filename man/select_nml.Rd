@@ -16,8 +16,6 @@ NML complexity values (see \code{\link{compute_cnml}}).
 Note that the sample size \code{n} must match.}
 
 \item{n.fit}{number of repeated fitting runs with random starting values}
-
-\item{cores}{number of processing units to be used}
 }
 \description{
 Compute (L)NML for observed frequencies.

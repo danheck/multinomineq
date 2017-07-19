@@ -7,12 +7,6 @@
 sort_inequalities(A, b, M = 1000)
 }
 \arguments{
-\item{A}{a matrix with one row for each linear inequality constraint and one
-column for each of the binomial parameters. The parameter space is defined
-as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
-
-\item{b}{a vector of the same length as the number of rows of \code{A}}
-
 \item{M}{number of uniform samples from the unit cube}
 }
 \description{

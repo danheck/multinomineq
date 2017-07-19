@@ -4,28 +4,37 @@
 \alias{count_binomial}
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
-count_binomial(A, b, k = 0, n = 0, prior = c(1, 1), M = 10000, steps,
-  batch = 10000)
+count_binomial(k = 0, n = 0, A, b, V, prior = c(1, 1), M = 10000, steps,
+  batch = 10000, start = -1)
 }
 \arguments{
-\item{A}{a matrix with one row for each linear inequality constraint and one
-column for each of the binomial parameters. The parameter space is defined
-as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
-
-\item{b}{a vector of the same length as the number of rows of \code{A}}
-
 \item{k}{the number of Option B choices.
 The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
 
 \item{n}{the number of choices per item type.}
 
-\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter}
+\item{A}{a matrix with one row for each linear inequality constraint and one
+column for each of the free parameters. The parameter space is defined
+as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
+
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
+
+\item{V}{a matrix of vertices (one per row) that define the polytope of
+admissible parameters as the convex hull over these points
+(if provided, \code{A} and \code{b} are ignored). Note that this method
+is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
+
+\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
 \item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
 
 \item{batch}{size of the batches into which computations are split to reduce memory load}
+
+\item{start}{only if \code{steps} is defined: a vector with starting values
+within the polytope. If \code{steps = -1}, a random starting value is used
+(but a poitn within the polytope might not be found if the order constraints are strong).}
 }
 \value{
 a list with the elements
@@ -36,10 +45,14 @@ a list with the elements
 }
 }
 \description{
-Counts the number of prior/posterior samples for product-binomial data  that fall into
-the polytope defined via A*x <= b. Useful to compute the encompassing Bayes factor.
+Draws prior/posterior samples for product-binomial data and counts how many samples are
+inside the convex polytope defined by
+(1) the inequalities A*x <= b or
+(2) the convex hull over the vertices V.
 }
 \details{
+Useful to compute the encompassing Bayes factor for testing order constraints (see \code{\link{bf_binomial}}; Hojtink, 2011).
+
 The stepwise computation of the Bayes factor proceeds as follows:
 If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing:
 (1) Unconstrained model vs. inequalities in \code{A[1:5,]};
@@ -65,16 +78,18 @@ n <- rep(10, 6)
 A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
 
 # count prior samples and compare to analytical result
-prior <- count_binomial(A, b, M = 5e5)
+prior <- count_binomial(0, 0, A, b, M = 5e5)
 prior
 (.50)^6 / factorial(6)
 
 # count posterior samples and get Bayes factor
-posterior <- count_binomial(A, b, k, n,
+posterior <- count_binomial(k, n, A, b,
                             M=c(1e5, 2e4), steps = 2)
-posterior$integral / prior$integral  # BF for constraints
+posterior$integral / prior$integral  # Bayes factor
 count_to_bf(posterior, prior)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
+
+Fukuda, K. (2004). Is there an efficient way of determining whether a given point q is in the convex hull of a given finite set S of points in Rd? Retrieved from \url{http://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}
 }

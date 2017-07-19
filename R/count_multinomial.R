@@ -1,7 +1,9 @@
 #' Number of Product-Multinomial Prior/Posterior Samples in Polytope
 #'
-#' Counts the number of prior/posterior samples for product-multininomial data that fall into
-#' the polytope defined via A*x <= b. Useful to compute the encompassing Bayes factor.
+#' Draws prior/posterior samples for product-multinomial data and counts how many samples are
+#' inside the convex polytope defined by
+#' (1) the inequalities A*x <= b or
+#' (2) the convex hull over the vertices V.
 #'
 #' @param A a matrix defining the convex polytope via A*x <= b.
 #'    The columns of A do not include the last choice option per item type and
@@ -14,7 +16,7 @@
 #'     The default \code{k=0} is equivalent to sampling from the prior.
 #' @param prior the prior parameters of the Dirichlet-shape parameters.
 #'    Must have the same length as \code{k}.
-#' @inheritParams compute_bf
+#' @inheritParams inside
 #' @return a list with the elements
 #' \itemize{
 #'     \item\code{integral}: estimated probability that samples are in polytope
@@ -41,24 +43,26 @@
 #' b <- c(0, 1, 0, .50)
 #'
 #' # count prior and posterior samples and get BF
-#' prior <- count_multinomial(A, b, options, M = 2e5)
-#' posterior <- count_multinomial(A, b, options, k, M=c(2e5))
+#' prior <- count_multinomial(0, options, A, b, M = 2e5)
+#' posterior <- count_multinomial(k, options, A, b, M = c(2e5))
 #' posterior$integral / prior$integral  # BF for constraints
 #' count_to_bf(posterior, prior)
+#'
+#' bf_multinomial(k, options, A, b, M=1000)
 #' @export
-count_multinomial <- function (A, b, options, k = 0,
+count_multinomial <- function (k = 0, options, A, b, V,
                                prior = rep(1, sum(options)),
-                               M, batch = 10000){
+                               M, steps, batch = 10000){
   if (length(k) == 1 && k == 0)
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
   check_Mbatch(M, batch)
 
-  # if (missing(steps) || is.null(steps) || length(steps) == 0){
-  cnt <- as.list(count_multinomial_cpp(A, b, options, k, prior, M, batch))
-  # } else {
-  #   check_stepsA(steps, A)
-  #   cnt <- count_stepwise(k, n, A, b, prior, M, steps, batch)
-  # }
+  if (missing(steps) || is.null(steps) || length(steps) == 0){
+    cnt <- as.list(count_multinomial_cpp(k, options, A, b, prior, M, batch))
+  } else {
+    check_stepsA(steps, A)
+    cnt <- count_stepwise_multi(k, n, A, b, prior, M, steps, batch)
+  }
   cnt
 }

@@ -33,6 +33,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// inside_Ab
+arma::vec inside_Ab(arma::mat X, arma::mat A, arma::vec b);
+RcppExport SEXP stratsel_inside_Ab(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(inside_Ab(X, A, b));
+    return rcpp_result_gen;
+END_RCPP
+}
 // count_samples
 int count_samples(arma::mat X, arma::mat A, arma::vec b);
 RcppExport SEXP stratsel_count_samples(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
@@ -61,55 +74,56 @@ BEGIN_RCPP
 END_RCPP
 }
 // sampling_binomial_cpp
-arma::mat sampling_binomial_cpp(arma::mat A, arma::vec b, arma::vec k, arma::vec n, arma::vec prior, int M, arma::vec start, int burnin);
-RcppExport SEXP stratsel_sampling_binomial_cpp(SEXP ASEXP, SEXP bSEXP, SEXP kSEXP, SEXP nSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP) {
+arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin);
+RcppExport SEXP stratsel_sampling_binomial_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampling_binomial_cpp(A, b, k, n, prior, M, start, burnin));
+    rcpp_result_gen = Rcpp::wrap(sampling_binomial_cpp(k, n, A, b, prior, M, start, burnin));
     return rcpp_result_gen;
 END_RCPP
 }
 // count_binomial_cpp
-NumericVector count_binomial_cpp(arma::mat A, arma::vec b, arma::vec k, arma::vec n, arma::vec prior, int M, int batch);
-RcppExport SEXP stratsel_count_binomial_cpp(SEXP ASEXP, SEXP bSEXP, SEXP kSEXP, SEXP nSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
+NumericVector count_binomial_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
+RcppExport SEXP stratsel_count_binomial_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_binomial_cpp(A, b, k, n, prior, M, batch));
+    rcpp_result_gen = Rcpp::wrap(count_binomial_cpp(k, n, A, b, prior, M, batch));
     return rcpp_result_gen;
 END_RCPP
 }
 // count_stepwise
-List count_stepwise(arma::mat A, arma::vec b, arma::vec k, arma::vec n, arma::vec prior, arma::vec M, arma::vec steps, int batch);
-RcppExport SEXP stratsel_count_stepwise(SEXP ASEXP, SEXP bSEXP, SEXP kSEXP, SEXP nSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP) {
+List count_stepwise(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start);
+RcppExport SEXP stratsel_count_stepwise(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type steps(stepsSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_stepwise(A, b, k, n, prior, M, steps, batch));
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_stepwise(k, n, A, b, prior, M, steps, batch, start));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -152,19 +166,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // count_multinomial_cpp
-NumericVector count_multinomial_cpp(arma::mat A, arma::vec b, arma::vec options, arma::vec k, arma::vec prior, int M, int batch);
-RcppExport SEXP stratsel_count_multinomial_cpp(SEXP ASEXP, SEXP bSEXP, SEXP optionsSEXP, SEXP kSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
+NumericVector count_multinomial_cpp(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, int batch);
+RcppExport SEXP stratsel_count_multinomial_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
     Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_multinomial_cpp(A, b, options, k, prior, M, batch));
+    rcpp_result_gen = Rcpp::wrap(count_multinomial_cpp(k, options, A, b, prior, M, batch));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -205,20 +219,39 @@ BEGIN_RCPP
 END_RCPP
 }
 // sampling_multinomial_cpp
-arma::mat sampling_multinomial_cpp(arma::mat A, arma::vec b, arma::vec options, arma::vec k, arma::vec prior, int M, arma::vec start, int burnin);
-RcppExport SEXP stratsel_sampling_multinomial_cpp(SEXP ASEXP, SEXP bSEXP, SEXP optionsSEXP, SEXP kSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP) {
+arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin);
+RcppExport SEXP stratsel_sampling_multinomial_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
     Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampling_multinomial_cpp(A, b, options, k, prior, M, start, burnin));
+    rcpp_result_gen = Rcpp::wrap(sampling_multinomial_cpp(k, options, A, b, prior, M, start, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_stepwise_multi
+List count_stepwise_multi(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start);
+RcppExport SEXP stratsel_count_stepwise_multi(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type steps(stepsSEXP);
+    Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_stepwise_multi(k, options, A, b, prior, M, steps, batch, start));
     return rcpp_result_gen;
 END_RCPP
 }

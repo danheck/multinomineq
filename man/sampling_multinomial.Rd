@@ -4,30 +4,32 @@
 \alias{sampling_multinomial}
 \title{Posterior Samples for Ordered-Constrained Product-Multinomial Models}
 \usage{
-sampling_multinomial(A, b, options, k, prior = rep(1, sum(options)),
+sampling_multinomial(k, options, A, b, prior = rep(1, sum(options)),
   M = 5000, start, burnin = 10)
 }
 \arguments{
+\item{k}{the number of choices for each alternative ordered by item type, e.g.
+\code{c(a1,a2,a3, b1,b2)}.
+The default \code{k=0} is equivalent to sampling from the prior.}
+
+\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
+The sum of \code{options} must be equal to the length of \code{k}.}
+
 \item{A}{a matrix defining the convex polytope via A*x <= b.
 The columns of A do not include the last choice option per item type and
 thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
 for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
 
-\item{b}{a vector of the same length as the number of rows of \code{A}}
-
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
-
-\item{k}{the number of choices for each alternative ordered by item type, e.g.
-\code{c(a1,a2,a3, b1,b2)}.
-The default \code{k=0} is equivalent to sampling from the prior.}
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
 
 \item{prior}{the prior parameters of the Dirichlet-shape parameters.
 Must have the same length as \code{k}.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{start}{starting vectors. Must be in the convex polytope (that is, \code{A*start <= b})}
+\item{start}{only if \code{steps} is defined: a vector with starting values
+within the polytope. If \code{steps = -1}, a random starting value is used
+(but a poitn within the polytope might not be found if the order constraints are strong).}
 
 \item{burnin}{number of burnin samples that are discarded}
 }
@@ -36,9 +38,9 @@ Uses Gibbs sampling to draw posterior samples for order-constrained models of bi
 }
 \examples{
 # binary and ternary choice:
-#           (a1,a2  b1,b2,b3)
+#           (a1,a2   b1,b2,b3)
 k       <- c(15,9,   5,2,17)
-options <- c(2,     3)
+options <- c(2,      3)
 
 # columns:   (a1,  b1,b2)
 A <- matrix(c(1, 0, 0,   # a1 < .20
@@ -47,7 +49,7 @@ A <- matrix(c(1, 0, 0,   # a1 < .20
               0, 0, 1),  # b2 < .4
             ncol = 3, byrow = TRUE)
 b <- c(.2, 1, -.2, .4)
-samp <- sampling_multinomial(A, b, options, k)
+samp <- sampling_multinomial(k, options, A, b)
 head(samp)
 colMeans(samp)
 apply(samp, 2, plot, type = "l", ylim = c(0, 1))

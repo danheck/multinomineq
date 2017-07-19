@@ -145,12 +145,10 @@
 #' head(heck2017_raw)
 #'
 #' \dontrun{
-#' # check predictions
+#' # get cue values, validities, and predictions
 #' cueA <- heck2017_raw[,paste0("a",1:4)]
 #' cueB <- heck2017_raw[,paste0("b",1:4)]
 #' v <- c(.9, .8, .7, .6)
-#'
-#' # get predictions:
 #' strat <- predict_multiattribute(cueA, cueB, v,
 #'                      c("TTB", "TTBprob", "WADD",
 #'                        "WADDprob", "EQW", "GUESS"))
@@ -170,7 +168,7 @@
 #' freqB <- freq[,4:1,1] + # reversed items: Option A
 #'          freq[,5:8,2]   # non-rev. items: Option B
 #' head(40 - freqB)
-#' head(heck2017)  # same frequencies (reversed)
+#' head(heck2017)  # same frequencies (different order)
 #'
 #' # strategy classification
 #' pp <- select_bf(freqB[1:4,], rep(40, 4),
@@ -211,8 +209,19 @@
 #' data(regenwetter2012)
 #' head(regenwetter2012)
 #'
+#' # check: strict weak order polytope (SWOP):
+#' data(swop5)
+#' tail(swop5$A, 3)
+#' p1 <- regenwetter2012[1,-c(1:2)]
+#' inside_multinomial(p1, swop5$options, swop5$A, swop5$b)
+#'
 #' \dontrun{
-#' # check predictions
+#' # posterior samples
+#' p <- sampling_multinomial(regenwetter2012[1,-c(1:2)],
+#'                           swop5$options, swop5$A, swop5$b,
+#'                           M=1000, start = swop5$start)
+#' colMeans(p)
+#' apply(p[,1:5], 2, plot, type = "l")
 #' }
 "regenwetter2012"
 

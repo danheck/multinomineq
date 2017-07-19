@@ -18,7 +18,7 @@ The columns of A do not include the last choice option per item type and
 thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
 for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
 
-\item{b}{a vector of the same length as the number of rows of \code{A}}
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
 
 \item{options}{number of choice options per item type.
 Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.}
