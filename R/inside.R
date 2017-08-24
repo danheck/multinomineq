@@ -4,6 +4,7 @@
 #' (1) all inequalities \code{A*x <= b} are satisfied or
 #' (2) the point \code{x} is in the convex hull of the vertices in \code{V}.
 #'
+#' @inheritParams inside
 #' @param x a vector of length equal to the number of columns of \code{A} or \code{V}
 #' (i.e., a single point in D-dimensional space) or matrix of points/vertices (one per row).
 #' @param A a matrix with one row for each linear inequality constraint and one
@@ -15,7 +16,7 @@
 #'     (if provided, \code{A} and \code{b} are ignored). Note that this method
 #'     is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).
 #'
-#' @seealso \code{\link{ineq_to_vertex}} to change between A/b and V representation.
+#' @seealso \code{\link{Ab_to_V}} and \code{\link{V_to_Ab}} to change between A/b and V representation.
 #' @examples
 #' # linear order constraints:  x1<x2<x3<.5
 #' A <- matrix(c(1,-1, 0,
@@ -51,6 +52,7 @@ inside <- function(x, A, b, V){
 #' Computes relative choice frequencies and checks whether these are in the polytope defined
 #' via (1) \code{A*x <= b} or (2) by the convex hull of a set of vertices \code{V}.
 #'
+#' @inheritParams inside
 #' @param k choice frequencies.
 #'    For \code{inside_binomial}: per item type (e.g.: a1,b1,c1,..)
 #'    For \code{inside_multinomial}: for all choice options ordered by item type

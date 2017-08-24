@@ -17,6 +17,7 @@
 #' @template ref_regenwetter2014
 #' @examples
 #' \dontrun{
+#' ######## (requires rPorta) ########
 #'
 #' ### binary choice:
 #' # linear order: x1 < x2 < x3 < .50
@@ -26,7 +27,7 @@
 #'               0,  0,  1),
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
-#' ineq_to_vertex(A, b)
+#' Ab_to_V(A, b)
 #'
 #'
 #' ### binary choice polytope:
@@ -38,7 +39,7 @@
 #'               0, 1, 1,  # c < a < b
 #'               0, 0, 1   # a < c < b
 #'             ), ncol = 3, byrow = TRUE)
-#' vertex_to_ineq(V)
+#' V_to_Ab(V)
 #'
 #'
 #' ### ternary choice (Regenwetter & Davis-Stober, 2012)
@@ -63,10 +64,10 @@
 #'
 #'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
 #' ), byrow = TRUE, ncol = 6)
-#' vertex_to_ineq(V)
+#' V_to_Ab(V)
 #' }
 #' @export
-vertex_to_ineq <- function (V){
+V_to_Ab <- function (V){
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
@@ -83,23 +84,24 @@ vertex_to_ineq <- function (V){
 
 
 #' @inheritParams count_multinomial
-#' @rdname vertex_to_ineq
+#' @rdname V_to_Ab
 #' @param options number of choice options per item type.
 #'    Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.
 #' @details
 #' For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
-#' to ensure that all dimensions of the polytope satisfy:  0 <= x <= 1.
-#' For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= x1+x2 <=1
-#' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{ineq_probabilities}}
+#' to ensure that all dimensions of the polytope satisfy:  0 <= p_i <= 1.
+#' For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= p_1+p_2 <=1
+#' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinomial}}.
+#'
 #' @export
-ineq_to_vertex <- function (A, b, options = 2){
+Ab_to_V <- function (A, b, options = 2){
   if (length(options) == 1)
     options <- rep(options, ncol(A) / (options - 1))
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
   check_Ab(A, b, options)
-  tmp <- ineq_probabilities(options, A, b, nonneg = TRUE)
+  tmp <- Ab_multinomial(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
@@ -116,17 +118,18 @@ ineq_to_vertex <- function (A, b, options = 2){
 #' positive and sum to one for all choice options within each item type.
 #'
 #' @inheritParams count_multinomial
-#' @inheritParams ineq_to_vertex
+#' @inheritParams Ab_to_V
 #' @param nonneg whether to add constraints that probabilities must be nonnegative
 #' @details
 #' If \code{A} and \code{b} are provided, the constraints are added to these inequality constraints.
+#'
 #' @examples
 #' # three binary and two ternary choices:
 #' options <- c(2,2,2, 3,3)
-#' ineq_probabilities(options)
-#' ineq_probabilities(options, nonneg = TRUE)
+#' Ab_multinomial(options)
+#' Ab_multinomial(options, nonneg = TRUE)
 #' @export
-ineq_probabilities <- function (options, A = NULL, b = NULL, nonneg = FALSE){
+Ab_multinomial <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   S <- sum(options - 1)
   sum_to_one <- matrix(0, length(options), S)
   cnt <- 0
@@ -144,8 +147,4 @@ ineq_probabilities <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   }
   list("A" = A_new, "b" = b_new)
 }
-
-# Vertices For Possible Product-Multinomial Probabilities
-# Get or add vertices that constraints the multinomial probabilities to be
-# positive and sum to one for all choice options within each item type.
 
