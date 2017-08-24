@@ -1,8 +1,11 @@
 #include <RcppArmadillo.h>
+#include <RcppArmadilloExtensions/rmultinom.h>
 #include <functions.h>
+#include <progress.hpp>
+
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppProgress)]]
 using namespace Rcpp;
-
-
 
 // [[Rcpp::export]]
 arma::mat rdirichlet(int n, arma::vec alpha)
@@ -19,6 +22,23 @@ arma::mat rdirichlet(int n, arma::vec alpha)
   return X;
 }
 
+//' Random Samples from the Product-Dirichlet Distribution
+//'
+//' Random samples from the prior/posterior (i.e., product-Dirichlet) of the unconstrained
+//' product-multinomial model (the encompassing model).
+//'
+//' @param n number of samples
+//' @param alpha Dirichlet parameters concatenated across independent conditions
+//'     (e.g., a1,a2,a3,  b1,b2,b3, ..)
+//' @param options the number of choice options per item type, e.g., \code{c(3,2)}
+//'     for a ternary and binary condition. The sum of \code{options} must be equal to the length of \code{alpha}.
+//' @examples
+//' # standard uniform Dirichlet
+//' rpdirichlet(5, c(1,1,1,1), 4)
+//'
+//' # two ternary outcomes: (a1,a2,a3,  b1,b2,b3)
+//' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
+//' @export
 // [[Rcpp::export]]
 arma::mat rpdirichlet(int n, arma::vec alpha, arma::vec options)
 {
@@ -36,8 +56,6 @@ arma::mat rpdirichlet(int n, arma::vec alpha, arma::vec options)
   return X;
 }
 
-
-
 // omit last column for each item type
 //  [a1 a2 a3  b1 b2]  => [a1 a2  b1]
 // [[Rcpp::export]]
@@ -51,26 +69,6 @@ arma::mat rpdirichlet_free(int n, arma::vec alpha, arma::vec options)
     X.shed_col(dep_idx(i));
   }
   return X;
-}
-
-
-// [[Rcpp::export]]
-NumericVector count_multinomial_cpp(arma::vec k, arma::vec options,
-                                    arma::mat A, arma::vec b,
-                                    arma::vec prior, int M, int batch)
-{
-  int count = 0, todo = M;
-  mat X(batch, k.n_elem);
-  while (todo > 0)
-  {
-    // count prior and posterior samples that match constraints:
-    X = rpdirichlet_free(fmin(todo,batch), k + prior, options);
-    count = count  + count_samples(X, A, b);
-    todo = todo - batch;
-  }
-  return NumericVector::create(Named("integral") = (double)count / M,
-                               Named("count") = count,
-                               Named("M") = M);
 }
 
 // remove dependent categories:  (a1,a2, b1,b2,b3)  =>  (a1,  b1,b2)
@@ -118,28 +116,40 @@ arma::vec sum_options(arma::vec k, arma::vec options)
   return rep_options(n, options);
 }
 
-// / [[Rcpp::export]]
-// arma::mat rpmultinom(arma::vec theta_full, arma::vec k, arma::vec options)
-// {
-//   arma::vec n = sum_options(k, options);
-//   arma::vec k_pred(accu(options));
-//   // for (int i = 0; i < ; i++)
-//   // {
-//     for(int o = 0; o < options.n_elem)
-//     {
-//     k_pred() = rmultinom(n(o), theta());
-//     // inline void rmultinom(int n, double* prob, int k, int* rn)
-//       // IntegerVector rmultinom(int size,  NumericVector prob )
-//     }
-//   // }
-//   return kp;
-// }
+arma::ivec rpm_vec(arma::vec theta, arma::vec n, arma::vec options)
+{
+  int I = options.n_elem, s0 = 0, s1, nn;
+  ivec k, tmp;
+  vec tt;
+  for(int i = 0; i < I; i++)
+  {
+    s1 = s0 + options(i) - 1;
+    tt = theta.rows(s0, s1);
+    s0 = s1 + 1;
+    nn = as_scalar(n(i));
+    tmp = Rcpp::RcppArmadillo::rmultinom(nn, as<NumericVector>(wrap(tt)));
+    k = join_cols(k, tmp);
+  }
+  return k;
+}
+
+
+// [[Rcpp::export]]
+arma::imat rpm_mat(arma::mat theta, arma::vec n, arma::vec options)
+{
+  imat k(theta.n_cols, theta.n_rows);
+  for(int i = 0; i < theta.n_rows; i++)
+  {
+    k.col(i) = rpm_vec(theta.row(i).t(), n, options);
+  }
+  return k.t();
+}
 
 // [[Rcpp::export]]
 arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
                                    arma::mat A, arma::vec b,
                                    arma::vec prior, int M, arma::vec start,
-                                   int burnin = 5)
+                                   int burnin = 5, double progress = true)
 {
   int D = A.n_cols;  // dimensions
   mat X(D, M + burnin);       // initialize posterior, column-major order
@@ -153,40 +163,74 @@ arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
   vec j_up  = rep_options(cumsum(options - 1) - 1, options - 1);
   vec j_low = j_up - rep_options(options - 2, options - 1);
 
+  Progress p(M, progress);
+  bool run = true;
   double bmax, bmin, s;
   vec rhs = b;
   uvec Apos, Aneg;
-  ivec idx;
-  int j;
+  IntegerVector idx = seq_len(D) - 1;
+  int j=0, steps=100;
   for (int i = 1 ; i < M  + burnin; i++)
   {
-    X.col(i) = X.col(i-1);
-    idx = randi(D, distr_param(0,D - 1));
-    for (int m = 0; m < D; m++)
+    p.increment();   // update progress bar
+    if(run && i % steps == 0) run = !Progress::check_abort();
+    if (run)
     {
-      j = idx(m);
-      // scaled truncated beta:
-      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
-      bmax = 1; bmin = 0;
-      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / (A.col(j) * s);
-      Aneg = find(A.col(j) < 0);
-      Apos = find(A.col(j) > 0);
-      if (!Aneg.is_empty())
-        bmin = rhs(Aneg).max();
-      if (!Apos.is_empty())
-        bmax = rhs(Apos).min();
-      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
+      X.col(i) = X.col(i-1);
+      idx = sample(idx, D, false);
+      for (int m = 0; m < D; m++)
+      {
+        j = m; //idx(m);
+        // scaled truncated beta:
+        s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
+        bmax = 1; bmin = 0;
+        rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / (A.col(j) * s);
+        Aneg = find(A.col(j) < 0);
+        Apos = find(A.col(j) > 0);
+        if (!Aneg.is_empty())
+          bmin = rhs(Aneg).max();
+        if (!Apos.is_empty())
+          bmax = rhs(Apos).min();
+        X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
+      }
     }
   }
   X.shed_cols(0,burnin - 1);
   return X.t();
 }
 
+
+// [[Rcpp::export]]
+NumericVector count_multinomial_cpp(arma::vec k, arma::vec options,
+                                    arma::mat A, arma::vec b,
+                                    arma::vec prior, int M,
+                                    int batch, bool progress = true)
+{
+  Progress p(M/batch, progress);
+  bool run = true;
+  int count = 0, todo = M;
+  mat X(batch, k.n_elem);
+  while (todo > 0)
+  {
+    p.increment();   // update progress bar
+    if (run)
+    {
+      // count prior and posterior samples that match constraints:
+      X = rpdirichlet_free(fmin(todo,batch), k + prior, options);
+      count = count  + count_samples(X, A, b);
+      todo = todo - batch;
+    }
+  }
+  return NumericVector::create(Named("integral") = (double)count / M,
+                               Named("count") = count,
+                               Named("M") = M);
+}
+
 // [[Rcpp::export]]
 List count_stepwise_multi(arma::vec k, arma::vec options,
                           arma::mat A, arma::vec b, arma::vec prior,
                           arma::vec M, arma::vec steps, int batch,
-                          arma::vec start)
+                          arma::vec start, bool progress = true)
 {
   steps = sort_steps(steps, A.n_rows);
   int S = steps.n_elem;    // number of unique steps
@@ -198,14 +242,14 @@ List count_stepwise_multi(arma::vec k, arma::vec options,
   vec cnt = zeros(S);
   cnt(0) = count_multinomial_cpp(k, options,
       A.rows(0, steps(0)),
-      b.subvec(0, steps(0)), prior, (int)M(0), batch)["count"];
+      b.subvec(0, steps(0)), prior, (int)M(0), batch, progress)["count"];
 
   for (int s = 1; s < S ; s++)
   {
     X =
       sampling_multinomial_cpp(k, options,
                                A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                               prior, (int)M(s), start);
+                               prior, (int)M(s), start, 10, progress);
     cnt(s) = cnt(s) +
       count_samples(X,
                     A.rows(steps(s-1) + 1, steps(s)),

@@ -1,5 +1,9 @@
 #include <RcppArmadillo.h>
 #include <functions.h>
+#include <progress.hpp>
+
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppProgress)]]
 using namespace Rcpp;
 
 
@@ -56,19 +60,6 @@ arma::vec inside_Ab(arma::mat X, arma::mat A, arma::vec b)
 // [[Rcpp::export]]
 int count_samples(arma::mat X, arma::mat A, arma::vec b)
 {
-  // int cnt = 0, idx = 0;
-  // bool inside;
-  // for (int m = 0 ; m < X.n_rows ; m++)
-  // {
-  //   inside = true;
-  //   idx = 0;
-  //   while (inside && idx < b.n_elem)
-  //   {
-  //     inside = dot(X.row(m), A.row(idx)) <= b(idx);
-  //     idx += 1;
-  //   }
-  //   cnt = cnt + (int)inside;
-  // }
   return accu(inside_Ab(X, A, b));
 }
 
@@ -78,14 +69,6 @@ int count_samples(arma::vec X, arma::mat A, arma::vec b)
   return count_samples(Xm, A, b);
 }
 
-
-// DIFFICULT:
-// arma::vec get_interior_point(arma::mat A, arma::vec b)
-// {
-//   arma::vec u = arma::randu(A.n_rows);
-//
-//   return x;
-// }
 // find permissible starting values:
 // [[Rcpp::export]]
 arma::vec start_random(arma::mat A, arma::vec b, int M, arma::vec start)
@@ -113,36 +96,43 @@ arma::vec start_random(arma::mat A, arma::vec b, int M, arma::vec start)
 arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
                                 arma::mat A, arma::vec b,
                                 arma::vec prior, int M, arma::vec start,
-                                int burnin = 5)
+                                int burnin = 5, double progress = true)
 {
   int D = A.n_cols;    // dimensions
   mat X(D, M + burnin);     // initialize posterior (column-major ordering)
   X.col(0) = start_random(A, b, M, start);
-  // X.col(0) = start;
 
+  Progress p(M, progress);
+  bool run = true;
   double bmax, bmin;
   vec rhs = b;
   uvec Apos, Aneg;
-  ivec idx;
-  int j;
+  IntegerVector idx = seq_len(D) - 1;
+  int j=0, steps=100;
   for (int i = 1 ; i < M + burnin; i++)
   {
-    // copy old and update to new parameters:
-    X.col(i) = X.col(i-1);
-    idx = randi(D, distr_param(0,D - 1));
-    for (int m = 0; m < D; m++)
+    p.increment();   // update progress bar
+    if(run && i % steps == 0) run = !Progress::check_abort();
+    if (run)
     {
-      j = idx(m);
-      // get min/max for truncated beta:
-      bmax = 1.; bmin = 0.;
-      rhs = (b - A * X.col(i) + A.col(j) * X(j,i))/ A.col(j);
-      Aneg = find(A.col(j) < 0);
-      Apos = find(A.col(j) > 0);
-      if (!Aneg.is_empty())
-        bmin = rhs(Aneg).max();
-      if (!Apos.is_empty())
-        bmax = rhs(Apos).min();
-      X(j,i) = rbeta_trunc(k(j) + prior(0), n(j) - k(j) + prior(1), bmin, bmax);
+      // copy old and update to new parameters:
+      X.col(i) = X.col(i-1);
+      idx = sample(idx, D, false);
+
+      for (int m = 0; m < D; m++)
+      {
+        j = idx(m);
+        // get min/max for truncated beta:
+        bmax = 1.; bmin = 0.;
+        rhs = (b - A * X.col(i) + A.col(j) * X(j,i))/ A.col(j);
+        Aneg = find(A.col(j) < 0);
+        Apos = find(A.col(j) > 0);
+        if (!Aneg.is_empty())
+          bmin = rhs(Aneg).max();
+        if (!Apos.is_empty())
+          bmax = rhs(Apos).min();
+        X(j,i) = rbeta_trunc(k(j) + prior(0), n(j) - k(j) + prior(1), bmin, bmax);
+      }
     }
   }
   X.shed_cols(0, burnin - 1);
@@ -153,16 +143,24 @@ arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
 // [[Rcpp::export]]
 NumericVector count_binomial_cpp(arma::vec k, arma::vec n,
                                  arma::mat A, arma::vec b,
-                                 arma::vec prior, int M, int batch)
+                                 arma::vec prior, int M,
+                                 int batch, bool progress = true)
 {
+  Progress p(M/batch, progress);
+  bool run = true;
   int count = 0, todo = M;
   mat X;
   while (todo > 0)
   {
-    // count prior and posterior samples that match constraints:
-    X = rbeta_mat(fmin(todo,batch), k + prior(0), n - k + prior(1));
-    count = count  + count_samples(X, A, b);
-    todo = todo - batch;
+    p.increment();   // update progress bar
+    if (run)
+    {
+      run = !Progress::check_abort();
+      // count prior and posterior samples that match constraints:
+      X = rbeta_mat(fmin(todo,batch), k + prior(0), n - k + prior(1));
+      count = count  + count_samples(X, A, b);
+      todo = todo - batch;
+    }
   }
   return NumericVector::create(Named("integral") = (double)count / M,
                                Named("count") = count,
@@ -183,7 +181,7 @@ arma::vec sort_steps(arma::vec steps, int max)
 List count_stepwise(arma::vec k, arma::vec n,
                     arma::mat A, arma::vec b, arma::vec prior,
                     arma::vec M, arma::vec steps, int batch,
-                    arma::vec start)
+                    arma::vec start, bool progress = true)
 {
   steps = sort_steps(steps, A.n_rows);
   int S = steps.n_elem;    // number of unique steps
@@ -195,21 +193,62 @@ List count_stepwise(arma::vec k, arma::vec n,
   vec cnt = zeros(S);
   cnt(0) = count_binomial_cpp(k, n,
       A.rows(0, steps(0)),
-      b.subvec(0, steps(0)), prior, M(0), batch)["count"];
+      b.subvec(0, steps(0)), prior, M(0), batch, progress)["count"];
 
   for (int s = 1; s < S ; s++)
   {
     sample =
       sampling_binomial_cpp(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                            prior, (int)M(s), start);
+                            prior, (int)M(s), start, 10, progress);
     cnt(s) = cnt(s) +
       count_samples(sample,
                     A.rows(steps(s-1) + 1, steps(s)),
                     b.subvec(steps(s-1) + 1, steps(s)));
   }
-  return List::create(Named("integral") = prod(cnt/M),
+  return List::create(Named("integral") = prod(cnt / M.rows(0, S-1)),
                       Named("count") = as<NumericVector>(wrap(cnt)),
                       Named("M") = as<NumericVector>(wrap(M)),
                       Named("steps") = steps + 1);  // R indexing
 }
 
+
+// not as efficient as random-direction Gibbs sampling
+//  (requires constraints 0<p<1  in Ab representation)
+// [[Rcpp::export]]
+arma::mat sampling_hitandrun(arma::mat A, arma::vec b, int M, arma::vec start,
+                             int burnin = 5, double progress = true)
+{
+  int D = A.n_cols;    // dimensions
+  mat X(D, M + burnin);     // initialize posterior (column-major ordering)
+  X.col(0) = start_random(A, b, M, start);
+
+  Progress p(M, progress);
+  bool run = true;
+  double bmax = 1, bmin = 0;
+  vec rhs, u, x, z;
+  uvec Apos, Aneg;
+  int steps=100;
+  for (int i = 1 ; i < M + burnin; i++)
+  {
+    p.increment();   // update progress bar
+    if(run && i % steps == 0) run = !Progress::check_abort();
+    if (run)
+    {
+      // random direction
+      u = normalise(randn(D,1));
+      z = A * u;
+      x = X.col(i-1);
+      rhs = (b - A * x) / z;
+
+      // get min/max for truncated uniform:
+      bmax = 1.; bmin = 0.;
+      if (any(z < 0))
+        bmin = rhs(find(z < 0)).max();
+      if (any(z > 0))
+        bmax = rhs(find(z > 0)).min();
+      X.col(i) = x + R::runif(bmin, bmax) * u;
+    }
+  }
+  X.shed_cols(0, burnin - 1);
+  return X.t();
+}
