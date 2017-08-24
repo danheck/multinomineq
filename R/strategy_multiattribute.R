@@ -38,23 +38,23 @@ as_strategy <- function(pattern, c = .50, ordered = TRUE, prior = c(1,1)){
 #' v <- c(.9, .8, .7, .6)
 #' ca <- c(1, -1, -1, 1)
 #' cb <- c(-1, 1, -1, -1)
-#' predict_multiattribute(ca, cb, v, "TTB")
-#' predict_multiattribute(ca, cb, v, "WADDprob")
+#' strategy_multiattribute(ca, cb, v, "TTB")
+#' strategy_multiattribute(ca, cb, v, "WADDprob")
 #'
 #' # multiple cues
 #' data(heck2017_raw)
-#' predict_multiattribute(heck2017_raw[1:10, c("a1","a2","a3","a4")],
-#'                        heck2017_raw[1:10, c("b1","b2","b3","b4")],
-#'                        v, "WADDprob")
+#' strategy_multiattribute(heck2017_raw[1:10, c("a1","a2","a3","a4")],
+#'                         heck2017_raw[1:10, c("b1","b2","b3","b4")],
+#'                         v, "WADDprob")
 #' @export
-predict_multiattribute <- function (cueA, cueB, v, strategy,
+strategy_multiattribute <- function (cueA, cueB, v, strategy,
                                     c= .50, prior = c(1, 1)){
   check_cues(cueA, cueB, v)
 
   if (length(strategy) != 1){
     # multiple strategies
     strat.list <- lapply(strategy, function(s)
-      predict_multiattribute(cueA, cueB, v, s, c, prior))
+      strategy_multiattribute(cueA, cueB, v, s, c, prior))
     names(strat.list) <- strategy
     return(strat.list)
 
@@ -64,7 +64,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
       v <- matrix(v, nrow(cueA), length(v), byrow = TRUE)
     if (length(c) == 1)
       c <- rep(c, nrow(cueA))
-    tmp <- mapply(predict_multiattribute,
+    tmp <- mapply(strategy_multiattribute,
                   cueA = as.list(data.frame(t(cueA))),
                   cueB = as.list(data.frame(t(cueB))),
                   v = as.list(data.frame(t(v))),
@@ -92,7 +92,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
                      ifelse(length(d2) == 0, 0, 1 / cnt * sign(d2[1]))
                    },
                    "TTB" = {
-                     cnt <- predict_multiattribute(cueA, cueB, v, "TTBprob")$pattern
+                     cnt <- strategy_multiattribute(cueA, cueB, v, "TTBprob")$pattern
                      sign(cnt)
                    },
                    "EQW" = {
@@ -105,7 +105,7 @@ predict_multiattribute <- function (cueA, cueB, v, strategy,
                        sum(logodds[cueA == 1 & cueB == -1])
                    },
                    "WADD" = {
-                     ev <- predict_multiattribute(cueA, cueB, v, "WADDprob")$pattern
+                     ev <- strategy_multiattribute(cueA, cueB, v, "WADDprob")$pattern
                      sign(ev)
                    },
                    "GUESS" = {
@@ -144,13 +144,13 @@ print.strategy <- function(x, ...){
 #'
 #' Transforms ordered item-type predictions to polytope definition.
 #' This allows to use Monte-Carlo methods to compute the Bayes factor
-#' if the number of item types is large (\code{\link{compute_bf}}).
+#' if the number of item types is large (\code{\link{bf_binomial}}).
 #'
-#' @param strategy a decision strategy returned by \code{\link{predict_multiattribute}}.
+#' @param strategy a decision strategy returned by \code{\link{strategy_multiattribute}}.
 #'
 #' @details
 #' Note: Only works for models without guessing predictions and
-#'       without equality constraints (i.e., requires separate error probabilities per item type)
+#' without equality constraints (i.e., requires separate error probabilities per item type)
 #'
 #' @return a list containing the matrix \code{A} and the vector \code{b}
 #'      that define a polytope via \code{A*x <= b}.
@@ -159,7 +159,7 @@ print.strategy <- function(x, ...){
 #' strat <- list(pattern = c(-1,4,3,-2),
 #'               c = .5, ordered = TRUE,
 #'               prior = c(1,1))
-#' pt <- as_polytope(strat)
+#' pt <- strategy_to_Ab(strat)
 #' pt
 #'
 #' # compare results to encompassing BF method:
@@ -167,11 +167,11 @@ print.strategy <- function(x, ...){
 #'           ordered = FALSE, prior = c(1,1))
 #' k <- c(2, 20, 18, 0)
 #' n <- rep(20, 4)
-#' m1 <- select_bf(k, n, list(strat, b))
+#' m1 <- strategy_postprob(k, n, list(strat, b))
 #' log(m1[1] / m1[2])
-#' compute_bf(k, n, pt$A, pt$b)["log_bf_0e",]
+#' bf_binomial(k, n, pt$A, pt$b)["log_bf_0e",]
 #' @export
-as_polytope <- function (strategy){
+strategy_to_Ab <- function (strategy){
   check_strategy(strategy)
   pattern <- strategy$pattern
   c <- strategy$c
@@ -186,7 +186,8 @@ as_polytope <- function (strategy){
   s <- sign(pattern)
   A <- rbind(diag(s), diag(-s))
   colnames(A) <- paste0("p", abs(pattern))
-  b <- c(ifelse(s == -1, 0, 1), -s * c)
+  b <- c(ifelse(s == -1, 0, 1),
+         ifelse(s == -1, c, -c))
 
   if (strategy$ordered){
     # linear order constraints:

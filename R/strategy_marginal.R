@@ -1,12 +1,13 @@
 #########################
-#' Compute Log-Marginal Probabilities for Strategies
+#' Log-Marginal Likelihood for Decision Strategy
 #'
-#' Computes the logarithm of the integral over the likelihood function weighted by the prior distribution of the error probabilities.
+#' Computes the logarithm of the integral over the likelihood function weighted
+#' by the prior distribution of the error probabilities.
 #'
 #' @param k observed frequencies of Option B.
-#'          Either a vector or a matrix/data frame (one person per row)
-#' @param n vector with the number of choices per item type
-#' @param strategy a list that defines the predictions of a strategy, see\code{\link{predict_multiattribute}}
+#'          Either a vector or a matrix/data frame (one person per row).
+#' @param n vector with the number of choices per item type.
+#' @param strategy a list that defines the predictions of a strategy, see\code{\link{strategy_multiattribute}}.
 #'
 #'
 #' @examples
@@ -16,20 +17,20 @@
 #' strat <- list(pattern = c(-1, -1, 1),
 #'               c = .5, ordered = FALSE,
 #'               prior = c(1,1))
-#' m1 <- compute_marginal(k, n, strat)
+#' m1 <- strategy_marginal(k, n, strat)
 #' m1
 #'
 #' # pattern: A, B, B with ordered error e1<e3<e2<.50
 #' strat2 <- list(pattern = c(-1, 3, 2),
 #'                c = .5, ordered = TRUE,
 #'                prior = c(1,1))
-#' m2 <- compute_marginal(k, n, strat2)
+#' m2 <- strategy_marginal(k, n, strat2)
 #' m2
 #'
 #' # Bayes factor: Model 2 vs. Model 1
 #' exp(m2 - m1)
 #' @export
-compute_marginal <- function (k, n, strategy){
+strategy_marginal <- function (k, n, strategy){
   check_data_strategy(k, n, strategy)
   prior <- strategy$prior
   c <- strategy$c
@@ -93,14 +94,15 @@ compute_marginal <- function (k, n, strategy){
 }
 
 
-#' Strategy Selection Using the Bayes Factor
+#' Strategy Classification: Posterior Model Probabilities
 #'
-#' Computes the posterior model probabilities for multiple strategies (with equal prior model probabilities).
+#' Posterior model probabilities for multiple strategies (with equal prior model probabilities).
 #'
-#' @inheritParams compute_cnml
-#' @inheritParams select_nml
-#' @inheritParams compute_marginal
-#' @param strategies list of strategies. See \link{predict_multiattribute}
+# ' @inheritParams strategy_cnml
+# ' @inheritParams strategy_nml
+#' @inheritParams strategy_marginal
+#' @param strategies list of strategies. See \link{strategy_multiattribute}
+#' @param cores number of processing units for parallel computation.
 # @param c upper boundary for parameters/error probabilities.
 #   A vector of the same length as \code{strategies}
 #   can be provided to use a different upper bound per model.
@@ -108,7 +110,7 @@ compute_marginal <- function (k, n, strategy){
 #   Similar as for \code{c}, a vector of the same length as \code{strategies}
 #   can be provided to define which models have ordered error probabilities.
 #'
-#' @seealso \code{\link{compute_marginal}} and \code{\link{model_weights}}
+#' @seealso \code{\link{strategy_marginal}} and \code{\link{model_weights}}
 #' @examples
 #' # pattern 1: A, A, B with constant error e<.50
 #' strat1 <- list(pattern = c(-1, -1, 1),
@@ -124,9 +126,9 @@ compute_marginal <- function (k, n, strategy){
 #' # data
 #' k <- c(3, 4, 12)               # frequencies Option B
 #' n <- c(20, 20, 20)             # number of choices
-#' select_bf(k, n, list(strat1, strat2, baseline))
+#' strategy_postprob(k, n, list(strat1, strat2, baseline))
 #' @export
-select_bf <- function (k, n, strategies, cores = 1){
+strategy_postprob <- function (k, n, strategies, cores = 1){
 
   if (!is.null(dim(k))){
     if (is.null(dim(n)) || is.table(n))
@@ -135,14 +137,14 @@ select_bf <- function (k, n, strategies, cores = 1){
       k <- unclass(k)
     if (cores > 1){
       cl <- makeCluster(cores)
-      pp <- clusterMap(cl, select_bf,
+      pp <- clusterMap(cl, strategy_postprob,
                        k = as.list(data.frame(t(k))),
                        n = as.list(data.frame(t(n))),
                        MoreArgs = list(strategies = strategies),
                        SIMPLIFY = TRUE, .scheduling = "dynamic")
       stopCluster(cl)
     } else {
-      pp <- mapply(select_bf,
+      pp <- mapply(strategy_postprob,
                    k = as.list(data.frame(t(k))),
                    n = as.list(data.frame(t(n))),
                    MoreArgs = list(strategies = strategies))
@@ -154,7 +156,7 @@ select_bf <- function (k, n, strategies, cores = 1){
 
   } else {
     marginal <- sapply(strategies, function(strat)
-      compute_marginal(k, n, strat))
+      strategy_marginal(k, n, strat))
     pp <- model_weights(marginal)
   }
   pp
