@@ -89,14 +89,17 @@ check_Abknprior <- function (A, b, k, n, prior = c(1, 1)){
     stop("'A' must be a matrix with number of columns equal to the length of 'k'.")
 }
 
-check_ko <- function(k, options){
+check_o <- function(options)
   if (any(options != round(options), options <0))
     stop ("'options' must contain positive integers.")
+
+check_ko <- function(k, options){
+  check_o(options)
   if (length(k) != sum(options))
     stop("'k' must have the same length as sum(options).")
 }
 
-check_Abokprior <- function (A, b, options, k, prior){
+check_Abokprior <- function (A, b, options, k, prior = rep(1, length(k))){
   check_Ab(A, b, options)
   check_ko(k, options)
   if (length(prior) != length(k))
@@ -188,3 +191,14 @@ check_count <- function(count){
   if (length(count$count) != length(count$M))
     stop ("in 'prior'/'posterior': 'count' and 'M' must have equal length.")
 }
+
+check_io <- function(inside, options){
+  if (!is.function(inside))
+    stop("'inside' must be a function.")
+  tryCatch (inside(runif(sum(options))),
+            error = function(e)
+              stop("The function 'inside' should work for vector of length ", sum(options)))
+  if (!inside(runif(sum(options))) %in% c(0,1))
+    stop ("The function 'inside' should return 0/1  or TRUE/FALSE.")
+}
+
