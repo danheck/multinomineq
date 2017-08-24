@@ -1,0 +1,1 @@
+#' @references Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \url{https://doi.org/10.1177/0146621603260678}
