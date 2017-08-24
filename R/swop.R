@@ -2,8 +2,8 @@
 #' Strict Weak Order Polytope for 5 Elements and Ternary Choices
 #'
 #' Facet-defining inequalities of the strict weak order mixture model
-#' for the 20 paired comparisons of 5 choice elements {a,b,c,d,e}
-#' (Regenwetter & Davis-Stober, 2012).
+#' for all 10 paired comparisons of 5 choice elements {a,b,c,d,e} in a
+#' 3-alternative forced-choice task (Regenwetter & Davis-Stober, 2012).
 #'
 #' @format A list with 3 elements:
 #' \describe{
@@ -18,7 +18,7 @@
 #' tail(swop5$A)  # A*x <= b
 #' tail(swop5$b)
 #' swop5$start    # inside SWOP polytope
-#' swop5$options  # number of options per item
+#' swop5$options  # 3 choice options per item
 #'
 #' # check whether point is in polytope:
 #' inside(swop5$start, swop5$A, swop5$b)
