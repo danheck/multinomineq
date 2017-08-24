@@ -1,7 +1,7 @@
-#' Encompassing Bayes Factor
+#' Bayes Factor for Linear Order Constraints
 #'
-#' Computes the Bayes factor for order-constrained product-binomial/-multinomial models
-#' that are specified as a polytope via:  A*x <= b (see details).
+#' Computes the Bayes factor for linear order-constraints (specified via: A*x <= b)
+#' for product-binomial/-multinomial models.
 #'
 #' @inheritParams count_binomial
 #' @details
@@ -13,6 +13,9 @@
 #' @template ref_karabatsos2005
 #' @template ref_regenwetter2014
 #' @template return_bf
+#' @seealso \code{\link{count_binomial}} and \code{\link{count_multinomial}} for
+#'     for more control on the number of prior/posterior samples and
+#'     \code{\link{bf_nonlinear}} for nonlinear order constraints.
 #' @examples
 #' k <- c(0, 3, 2, 5, 3, 7)
 #' n <- rep(10, 6)
@@ -29,17 +32,19 @@
 #' b <- c(0, 0, 0, 0, 0, .50)
 #'
 #' # check whether vectors are in polytope:
-#' A %*% c(.05, .1, .12, .16, .19, .23) <= b
-#' A %*% c(.05, .3, .12, .16, .19, .53) <= b
+#' inside(c(.05, .1, .12, .16, .19, .23), A, b)  # yes
+#' inside(c(.05, .3, .12, .16, .19, .53), A, b)  # no
 #'
 #' # Bayes factor: unconstrained vs. constrained
 #' bf_binomial(k, n, A, b, prior=c(1, 1), M=2e5)
 #' bf_binomial(k, n, A, b, prior=c(1, 1), M=1e4, steps=c(2,4,5))
 #' @export
-bf_binomial <- function(k, n, A, b, V, prior = c(1, 1),
+bf_binomial <- function(k, n, A, b, V, map, prior = c(1, 1),
                         M = 5e5, steps, batch = 10000){
-  pr <- count_binomial (0, 0, A, b, V, prior, M, steps, batch)
-  po <- count_binomial (k, n, A, b, V, prior, M, steps, batch)
+  pr <- count_binomial(0, 0, A, b, V, map = map, prior = prior,
+                       M = M, steps = steps, batch = batch)
+  po <- count_binomial(k, n, A, b, V, map = map, prior = prior,
+                       M = M, steps = steps, batch = batch)
   count_to_bf(po, pr)
 }
 
@@ -48,7 +53,7 @@ bf_binomial <- function(k, n, A, b, V, prior = c(1, 1),
 #' @export
 bf_multinomial <- function(k, options, A, b, V, prior = rep(1, sum(options)),
                             M = 5e5, steps, batch = 10000){
-  pr <- count_multinomial (0, options, A, b, V, prior, M, steps, batch)
-  po <- count_multinomial (k, options, A, b, V, prior, M, steps, batch)
+  pr <- count_multinomial(0, options, A, b, V, prior, M, steps, batch)
+  po <- count_multinomial(k, options, A, b, V, prior, M, steps, batch)
   count_to_bf(po, pr)
 }

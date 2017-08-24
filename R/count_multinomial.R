@@ -17,6 +17,7 @@
 #' @param prior the prior parameters of the Dirichlet-shape parameters.
 #'    Must have the same length as \code{k}.
 #' @inheritParams inside
+#' @inheritParams count_binomial
 #' @return a list with the elements
 #' \itemize{
 #'     \item\code{integral}: estimated probability that samples are in polytope
@@ -52,17 +53,21 @@
 #' @export
 count_multinomial <- function (k = 0, options, A, b, V,
                                prior = rep(1, sum(options)),
-                               M, steps, batch = 10000){
+                               M, steps, batch = 10000, start = -1, progress = TRUE){
   if (length(k) == 1 && k == 0)
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
   check_Mbatch(M, batch)
 
   if (missing(steps) || is.null(steps) || length(steps) == 0){
-    cnt <- as.list(count_multinomial_cpp(k, options, A, b, prior, M, batch))
+    cnt <- as.list(count_multinomial_cpp(k, options, A, b, prior, M, batch, progress))
   } else {
     check_stepsA(steps, A)
-    cnt <- count_stepwise_multi(k, n, A, b, prior, M, steps, batch)
+    tmp <- Ab_multinomial(options, A, b)  # sum-to-1 constraints
+    A <- tmp$A
+    b <- tmp$b
+    cnt <- count_stepwise_multi(k, options, A, b, prior, M,
+                                steps, batch, start, progress)
   }
   cnt
 }

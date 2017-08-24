@@ -7,8 +7,9 @@
 #'
 #' @inheritParams inside
 #' @param k the number of Option B choices.
-#'     The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.
+#'     The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.
 #' @param n the number of choices per item type.
+#' @param map optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}
 #' @param M number of posterior samples drawn from the encompassing model
 #' @param batch size of the batches into which computations are split to reduce memory load
 #' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling
@@ -16,6 +17,7 @@
 #' @param start only if \code{steps} is defined: a vector with starting values
 #'     within the polytope. If \code{steps = -1}, a random starting value is used
 #'     (but a poitn within the polytope might not be found if the order constraints are strong).
+#' @param progress whether a progress bar should be shown.
 #'
 #' @details
 #' Useful to compute the encompassing Bayes factor for testing order constraints (see \code{\link{bf_binomial}}; Hojtink, 2011).
@@ -31,6 +33,7 @@
 #'     \item\code{integral}: estimated probability that samples are in polytope
 #'     \item\code{count}: number of samples in polytope
 #'     \item\code{M}: total number of samples
+#'     \item\code{const_map}: logarithm of the binomial constants that have to be considered due to equality constraints
 #' }
 #' @examples
 #' # linear order constraint:
@@ -64,29 +67,27 @@
 #' @template ref_fukuda2004
 #' @importFrom Rglpk Rglpk_solve_LP
 #' @export
-count_binomial <- function (k = 0, n = 0, A, b, V, prior = c(1, 1),
-                            M = 10000, steps, batch = 10000, start = -1){
+count_binomial <- function (k, n, A, b, V, map, prior = c(1, 1),
+                            M = 10000, steps, batch = 10000,
+                            start = -1, progress = TRUE){
 
-  if (missing(V) || is.null(V)){
-    if (length(k) == 1 && k == 0)
-      k <- rep(0, ncol(A))
-    if (length(n) == 1 && n == 0)
-      n <- rep(0, ncol(A))
+  if (missing(A)) A <- V
+  aggr <- map_k_to_A(k, n, A, map, prior)
+  k <- aggr$k
+  n <- aggr$n
+
+  check_Mbatch(M, batch)
+
+  if (!missing(b)){
     check_Abknprior(A, b, k, n, prior)
-    check_Mbatch(M, batch)
-
     if (missing(steps) || is.null(steps) || length(steps) == 0){
-      cnt <- as.list(count_binomial_cpp(k, n, A, b, prior, M, batch))
+      cnt <- as.list(count_binomial_cpp(k, n, A, b, prior, M, batch, progress))
     } else {
       check_stepsA(steps, A)
-      cnt <- count_stepwise(k, n, A, b, prior, M, steps, batch, start)
+      cnt <- count_stepwise(k, n, A, b, prior, M, steps, batch, start, progress)
     }
 
-  } else {
-    if (length(k) == 1 && k == 0)
-      k <- rep(0, ncol(V))
-    if (length(n) == 1 && n == 0)
-      n <- rep(0, ncol(V))
+  } else if (!missing(V)){
     count <- 0
     m <- M
     a <- c(rbind(k + prior[1], n - k + prior[2]))
@@ -95,8 +96,12 @@ count_binomial <- function (k = 0, n = 0, A, b, V, prior = c(1, 1),
       count <- count + sum(inside_V(X, V))
       m <- m - batch
     }
-    cnt <- list("integral" = count/M, "count" = count, "M" = M)
+    cnt <- list("integral" = count/M, "count" = count, "M" = M,
+                "const_map_0e" = aggr$const_map_0e)
+  } else {
+    stop("A/b or V must be provided.")
   }
+  cnt$const_map_0e <- aggr$const_map_0e
   cnt
 }
 
@@ -104,58 +109,4 @@ count_binomial <- function (k = 0, n = 0, A, b, V, prior = c(1, 1),
 #   apply(X, 1, inside_V, V = V)
 # }
 
-
-#' Compute Bayes Factor Using Prior/Posterior Counts
-#'
-#' Computes the encompassing Bayes factor (and standard error) defined as the ratio of posterior/prior
-#' samples that satisfy the order constraints (e.g., of a polytope).
-#'
-#' @param posterior a list with the entries \code{count} (number of samples within polytope)
-#'     and \code{M} (total number of samples). Both can be vectors in the stepwise procedure.
-#'     See \code{\link{count_binomial}}.
-#' @param prior a list similar as \code{posterior} but based on prior samples.
-#' @param beta prior parameters of beta distributions for estimating the standard error
-#' @param samples number of samples from beta distributions used to approximate the standard error.
-#'      The default is Jeffreys' prior.
-#'
-#' The standard error of the (stepwise) encompassing Bayes factor is estimated by sampling
-#' ratios from beta distributions, with parameters defined by the posterior/prior counts
-#' (see Hoijtink, 2011; p. 211).
-#'
-#' @template ref_hoijtink2011
-#' @template return_bf
-#' @seealso \code{\link{count_binomial}}, \code{\link{count_multinomial}}
-#' @examples
-#' post  <- list(count = 1447, M = 5000)
-#' prior <- list(count = 152, M = 5000)
-#' count_to_bf(post, prior)
-#' @export
-count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 3000){
-  check_count(posterior)
-  check_count(prior)
-  est <- prod(posterior$count / posterior$M)  / prod(prior$count / prior$M)
-
-  bpost  <- sampling_beta(posterior$count, posterior$M, beta, samples)
-  bprior <- sampling_beta(prior$count, prior$M, beta, samples)
-
-  bf_0e <- apply(bpost,  1, prod) / apply(bprior, 1, prod)
-  bf_e0 <- apply(bprior, 1, prod) / apply(bpost,  1, prod)
-
-  bf <- matrix(c(est,  1 / est, log(est), - log(est),
-                 sd(bf_0e), sd(bf_e0), sd(log(bf_0e)), sd(log(bf_e0))),
-               4, 2,  dimnames = list(c("bf_0e", "bf_e0", "log_bf_0e", "log_bf_e0"),
-                                      c("BF", "SE")))
-  bf
-}
-
-sampling_beta <- function (count, M, beta = c(.5, .5), samples = 10000){
-  S <- length(count)
-  if (length(M) == 1)
-    M <- rep(M, S)
-  probs <- matrix(NA, samples, S)
-  for (s in 1:S){
-    probs[,s]  = rbeta(samples, count[s] + beta[1], M[s] - count[s]  + beta[2])
-  }
-  probs
-}
 
