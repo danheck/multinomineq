@@ -3,12 +3,11 @@
 #' Uses posterior samples to get posterior-predicted frequencies and compare
 #' the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the posterior-predicted frequencies.
 #'
+#' @inheritParams rpmultinom
 #' @inheritParams count_binomial
 #' @inheritParams count_multinomial
-#' @param theta posterior samples of the choice probabilities.
-#'     See \code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}}
 #' @param M number of subsamples from \code{theta}
-#' @seealso \code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}} to get posterior samples
+#' @seealso \code{\link{sampling_binomial}}/\code{\link{sampling_multinomial}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
 #' @template ref_myung2005
 #'
 #' @examples
@@ -20,9 +19,11 @@
 #'
 #' # multinomial (ternary choice)
 #' theta <- matrix(runif(300*2, 0, .05), 300)
-#' ppp_multinomial(theta, c(1,0,9), 3)
+#' ppp_multinomial(theta, c(1,0,9), 3)  # ok
 #' @export
 ppp_binomial <- function(theta, k, n, M = 2000){
+  if (length(n) == 1)
+    n <- rep(n, length(k))
   check_thetakn(theta, k, n)
   M <- min(nrow(theta), M)
   tt <- theta[sample(nrow(theta), M),]
@@ -47,7 +48,7 @@ ppp_multinomial <- function(theta, k, options, M = 2000){
   n <- tapply(k, rep(seq_along(options), options), sum)
   n_mat <- matrix(rep(n, options), M, sum(options), byrow= TRUE)
   k_obs <- matrix(k, M, length(k), byrow = TRUE)
-  k_pred <- pred_mult(tf, k, options)
+  k_pred <- rpmultinom(tf, get_n(k, options), options)
 
   X2_pred <- X2(e = tf * n_mat, o = k_pred)
   X2_obs <- X2(e = tf * n_mat, o = k_obs)
@@ -62,6 +63,11 @@ X2 <- function(e, o){
   } else {
     rowSums( (o - e)^2 / e )
   }
+}
+
+get_n <- function(k, options){
+  oo <- rep(1:length(options), options)
+  tapply(k, oo, sum)
 }
 
 pred_mult <- function(tf, k, options){

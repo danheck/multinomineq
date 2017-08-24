@@ -1,6 +1,7 @@
-#' Posterior Samples for Ordered-Constrained Product-Binomial Models
+#' Posterior Sampling for Constrained Binomial Models
 #'
-#' Uses Gibbs sampling to draw posterior samples for order-constrained models of binary choice.
+#' Uses Gibbs sampling to draw posterior samples for
+#' binomial models with linear inequality-constraints.
 #'
 #' @inheritParams count_binomial
 #' @param M number of posterior samples
@@ -24,27 +25,32 @@
 #' b <- c(.5, 1, 1, -.2, .1)
 #' samp <- sampling_binomial(c(5,12,7), c(20,20,20), A, b)
 #' head(samp)
-#' colMeans(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0,.6))
 #' @export
-sampling_binomial <- function (k, n, A, b, prior = c(1, 1), M = 5000,
-                               start, burnin = 10){
+sampling_binomial <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
+                               M = 5000, start, burnin = 10, progress = TRUE){
+  if (length(n) == 1) n <- rep(n, length(k))
+  aggr <- map_k_to_A(k, n, A, map)
+  k <- aggr$k
+  n <- aggr$n
   check_Abknprior(A, b, k, n, prior)
-  if (missing(start) || all(start < 0)){
-    start <- -1  # TODO: find start value
+  if (missing(start) || any(start < 0)){
+    start <- k/n # ML estimate
+    if (!inside(start, A, b))
+      start <- find_inside(A, b)
   } else if (length(start) != ncol(A) || !all(A %*% start <= b)) {
     stop ("'start' must be in the convex polytope:  A*start <= b")
   }
-  samples <- sampling_binomial_cpp(k, n, A, b, prior, M, start, burnin)
+  samples <- sampling_binomial_cpp(k, n, A, b, prior,
+                                   M, start, burnin, progress)
   colnames(samples) <- colnames(A)
-  if (is.null(colnames(A)))
-    colnames(samples) <- index_bin(k)
   samples
 }
 
-#' Posterior Samples for Ordered-Constrained Product-Multinomial Models
+#' Posterior Sampling for Constrained Multinomial Models
 #'
-#' Uses Gibbs sampling to draw posterior samples for order-constrained models of binary choice.
+#' Uses Gibbs sampling to draw posterior samples for
+#' multinomial models with linear inequality-constraints.
 #'
 #' @inheritParams count_multinomial
 #' @inheritParams count_binomial
@@ -64,26 +70,29 @@ sampling_binomial <- function (k, n, A, b, prior = c(1, 1), M = 5000,
 #' b <- c(.2, 1, -.2, .4)
 #' samp <- sampling_multinomial(k, options, A, b)
 #' head(samp)
-#' colMeans(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0, 1))
 #' @export
 sampling_multinomial <- function (k, options, A, b,
                                   prior = rep(1, sum(options)),
-                                  M = 5000, start, burnin = 10){
+                                  M = 5000, start, burnin = 10,
+                                  progress = TRUE){
   if (missing(start) || any(start < 0)){
-    start <- -1  # TODO: find start value
+    start <- k_to_prob(k, options) # ML estimate
+    if (!inside(start, A, b))
+      start <- find_inside(A, b, options = options)
   } else if (length(start) != ncol(A) || !all(A %*% start <= b)) {
     stop ("'start' must be in the convex polytope:  A*start <= b")
   }
   if (missing(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
-  tmp <- ineq_probabilities(options, A, b)
+  tmp <- Ab_multinomial(options, A, b)  # sum-to-1 constraints
   A <- tmp$A
   b <- tmp$b
-  samples <- sampling_multinomial_cpp(k, options, A, b, prior, M, start, burnin)
+  samples <- sampling_multinomial_cpp(k, options, A, b, prior,
+                                      M, start, burnin, progress)
   colnames(samples) <- colnames(A)
   if (is.null(colnames(A)))
-    colnames(samples) <- index_mult(options)
+    colnames(samples) <- drop_fixed(index_mult(options), options)
   samples
 }
