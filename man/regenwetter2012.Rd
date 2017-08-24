@@ -16,23 +16,20 @@
 regenwetter2012
 }
 \description{
-Raw data with risky choices between all 20 paired comparison of 5 elements a,b,c,d, and e.
-Participants could either choose "Option 1", "Option 2", or "indifferent".
-Each gamble pair (e.g., a vs. b) was repeated 45 times per participant.
-There werre three different gamble sets (see Regenwetter & Davis-Stober, 2012).
-}
-\details{
-Each participant made 40 choices for each of 4 item types with four cues
-(with validities .9, .8, .7, and .6).
-Individual choice freqeuncies are available as \code{\link{heck2017}}
+Raw data with choice frequencies for all 20 paired comparison of 5 gambles a, b, c, d, and e.
+Participants could either choose "Option 1", "Option 2", or "indifferent" (ternary choice).
+Each paired comparison (e.g., a vs. b) was repeated 45 times per participant.
+The data include 3 different gamble sets and aimed at testing whether people
+have transitive preferences (see Regenwetter & Davis-Stober, 2012).
 }
 \examples{
 data(regenwetter2012)
 head(regenwetter2012)
 
-# check: strict weak order polytope (SWOP):
+# check transitive preferences: strict weak order polytope (SWOP)
 data(swop5)
 tail(swop5$A, 3)
+# participant 1, gamble set 1:
 p1 <- regenwetter2012[1,-c(1:2)]
 inside_multinomial(p1, swop5$options, swop5$A, swop5$b)
 
@@ -42,10 +39,14 @@ p <- sampling_multinomial(regenwetter2012[1,-c(1:2)],
                           swop5$options, swop5$A, swop5$b,
                           M=1000, start = swop5$start)
 colMeans(p)
-apply(p[,1:5], 2, plot, type = "l")
+apply(p[,1:6], 2, plot, type = "l")
+ppp_multinomial(p, p1, swop5$options)
 }
 }
 \references{
 Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+}
+\seealso{
+The substantive model of interest was the strict weak order polytope (see \code{\link{swop5}}).
 }
 \keyword{datasets}

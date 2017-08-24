@@ -2,14 +2,14 @@
 % Please edit documentation in R/sampling_polytope.R
 \name{sampling_binomial}
 \alias{sampling_binomial}
-\title{Posterior Samples for Ordered-Constrained Product-Binomial Models}
+\title{Posterior Sampling for Constrained Binomial Models}
 \usage{
-sampling_binomial(k, n, A, b, prior = c(1, 1), M = 5000, start,
-  burnin = 10)
+sampling_binomial(k, n, A, b, map = 1:ncol(A), prior = c(1, 1), M = 5000,
+  start, burnin = 10, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of Option B choices.
-The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
+The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
 \item{n}{the number of choices per item type.}
 
@@ -19,6 +19,8 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
+\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+
 \item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples}
@@ -26,12 +28,15 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 \item{start}{starting vectors. Must be in the convex polytope (that is, \code{A*start <= b})}
 
 \item{burnin}{number of burnin samples that are discarded}
+
+\item{progress}{whether a progress bar should be shown.}
 }
 \value{
 a matrix with posterior samples for the probabilities to choose Option B for each item type
 }
 \description{
-Uses Gibbs sampling to draw posterior samples for order-constrained models of binary choice.
+Uses Gibbs sampling to draw posterior samples for
+binomial models with linear inequality-constraints.
 }
 \details{
 Can be used to obtain posterior samples for binary random utility models that assume a mixture over predefined
@@ -47,7 +52,6 @@ A <- matrix(c(1, 0, 0,   # x1 < .50
 b <- c(.5, 1, 1, -.2, .1)
 samp <- sampling_binomial(c(5,12,7), c(20,20,20), A, b)
 head(samp)
-colMeans(samp)
 apply(samp, 2, plot, type = "l", ylim = c(0,.6))
 }
 \references{

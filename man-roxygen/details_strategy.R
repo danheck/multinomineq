@@ -8,5 +8,5 @@
 #' \item{\code{c}}{upper boundary of error probabilities}
 #' \item{\code{ordered}: }{whether error probabilities are linearly ordered by their absolute value in \code{pattern} (largest error: smallest absolute number)}
 #' \item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
-#' \item{\code{label}: }{strategy label}
+#' \item{\code{label}: }{strategy label (optional)}
 #' }

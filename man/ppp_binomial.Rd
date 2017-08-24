@@ -10,18 +10,18 @@ ppp_binomial(theta, k, n, M = 2000)
 ppp_multinomial(theta, k, options, M = 2000)
 }
 \arguments{
-\item{theta}{posterior samples of the choice probabilities.
-See \code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}}}
+\item{theta}{vector with probability parameters. Must sum to one within each option.
+Can be a matrix with one parameter vector per row.
+See \code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}}.}
 
 \item{k}{the number of Option B choices.
-The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
+The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{integer vector, specifying the total number of objects for each multinomial distribution.}
 
 \item{M}{number of subsamples from \code{theta}}
 
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of parameters/categories of each multinomial distribution.}
 }
 \description{
 Uses posterior samples to get posterior-predicted frequencies and compare
@@ -36,11 +36,11 @@ ppp_binomial(theta, c(5,4,3), n)  # misfit
 
 # multinomial (ternary choice)
 theta <- matrix(runif(300*2, 0, .05), 300)
-ppp_multinomial(theta, c(1,0,9), 3)
+ppp_multinomial(theta, c(1,0,9), 3)  # ok
 }
 \references{
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
 }
 \seealso{
-\code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}} to get posterior samples
+\code{\link{sampling_binomial}}/\code{\link{sampling_multinomial}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
 }

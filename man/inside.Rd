@@ -47,5 +47,5 @@ inside(xout, A, b)
 inside(xout, V = V)
 }
 \seealso{
-\code{\link{ineq_to_vertex}} to change between A/b and V representation.
+\code{\link{Ab_to_V}} and \code{\link{V_to_Ab}} to change between A/b and V representation.
 }

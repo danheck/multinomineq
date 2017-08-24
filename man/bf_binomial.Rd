@@ -3,9 +3,9 @@
 \name{bf_binomial}
 \alias{bf_binomial}
 \alias{bf_multinomial}
-\title{Encompassing Bayes Factor}
+\title{Bayes Factor for Linear Order Constraints}
 \usage{
-bf_binomial(k, n, A, b, V, prior = c(1, 1), M = 5e+05, steps,
+bf_binomial(k, n, A, b, V, map, prior = c(1, 1), M = 5e+05, steps,
   batch = 10000)
 
 bf_multinomial(k, options, A, b, V, prior = rep(1, sum(options)), M = 5e+05,
@@ -13,7 +13,7 @@ bf_multinomial(k, options, A, b, V, prior = rep(1, sum(options)), M = 5e+05,
 }
 \arguments{
 \item{k}{the number of Option B choices.
-The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
+The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
 \item{n}{the number of choices per item type.}
 
@@ -27,6 +27,8 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 admissible parameters as the convex hull over these points
 (if provided, \code{A} and \code{b} are ignored). Note that this method
 is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
+
+\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
 
 \item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
@@ -43,8 +45,8 @@ The sum of \code{options} must be equal to the length of \code{k}.}
 a matrix with estiamtes (first column) and standard errors (second column) for the Bayes factor and log BF of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
 }
 \description{
-Computes the Bayes factor for order-constrained product-binomial/-multinomial models
-that are specified as a polytope via:  A*x <= b (see details).
+Computes the Bayes factor for linear order-constraints (specified via: A*x <= b)
+for product-binomial/-multinomial models.
 }
 \details{
 For more control, use \code{\link{count_binomial}} to specifiy how many samples
@@ -68,8 +70,8 @@ A <- matrix(c(1, -1, 0, 0, 0, 0,
 b <- c(0, 0, 0, 0, 0, .50)
 
 # check whether vectors are in polytope:
-A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
-A \%*\% c(.05, .3, .12, .16, .19, .53) <= b
+inside(c(.05, .1, .12, .16, .19, .23), A, b)  # yes
+inside(c(.05, .3, .12, .16, .19, .53), A, b)  # no
 
 # Bayes factor: unconstrained vs. constrained
 bf_binomial(k, n, A, b, prior=c(1, 1), M=2e5)
@@ -79,4 +81,9 @@ bf_binomial(k, n, A, b, prior=c(1, 1), M=1e4, steps=c(2,4,5))
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}
 
 Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
+}
+\seealso{
+\code{\link{count_binomial}} and \code{\link{count_multinomial}} for
+    for more control on the number of prior/posterior samples and
+    \code{\link{bf_nonlinear}} for nonlinear order constraints.
 }

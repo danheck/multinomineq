@@ -50,16 +50,10 @@ cueB <- matrix(c(-1, -1, -1, -1,
 # get predictions
 strategies <- c("baseline", "WADDprob", "WADD",
                 "TTBprob", "TTB", "EQW", "GUESS")
-strats <- predict_multiattribute(cueA, cueB, v, strategies)
+strats <- strategy_multiattribute(cueA, cueB, v, strategies)
 
 # strategy classification with Bayes factor
-select_bf(heck2017[1:4,], n, strats)
-
-\dontrun{
-# strategy classification by NML (can take hours)
-cnmls <- compute_cnml(preds, n, cores = 3)
-select_nml(heck2017[1:4,], n, cnmls)
-}
+strategy_postprob(heck2017[1:4,], n, strats)
 }
 \references{
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \url{https://doi.org/10.1016/j.cogpsych.2017.05.003}

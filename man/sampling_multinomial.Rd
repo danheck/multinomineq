@@ -2,10 +2,10 @@
 % Please edit documentation in R/sampling_polytope.R
 \name{sampling_multinomial}
 \alias{sampling_multinomial}
-\title{Posterior Samples for Ordered-Constrained Product-Multinomial Models}
+\title{Posterior Sampling for Constrained Multinomial Models}
 \usage{
 sampling_multinomial(k, options, A, b, prior = rep(1, sum(options)),
-  M = 5000, start, burnin = 10)
+  M = 5000, start, burnin = 10, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -32,9 +32,12 @@ within the polytope. If \code{steps = -1}, a random starting value is used
 (but a poitn within the polytope might not be found if the order constraints are strong).}
 
 \item{burnin}{number of burnin samples that are discarded}
+
+\item{progress}{whether a progress bar should be shown.}
 }
 \description{
-Uses Gibbs sampling to draw posterior samples for order-constrained models of binary choice.
+Uses Gibbs sampling to draw posterior samples for
+multinomial models with linear inequality-constraints.
 }
 \examples{
 # binary and ternary choice:
@@ -51,6 +54,5 @@ A <- matrix(c(1, 0, 0,   # a1 < .20
 b <- c(.2, 1, -.2, .4)
 samp <- sampling_multinomial(k, options, A, b)
 head(samp)
-colMeans(samp)
 apply(samp, 2, plot, type = "l", ylim = c(0, 1))
 }

@@ -5,7 +5,7 @@
 \title{Number of Product-Multinomial Prior/Posterior Samples in Polytope}
 \usage{
 count_multinomial(k = 0, options, A, b, V, prior = rep(1, sum(options)), M,
-  steps, batch = 10000)
+  steps, batch = 10000, start = -1, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -29,6 +29,18 @@ is comparatively slow since it solves a linear-programming problem for each poin
 
 \item{prior}{the prior parameters of the Dirichlet-shape parameters.
 Must have the same length as \code{k}.}
+
+\item{M}{number of posterior samples drawn from the encompassing model}
+
+\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
+
+\item{batch}{size of the batches into which computations are split to reduce memory load}
+
+\item{start}{only if \code{steps} is defined: a vector with starting values
+within the polytope. If \code{steps = -1}, a random starting value is used
+(but a poitn within the polytope might not be found if the order constraints are strong).}
+
+\item{progress}{whether a progress bar should be shown.}
 }
 \value{
 a list with the elements

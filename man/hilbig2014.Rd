@@ -30,7 +30,6 @@ The pattern of cue values of Option A and and B was as follows:
 data(hilbig2014)
 head(hilbig2014)
 
-\dontrun{
 # validities and cue values
 v <- c(.9, .8, .7, .6)
 cueA <- matrix(c(1,  1,  1, -1,
@@ -45,14 +44,12 @@ cueB <- matrix(c(-1, 1, -1,  1,
 # get strategy predictions
 strategies <- c("baseline", "WADDprob", "WADD",
                 "TTB", "EQW", "GUESS")
-preds <- predict_multiattribute(cueA, cueB, v, strategies)
+preds <- strategy_multiattribute(cueA, cueB, v, strategies)
 c <- c(1, rep(.5, 5))  # upper bound of probabilities
 
-# get NML complexity and perform model selection
+# use Bayes factor for strategy classification
 n <- rep(32, 3)
-cnmls <- compute_cnml(preds, n, c, cores = 3)
-select_nml(hilbig2014[1:5,], n, cnmls)
-}
+strategy_postprob(k = hilbig2014[1:5,], n, preds)
 }
 \references{
 Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \url{https://doi.org/10.3758/s13423-014-0643-0}

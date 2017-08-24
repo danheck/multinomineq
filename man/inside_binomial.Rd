@@ -17,6 +17,17 @@ For \code{inside_multinomial}: for all choice options ordered by item type
 
 \item{n}{only for \code{inside_binomial}: number of choices per item type.}
 
+\item{A}{a matrix with one row for each linear inequality constraint and one
+column for each of the free parameters. The parameter space is defined
+as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
+
+\item{b}{a vector of the same length as the number of rows of \code{A}.}
+
+\item{V}{a matrix of vertices (one per row) that define the polytope of
+admissible parameters as the convex hull over these points
+(if provided, \code{A} and \code{b} are ignored). Note that this method
+is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
+
 \item{options}{only for \code{inside_multinomial}: number of response options per item type.}
 }
 \description{

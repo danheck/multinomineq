@@ -43,39 +43,36 @@ Individual choice freqeuncies are available as \code{\link{heck2017}}
 data(heck2017_raw)
 head(heck2017_raw)
 
-\dontrun{
 # get cue values, validities, and predictions
 cueA <- heck2017_raw[,paste0("a",1:4)]
 cueB <- heck2017_raw[,paste0("b",1:4)]
 v <- c(.9, .8, .7, .6)
-strat <- predict_multiattribute(cueA, cueB, v,
+strat <- strategy_multiattribute(cueA, cueB, v,
                      c("TTB", "TTBprob", "WADD",
                        "WADDprob", "EQW", "GUESS"))
 
 # get unique item types
-types <- unique_predictions(strat)
+types <- strategy_unique(strat)
 types$unique
 
-# check classification:
-item_rev <- paste(heck2017_raw$itemtype,
-                  heck2017_raw$reversedorder)
-table(item_rev, types$item_type)
-
-# get table of chocie frequencies for analysis
+# get table of choice frequencies for analysis
 freq <- with(heck2017_raw,
              table(vp, types$item_type, choice))
 freqB <- freq[,4:1,1] + # reversed items: Option A
          freq[,5:8,2]   # non-rev. items: Option B
 head(40 - freqB)
+data(heck2017)
 head(heck2017)  # same frequencies (different order)
 
 # strategy classification
-pp <- select_bf(freqB[1:4,], rep(40, 4),
-                types$strategies)
+pp <- strategy_postprob(freqB[1:4,], rep(40, 4),
+                        types$strategies)
 round(pp, 3)
-}
 }
 \references{
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \url{https://doi.org/10.1016/j.cogpsych.2017.05.003}
+}
+\seealso{
+\code{\link{heck2017}} for the aggregated choice frequencies per item type.
 }
 \keyword{datasets}

@@ -4,12 +4,12 @@
 \alias{count_binomial}
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
-count_binomial(k = 0, n = 0, A, b, V, prior = c(1, 1), M = 10000, steps,
-  batch = 10000, start = -1)
+count_binomial(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
+  batch = 10000, start = -1, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of Option B choices.
-The default \code{k=0} an \code{n=0} is equivalent to sampling from the prior.}
+The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
 \item{n}{the number of choices per item type.}
 
@@ -24,6 +24,8 @@ admissible parameters as the convex hull over these points
 (if provided, \code{A} and \code{b} are ignored). Note that this method
 is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
 
+\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+
 \item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
@@ -35,6 +37,8 @@ is comparatively slow since it solves a linear-programming problem for each poin
 \item{start}{only if \code{steps} is defined: a vector with starting values
 within the polytope. If \code{steps = -1}, a random starting value is used
 (but a poitn within the polytope might not be found if the order constraints are strong).}
+
+\item{progress}{whether a progress bar should be shown.}
 }
 \value{
 a list with the elements
@@ -42,6 +46,7 @@ a list with the elements
     \item\code{integral}: estimated probability that samples are in polytope
     \item\code{count}: number of samples in polytope
     \item\code{M}: total number of samples
+    \item\code{const_map}: logarithm of the binomial constants that have to be considered due to equality constraints
 }
 }
 \description{

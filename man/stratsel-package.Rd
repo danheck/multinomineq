@@ -4,21 +4,24 @@
 \name{stratsel-package}
 \alias{stratsel}
 \alias{stratsel-package}
-\title{stratsel: Bayesian Inference for Order-Constrained Multinomial Choice Models}
+\title{stratsel: Bayesian Inference for Inequality/Order-Constrained Multinomial Models}
 \description{
 Strategy classification is used to select the decision strategy that
 provides the best account for a vector of observed choice frequencies.
-By expressing choice stratgies as statistical models for binary choices,
+By expressing choice strategies as statistical models for binary choices,
 model-selection methods such as the Bayes factors and minimum description length
 can be used.
 }
 \details{
-The method is implemented for two areas:
+The method is implemented for multiple purposes:
 \itemize{
 \item Multiattribute decisions for probabilistic inferences involving strategies such as
-      Take-the-best (TTB) vs. weighted additive (WADD; Bröder, 2003)
+      Take-the-best (TTB) vs. weighted additive (WADD; Bröder, 2003; Heck et al., 2017)
 \item Risky decisions between different gambles to test choice axioms
-      such as transitivity (Regenwetter, 2014).
+      such as transitivity (Regenwetter et al., 2012, 2014).
+ \item Testing deterministic axioms of measurement and choice (Karabatsos, 2005; Myung et al., 2005).
+ \item Fitting and testing nonparametric item response theory models (Karabatsos, 2002).
+ \item Statistical inference for order-constrained contingency tables (Klugkist et al., 2007, 2010).
 }
 
 Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}.
@@ -33,13 +36,21 @@ Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing t
 
 Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \url{https://doi.org/10.3758/s13423-014-0643-0}
 
+Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
+
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}
 
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
 
-Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \url{https://doi.org/10.1177/0146621603260678}
 
-Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
+Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
+
+Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}
+
+Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \url{https://doi.org/10.1037/a0020137}
 }
 \seealso{
 Useful links:
