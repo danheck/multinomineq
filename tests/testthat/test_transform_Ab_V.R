@@ -12,7 +12,7 @@ test_that("transformation of A/b to V representation works",{
                  0,.5,.5,
                  .5,.5,.5), ncol = 3, byrow = TRUE)
 
-  tmp <- vertex_to_ineq(V)
+  # tmp <- V_to_Ab(V)
 
-  expect_equal(ineq_to_vertex(A, b), V)
+  expect_equal(Ab_to_V(A, b), V)
 })

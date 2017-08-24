@@ -17,55 +17,57 @@ predictions <- list("baseline" = baseline, "WADDprob" = WADDprob,
                     "EQW" = EQW, "GUESS" = GUESS)
 strats <- names(predictions)
 
+set.seed(12345)
+
 test_that('predictions work for one item type', {
 
   ca <- c(1, 1, -1, 1)
   cb <- c(-1, -1, -1, -1)
-  expect_named(p1 <- predict_multiattribute(ca, cb, v, "TTBprob"),
+  expect_named(p1 <- strategy_multiattribute(ca, cb, v, "TTBprob"),
                c("pattern", "c"   ,    "ordered", "prior",   "label"))
   expect_equivalent(p1$pattern, -1)
-  expect_equivalent(predict_multiattribute(ca, cb, v, "WADDprob")$pattern,
+  expect_equivalent(strategy_multiattribute(ca, cb, v, "WADDprob")$pattern,
                     sum(log( 1/c(.9,.8,.6)-1 )))
-  expect_equal(predict_multiattribute(ca, cb, v, "WADD")$pattern, -1)
-  expect_equal(predict_multiattribute(ca, cb, v, "EQW")$pattern, -1)
-  expect_equal(predict_multiattribute(ca, cb, v, "GUESS")$pattern, 0)
-  expect_named(predict_multiattribute(ca, cb, v, strats), strats)
+  expect_equal(strategy_multiattribute(ca, cb, v, "WADD")$pattern, -1)
+  expect_equal(strategy_multiattribute(ca, cb, v, "EQW")$pattern, -1)
+  expect_equal(strategy_multiattribute(ca, cb, v, "GUESS")$pattern, 0)
+  expect_named(strategy_multiattribute(ca, cb, v, strats), strats)
 
   # deterministic models
-  expect_equal(get_error_unique(TTB), 1)
-  expect_length(get_error_unique(GUESS), 0)
-  expect_equal(get_error_number(TTB), 1)
-  expect_equal(error_to_prob(.123, as_strategy(TTB)), rep(.123, 3))
+  expect_equal(stratsel:::get_error_unique(TTB), 1)
+  expect_length(stratsel:::get_error_unique(GUESS), 0)
+  expect_equal(stratsel:::get_error_number(TTB), 1)
+  expect_equal(error_to_prob(.123, stratsel:::as_strategy(TTB)), rep(.123, 3))
 
   # probabilistic models
-  expect_equal(get_error_unique(WADDprob), sort(abs(WADDprob)))
-  expect_equal(get_error_number(WADDprob), 3)
-  expect_equal(error_to_prob(c(.1,.2,.45), as_strategy(WADDprob)),
+  expect_equal(stratsel:::get_error_unique(WADDprob), sort(abs(WADDprob)))
+  expect_equal(stratsel:::get_error_number(WADDprob), 3)
+  expect_equal(error_to_prob(c(.1,.2,.45), stratsel:::as_strategy(WADDprob)),
                c(.1, 1 - .45, .2))
   # baseline
   e <- c(.1 , .25, .3)
-  expect_equal(error_to_prob(e, as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
+  expect_equal(error_to_prob(e, stratsel:::as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
 
 })
 
 test_that('predictions work for multiple item types', {
-  expect_named(p <- predict_multiattribute(cuesA, cuesB, v, strats), strats)
+  expect_named(p <- strategy_multiattribute(cuesA, cuesB, v, strats), strats)
   expect_equal(lapply(p, "[[", "pattern"), predictions)
 
   data(heck2017_raw)
   cA <- heck2017_raw[,paste0("a",1:4)]
   cB <- heck2017_raw[,paste0("b",1:4)]
   v <- c(.9, .8, .7, .6)
-  ttb <- predict_multiattribute(cA, cB, v, "TTB")
+  ttb <- strategy_multiattribute(cA, cB, v, "TTB")
   expect_equivalent(heck2017_raw$ttb , ifelse(ttb$pattern == -1, "A", "B"))
-  wadd <- predict_multiattribute(cA, cB, v, "WADD")
+  wadd <- strategy_multiattribute(cA, cB, v, "WADD")
   expect_equivalent(heck2017_raw$wadd , ifelse(wadd$pattern == -1, "A", "B"))
-  waddp <- predict_multiattribute(cA, cB, v, "WADDprob")
+  waddp <- strategy_multiattribute(cA, cB, v, "WADDprob")
   expect_equivalent(heck2017_raw$logoddsdiff , - waddp$pattern)
-  eqw <- predict_multiattribute(cA, cB, v, "EQW")
+  eqw <- strategy_multiattribute(cA, cB, v, "EQW")
   expect_equivalent(heck2017_raw$eqw , ifelse(eqw$pattern == -1, "A",
                                               ifelse(eqw$pattern == 1, "B", "guess")))
-  ttbp <- predict_multiattribute(cA, cB, v, "TTBprob")
+  ttbp <- strategy_multiattribute(cA, cB, v, "TTBprob")
   expect_equivalent(unname(1/ heck2017_raw$ttbsteps),
                     unname(abs(ttbp$pattern)))
 })
@@ -96,8 +98,8 @@ test_that("predictions/frequency table matches for Heck et al. (2017)", {
 
   strat_labels <- c("TTB", "TTBprob", "WADD",
                     "WADDprob", "EQW", "GUESS")
-  strat <- predict_multiattribute(cueA, cueB, v, strat_labels)
-  types <- unique_predictions(strat)
+  strat <- strategy_multiattribute(cueA, cueB, v, strat_labels)
+  types <- strategy_unique(strat)
 
   item_rev <- paste(heck2017_raw$itemtype,
                     heck2017_raw$reversedorder)
@@ -109,14 +111,13 @@ test_that("predictions/frequency table matches for Heck et al. (2017)", {
     freq[,5:8,2]   # non-rev. items: Option B
   expect_true( all( (40 - freqB)[,c(3,2,4,1)] - heck2017 == 0))
 
-  pp <- select_bf(freqB[1:5,], rep(40, 4),
-                  types$strategies)
-
+  pp <- strategy_postprob(freqB[1:5,], rep(40, 4),
+                          types$strategies)
   expect_equivalent(pp[,strat_labels], pp_heck2017[,strat_labels])
 })
 
 
-test_that("as_polytope transforms to the correct A/b representation",{
+test_that("strategy_to_Ab returns the correct A/b representation",{
   # compare results to encompassing BF method:
   b <- list(pattern = 1:4, c = 1,
             ordered = FALSE, prior = c(1,1))
@@ -127,24 +128,24 @@ test_that("as_polytope transforms to the correct A/b representation",{
   strat <- list(pattern =-c(1:4),  # A,A,A,A  e4<e3<e2<e1<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
-  pt <- as_polytope(strat)
-  m1 <- select_bf(k, n, list(strat, b))
-  expect_equal(log(m1[1] / m1[2]),
-               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .1)
+  pt <- strategy_to_Ab(strat)
+  m1 <- strategy_postprob(k, n, list(strat, b))
+  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 
   strat <- list(pattern =-c(4:1),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
-  pt <- as_polytope(strat)
-  m1 <- select_bf(k, n, list(strat, b))
-  expect_equal(log(m1[1] / m1[2]),
-               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .2)
+  pt <- strategy_to_Ab(strat)
+  m1 <- strategy_postprob(k, n, list(strat, b))
+  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 
   strat <- list(pattern =c(1,-5,2,-3),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
-  pt <- as_polytope(strat)
-  m1 <- select_bf(k, n, list(strat, b))
-  expect_equal(log(m1[1] / m1[2]),
-               compute_bf(k, n, pt$A, pt$b, M = 2e5)["log_bf_0e",1], tol = .2)
+  pt <- strategy_to_Ab(strat)
+  m1 <- strategy_postprob(k, n, list(strat, b))
+  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 })

@@ -12,17 +12,19 @@ X <- matrix(runif(M*d), M)
 cntr <- function(X, A, b)
   sum(apply(X, 1, function(x) all(A %*% x <= b)))
 
+set.seed(124356)
+
 test_that("counting methods work", {
   cnt <- stratsel:::count_samples(X, A, b)
   expect_equal(cnt, cntr(X, A, b))
-  expect_equal(cnt / M, V, tol = .002)
+  expect_equal(cnt / M, V, tol = .005)
 
-  c2 <- count_binomial(A=A, b=b, M = M, batch = M/10)
-  expect_equal(c2$integral, V, tol = .002)
-  c3 <- count_binomial(A=A, b=b, M = M, batch = M)
-  expect_equal(c3$integral, V, tol = .002)
+  c2 <- count_binomial(0, 0, A=A, b=b, M = M, batch = M/10)
+  expect_equal(c2$integral, V, tol = .005)
+  c3 <- count_binomial(0, 0, A=A, b=b, M = M, batch = M)
+  expect_equal(c3$integral, V, tol = .005)
 
-  c4 <- count_binomial(A=A, b=b, M = 1e5, batch = 10000, steps = 2:3)
+  c4 <- count_binomial(0, 0, A=A, b=b, M = 1e5, batch = 10000, steps = 2:3)
   c4
   expect_equal(c3$integral, V, tol = .0005)
 })
@@ -62,7 +64,7 @@ test_that("counting is equivalent for: A/b-method and V-method", {
                 1,1,1,1,1,1,
                 0,1,0,1,0,1,
                 0,0,0,0,0,1), ncol=6, byrow=TRUE)
-  tmp <- vertex_to_ineq(V)
+  tmp <- V_to_Ab(V)
   A <- tmp$A
   b <- tmp$b
 

@@ -34,8 +34,8 @@ test_that("Gibbs sampling gives same results as accept-reject for binomial", {
 
   ################### prior: uniform
   k <- n <- rep(0, 5)
-  A <- ineq_probabilities(rep(2, length(n)))$A
-  b <- ineq_probabilities(rep(2, length(n)))$b
+  A <- Ab_multinomial(rep(2, length(n)))$A
+  b <- Ab_multinomial(rep(2, length(n)))$b
   X <- sampling_binomial(k, n, A, b, M = M)
   expect_true(test_Ab(X, A, b))
   expect_equal(colMeans(X), 1/rep(2, ncol(A)), tol = .02)
@@ -83,7 +83,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X <- sampling_multinomial(k, options, A, b, M = M)
   X2 <- stratsel:::rdirichlet(M, k + 1)
   expect_true(test_sum1_free(X[1:1000,], options))
-  expect_equal(colMeans(X), 1/rep(options, options - 1), tol = .005)
+  expect_equal(unname(colMeans(X)), 1/rep(options, options - 1), tol = .005)
   for (i in 1:ncol(X))
     expect_equal(quantile_ss(X[,i],X2[,i],p), 0, tol = .1)
 
@@ -91,12 +91,12 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   options <- c(2,     3,      4)
 
   ################### unconstrained sampling from prior:
-  A <- ineq_probabilities(options)$A
-  b <- ineq_probabilities(options)$b
+  A <- Ab_multinomial(options)$A
+  b <- Ab_multinomial(options)$b
   k <- rep(0, sum(options))
   X <- sampling_multinomial(k, options, A, b, M = M)
   expect_true(test_sum1_free(X[1:1000,], options))
-  expect_equal(colMeans(X), 1/rep(options, options - 1), tol = .005)
+  expect_equal(unname(colMeans(X)), 1/rep(options, options - 1), tol = .005)
   expect_equal(unname(quantile(X[,1], p)), p, tol = .01)
 
   ################### uniform prior comparison to accept/reject
@@ -111,7 +111,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   b <- c(.2, 1, -.2, .4, 1,1)
   k <- rep(0, sum(options))
   start <- c(0.1871862, 0.2881284, 0.3919744, 0.4760341, 0.2890125, 0.1379431)
-  X1 <- sampling_multinomial(k, options, A, b = k, M = 2000, start = start)
+  X1 <- sampling_multinomial(k, options, A, b = b, M = 2000, start = start)
   expect_true(test_sum1_free(X1, options))
   expect_true(test_Ab(X1, A, b))
   X2 <- stratsel:::rpdirichlet_free(M*5, k+1, options)
@@ -139,8 +139,8 @@ test_that("Gibbs sampling for multinomial [posterior]", {
   expect_equal(c(n), unname(rep(tapply(k, rep(1:length(options), options), sum), options)))
   start <- c(0.2531039, 0.3094770, 0.0494943)
   X <- sampling_multinomial(k, options, A, b, M = M, start=start)
-  expect_true(test_sum1_free(X, options))
-  expect_true(test_Ab(X, A, b))
+  expect_true(test_sum1_free(X[1:100,], options))
+  expect_true(test_Ab(X[1:1000,], A, b))
   # accept-reject
   X1 <- stratsel:::rpdirichlet_free(M*5, k + 1, options)
   sel <- sel_Ab(X1, A, b)
@@ -149,9 +149,10 @@ test_that("Gibbs sampling for multinomial [posterior]", {
     plot(density(X[,i]), xlim = 0:1, main = i)
     lines(density(X1[sel,i]), col = 2)
     qqplot(X[,i], X1[sel,i])
+    abline(0,1,col=2)
   }
-  expect_equal(colMeans(X), colMeans(X1[sel,]), tol = .01)
-  expect_equal(apply(X, 2, sd), apply(X1[sel,], 2, sd), tol = .005)
+  expect_equal(unname(colMeans(X)), colMeans(X1[sel,]), tol = .01)
+  expect_equal(unname(apply(X, 2, sd)), apply(X1[sel,], 2, sd), tol = .005)
   for (i in 1:ncol(A))
     expect_equal(quantile_ss(X[,i],X1[sel,i], p), 0, tol = .001)
 })
@@ -176,8 +177,8 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   start <- c(0.1871862, 0.2881284, 0.3919744, 0.3760341, 0.2890125, 0.1379431)
   k       <- c(15,9,   5,2,17, 5,1,8,20)
   X <- sampling_multinomial(k, options, A, b, M = M, start = -1)
-  expect_true(test_sum1_free(X[1:1000,], options))
-  expect_true(test_Ab(X[1:1000,], A, b))
+  expect_true(test_sum1_free(X[1:100,], options))
+  expect_true(test_Ab(X[1:100,], A, b))
   # accept-reject
   X1 <- stratsel:::rpdirichlet_free(M*2, k + 1, options)
   sel <- sel_Ab(X1, A, b)
@@ -189,8 +190,8 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
     lines(density(X1[sel,i]), col = 2)
     qqplot(X[,i], X1[sel,i])
   }
-  expect_equal(colMeans(X), colMeans(X1[sel,]), tol = .01)   # TODO: posterior sampling
-  expect_equal(apply(X, 2, sd), apply(X1[sel,], 2, sd), tol = .01)   # TODO: posterior sampling
+  expect_equal(unname(colMeans(X)), colMeans(X1[sel,]), tol = .005)
+  expect_equal(unname(apply(X, 2, sd)), apply(X1[sel,], 2, sd), tol = .005)
   for (i in 1:ncol(A))
     expect_equal(quantile_ss(X[,i],X1[sel,i], p), 0, tol = .01)
 
@@ -201,13 +202,13 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   data(swop5)
   options <- rep(3, 10)
   k <- rep(0, 30)
-  X <- stratsel:::rpdirichlet_free(M*2, k + 1, options)
-  int <- stratsel:::count_samples(X, swop5$A, swop5$b)/(10*M)
-  cnt <- count_multinomial(k, options, swop5$A, swop5$b, M=M*10)
+  X <- stratsel:::rpdirichlet_free(M, k + 1, options)
+  int <- stratsel:::count_samples(X, swop5$A, swop5$b)/(M)
+  cnt <- count_multinomial(k, options, swop5$A, swop5$b, M=M)
   expect_equal(int, cnt$integral, tol = .001)
 
-  # X <- sampling_multinomial(swop5$A, swop5$b, options, k, M = 2000, start = rep(.3, 20))
-  # sel <- apply(X, 1, function(x) all(swop5$A %*% x <= swop5$b))
-  # colMeans(X[sel,])
-  # colMeans(X)
+  X2 <- sampling_multinomial(k, swop5$options, swop5$A, swop5$b,
+                            M = 2000, start = swop5$start)
+  # sel <- apply(X, 1, inside, A =swop5$A, b=swop5$b)
+  # rbind(colMeans(X[sel,]), colMeans(X2))
 })
