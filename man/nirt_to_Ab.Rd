@@ -4,7 +4,7 @@
 \alias{nirt_to_Ab}
 \title{Nonparametric Item Response Theory (NIRT)}
 \usage{
-nirt_to_Ab(N, M, options = 2, axioms = c("WI1", "WI2"))
+nirt_to_Ab(N, M, options = 2, axioms = c("W1", "W2"))
 }
 \arguments{
 \item{N}{number of persons / rows in item-response table}
@@ -29,16 +29,16 @@ the latent trait are tested directly.
 
 The axioms are as follows:
 \itemize{
-  \item{\code{"WI1"}}{Weak row/subject independence: Persons can be ordered on
+  \item{\code{"W1"}}{Weak row/subject independence: Persons can be ordered on
                       an ordinal scale independent of items.}
-  \item{\code{"WI2"}}{Weak column/item independence: Items can be ordered on
+  \item{\code{"W2"}}{Weak column/item independence: Items can be ordered on
                       an ordinal scale independent of persons}
   \item{\code{"DC"}}{Double cancellation: A necessary condition for a joint
                      ordering of (person,item) pairs and an additive representation
                      (i.e., an interval scale).}
 }
 
-Note that axioms WI1 and WI2 jointly define the ISOP model by Scheiblechner
+Note that axioms W1 and W2 jointly define the ISOP model by Scheiblechner
 (1995; isotonic ordinal probabilistic model) and the double homogeneity model
 by Mokken (1971). If DC is added, we obtain the ADISOP model
 by Scheiblechner (1999; ).
