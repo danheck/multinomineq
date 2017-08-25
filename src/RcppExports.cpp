@@ -6,33 +6,6 @@
 
 using namespace Rcpp;
 
-// adj_iterative
-NumericVector adj_iterative(NumericVector par, const double c, const double DIFF_BOUND);
-RcppExport SEXP _stratsel_adj_iterative(SEXP parSEXP, SEXP cSEXP, SEXP DIFF_BOUNDSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< const double >::type c(cSEXP);
-    Rcpp::traits::input_parameter< const double >::type DIFF_BOUND(DIFF_BOUNDSEXP);
-    rcpp_result_gen = Rcpp::wrap(adj_iterative(par, c, DIFF_BOUND));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rbeta_trunc
-double rbeta_trunc(double shape1, double shape2, double min, double max);
-RcppExport SEXP _stratsel_rbeta_trunc(SEXP shape1SEXP, SEXP shape2SEXP, SEXP minSEXP, SEXP maxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type shape1(shape1SEXP);
-    Rcpp::traits::input_parameter< double >::type shape2(shape2SEXP);
-    Rcpp::traits::input_parameter< double >::type min(minSEXP);
-    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rbeta_trunc(shape1, shape2, min, max));
-    return rcpp_result_gen;
-END_RCPP
-}
 // inside_Ab
 arma::vec inside_Ab(arma::mat X, arma::mat A, arma::vec b);
 RcppExport SEXP _stratsel_inside_Ab(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
@@ -73,6 +46,46 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// adj_iterative
+NumericVector adj_iterative(NumericVector par, const double c, const double DIFF_BOUND);
+RcppExport SEXP _stratsel_adj_iterative(SEXP parSEXP, SEXP cSEXP, SEXP DIFF_BOUNDSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< const double >::type c(cSEXP);
+    Rcpp::traits::input_parameter< const double >::type DIFF_BOUND(DIFF_BOUNDSEXP);
+    rcpp_result_gen = Rcpp::wrap(adj_iterative(par, c, DIFF_BOUND));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rbeta_trunc
+double rbeta_trunc(double shape1, double shape2, double min, double max);
+RcppExport SEXP _stratsel_rbeta_trunc(SEXP shape1SEXP, SEXP shape2SEXP, SEXP minSEXP, SEXP maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type shape1(shape1SEXP);
+    Rcpp::traits::input_parameter< double >::type shape2(shape2SEXP);
+    Rcpp::traits::input_parameter< double >::type min(minSEXP);
+    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(rbeta_trunc(shape1, shape2, min, max));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ppp_bin
+NumericVector ppp_bin(arma::mat theta, arma::vec k, arma::vec n);
+RcppExport SEXP _stratsel_ppp_bin(SEXP thetaSEXP, SEXP kSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(ppp_bin(theta, k, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sampling_binomial_cpp
 arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin, double progress);
 RcppExport SEXP _stratsel_sampling_binomial_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
@@ -107,6 +120,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
     rcpp_result_gen = Rcpp::wrap(count_binomial_cpp(k, n, A, b, prior, M, batch, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_step
+int count_step(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int from, int to, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_step(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP startSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< int >::type to(toSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_step(k, n, A, b, prior, M, from, to, start, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -230,6 +263,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
     rcpp_result_gen = Rcpp::wrap(rpm_mat(theta, n, options));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ppp_mult
+NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options);
+RcppExport SEXP _stratsel_ppp_mult(SEXP thetaSEXP, SEXP kSEXP, SEXP optionsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(ppp_mult(theta, k, options));
     return rcpp_result_gen;
 END_RCPP
 }

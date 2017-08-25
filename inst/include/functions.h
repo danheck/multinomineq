@@ -4,9 +4,14 @@ using namespace arma;
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
+
 // functions that are used in multiple scripts:
 
 
+NumericMatrix results(vec count, vec M, vec steps);
+NumericMatrix results(int count, int M);
+
+double x2(vec o, vec e);
 
 vec inside_Ab(mat X, mat A, vec b);
 int count_samples(mat X, mat A, vec b);

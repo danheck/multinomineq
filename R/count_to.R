@@ -34,10 +34,10 @@ count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 3000){
     const <- posterior$const_map_0e
   est <- sum(log(posterior$count / posterior$M)) - sum(log(prior$count / prior$M)) + const
 
-  bpost  <- sampling_beta(posterior$count, posterior$M, beta, samples)
-  bprior <- sampling_beta(prior$count, prior$M, beta, samples)
-  lbf_0e <- rowSums(log(bpost)) - rowSums(log(bprior)) + const
-  lbf_e0 <- rowSums(log(bprior)) - rowSums(log(bpost)) + const
+  bpost  <- sampling_integral(posterior$count, posterior$M, log = TRUE, beta, samples)
+  bprior <- sampling_integral(prior$count, prior$M, log = TRUE, beta, samples)
+  lbf_0e <- bpost - bprior + const
+  lbf_e0 <- bprior - bpost + const
 
   bf <- matrix(
     c(exp(est),  exp(-est), est, - est,
@@ -48,6 +48,31 @@ count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 3000){
   bf
 }
 
+precision_count <- function(count, M, log = TRUE,
+                            beta = c(.5, .5), samples = 5000){
+  s <- sampling_integral(count, M, log = TRUE, beta, samples)
+  if (log){
+    sd(s)
+  } else {
+    sd(exp(s))
+  }
+}
+
+sampling_integral <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 10000){
+  S <- length(count)
+  if (length(M) == 1)
+    M <- rep(M, S)
+  probs <- rep(0, samples)
+  for (s in 1:S){
+    probs <- probs + log(rbeta(samples, count[s] + beta[1],
+                               M[s] - count[s]  + beta[2]))
+  }
+  if (log){
+    probs
+  } else {
+    exp(probs)
+  }
+}
 
 sampling_beta <- function (count, M, beta = c(.5, .5), samples = 10000){
   S <- length(count)

@@ -78,9 +78,7 @@ arma::vec shed_options(arma::vec x, arma::vec options)
   int D = options.n_elem;
   vec sel = cumsum(options) - 1;
   for (int i = D - 1; i >= 0; i--)
-  {
     x.shed_row(sel(i));
-  }
   return x;
 }
 
@@ -90,15 +88,12 @@ arma::vec rep_options(arma::vec x, arma::vec options)
 {
   vec y;
   for (int i = 0; i < options.n_elem; i++)
-  {
     y = join_cols(y,repmat(x(i) * ones(1,1), options(i), 1));
-  }
   return y;
 }
 
-// sum per option (for k or prior)
-// [[Rcpp::export]]
-arma::vec sum_options(arma::vec k, arma::vec options)
+// sum per option, length equal to options (for k or prior)
+arma::vec sum_options_short(arma::vec k, arma::vec options)
 {
   vec n = zeros(options.n_elem, 1);
   int o = 0, cnt = 0;
@@ -113,6 +108,14 @@ arma::vec sum_options(arma::vec k, arma::vec options)
     }
     n(o) += k(i);
   }
+  return n;
+}
+
+// sum per option, length equal to input (for k or prior)
+// [[Rcpp::export]]
+arma::vec sum_options(arma::vec k, arma::vec options)
+{
+  vec n = sum_options_short(k, options);
   return rep_options(n, options);
 }
 
@@ -139,10 +142,29 @@ arma::imat rpm_mat(arma::mat theta, arma::vec n, arma::vec options)
 {
   imat k(theta.n_cols, theta.n_rows);
   for(int i = 0; i < theta.n_rows; i++)
-  {
     k.col(i) = rpm_vec(theta.row(i).t(), n, options);
-  }
   return k.t();
+}
+
+// theta: with fixed probabiltiies!
+// [[Rcpp::export]]
+NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options)
+{
+  int M = theta.n_rows;
+  vec n = sum_options(k, options);
+  vec n_short = sum_options_short(k, options);
+  vec tt, kpp, x2o(M), x2p(M);
+  for(int m = 0; m < M; m++)
+  {
+    tt = conv_to< colvec >::from(theta.row(m));
+    kpp = conv_to< vec >::from(rpm_vec(tt, n_short, options));
+    x2o(m) = x2(k, tt % n);
+    x2p(m) = x2(kpp, tt % n);
+  }
+  double ppp = double(accu(x2o <= x2p)) / M;
+  return NumericVector::create(Named("X2_obs") = mean(x2o),
+                               Named("X2_pred") = mean(x2p),
+                               Named("ppp") = ppp);
 }
 
 // [[Rcpp::export]]
@@ -232,7 +254,7 @@ List count_stepwise_multi(arma::vec k, arma::vec options,
                           arma::vec M, arma::vec steps, int batch,
                           arma::vec start, bool progress = true)
 {
-  steps = sort_steps(steps, A.n_rows);
+  steps = sort_steps(steps, A.n_rows) - 1;  // C++ indexing
   int S = steps.n_elem;    // number of unique steps
   int D = A.n_cols;        // number of dimensions/parameters
   if (M.n_elem == 1)

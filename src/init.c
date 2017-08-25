@@ -12,9 +12,12 @@ extern SEXP _stratsel_adj_iterative(SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_binomial_cpp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_multinomial_cpp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_samples(SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_step(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_stepwise(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_inside_Ab(SEXP, SEXP, SEXP);
+extern SEXP _stratsel_ppp_bin(SEXP, SEXP, SEXP);
+extern SEXP _stratsel_ppp_mult(SEXP, SEXP, SEXP);
 extern SEXP _stratsel_rbeta_trunc(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_rdirichlet(SEXP, SEXP);
 extern SEXP _stratsel_rep_options(SEXP, SEXP);
@@ -33,9 +36,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_stratsel_count_binomial_cpp",       (DL_FUNC) &_stratsel_count_binomial_cpp,        8},
     {"_stratsel_count_multinomial_cpp",    (DL_FUNC) &_stratsel_count_multinomial_cpp,     8},
     {"_stratsel_count_samples",            (DL_FUNC) &_stratsel_count_samples,             3},
+    {"_stratsel_count_step",               (DL_FUNC) &_stratsel_count_step,               10},
     {"_stratsel_count_stepwise",           (DL_FUNC) &_stratsel_count_stepwise,           10},
     {"_stratsel_count_stepwise_multi",     (DL_FUNC) &_stratsel_count_stepwise_multi,     10},
     {"_stratsel_inside_Ab",                (DL_FUNC) &_stratsel_inside_Ab,                 3},
+    {"_stratsel_ppp_bin",                  (DL_FUNC) &_stratsel_ppp_bin,                   3},
+    {"_stratsel_ppp_mult",                 (DL_FUNC) &_stratsel_ppp_mult,                  3},
     {"_stratsel_rbeta_trunc",              (DL_FUNC) &_stratsel_rbeta_trunc,               4},
     {"_stratsel_rdirichlet",               (DL_FUNC) &_stratsel_rdirichlet,                2},
     {"_stratsel_rep_options",              (DL_FUNC) &_stratsel_rep_options,               2},

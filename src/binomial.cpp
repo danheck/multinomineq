@@ -2,10 +2,7 @@
 #include <functions.h>
 #include <progress.hpp>
 
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::depends(RcppProgress)]]
 using namespace Rcpp;
-
 
 // sample from truncated beta distribution using the inverse cdf method
 // [[Rcpp::export]]
@@ -35,59 +32,33 @@ arma::mat rbeta_mat(int n, int D, double shape1, double shape2)
   return rbeta_mat(n, shape1 * ones(D), shape2 * ones(D));
 }
 
-// count number of samples that adhere to constraint A*x <= b
-// X: samples (rows: replications; cols: D dimensions)
-// [[Rcpp::export]]
-arma::vec inside_Ab(arma::mat X, arma::mat A, arma::vec b)
+arma::ivec rpb_vec(arma::vec theta, arma::vec n)
 {
-  vec i(X.n_rows);
-  int idx = 0;
-  bool inside;
-  for (int m = 0 ; m < X.n_rows ; m++)
+  int I = theta.n_elem;
+  arma::ivec k(I);
+  for(int i = 0; i < I; i++)
+    k(i) = R::rbinom(n(i), theta(i));
+  return k;
+}
+
+// [[Rcpp::export]]
+NumericVector ppp_bin(arma::mat theta, arma::vec k, arma::vec n)
+{
+  int M = theta.n_rows;
+  vec tt, kpp, x2o(M), x2p(M);
+  for(int m = 0; m < M; m++)
   {
-    inside = true;
-    idx = 0;
-    while (inside && idx < b.n_elem)
-    {
-      inside = dot(X.row(m), A.row(idx)) <= b(idx);
-      idx += 1;
-    }
-    i(m) = inside;
+    tt = conv_to< colvec >::from(theta.row(m));
+    kpp = conv_to< vec >::from(rpb_vec(tt, n));
+    x2o(m) = x2(k, tt % n);
+    x2p(m) = x2(kpp, tt % n);
   }
-  return i;
+  double ppp = double(accu(x2o <= x2p)) / M;
+  return NumericVector::create(Named("X2_obs") = mean(x2o),
+                               Named("X2_pred") = mean(x2p),
+                               Named("ppp") = ppp);
 }
 
-// [[Rcpp::export]]
-int count_samples(arma::mat X, arma::mat A, arma::vec b)
-{
-  return accu(inside_Ab(X, A, b));
-}
-
-int count_samples(arma::vec X, arma::mat A, arma::vec b)
-{
-  mat Xm = reshape(X, 1, X.n_elem);
-  return count_samples(Xm, A, b);
-}
-
-// find permissible starting values:
-// [[Rcpp::export]]
-arma::vec start_random(arma::mat A, arma::vec b, int M, arma::vec start)
-{
-  if (start(0) == -1)
-  {
-    int cnt = 0;
-    bool search = true;
-    while (search && cnt < fmax(M, 1000))
-    {
-      cnt++;
-      start.randu(A.n_cols);
-      search = 1 - count_samples(start, A, b);
-    }
-    if (cnt == fmax(M, 1000))
-      stop("Could not find starting values within the polytope");
-  }
-  return start;
-}
 
 // posterior sampling for polytope: A*x <= b
 // => uniform prior sampling if  k=n=b(0,...,0)
@@ -163,27 +134,39 @@ NumericVector count_binomial_cpp(arma::vec k, arma::vec n,
     }
   }
   return NumericVector::create(Named("integral") = (double)count / M,
+                               // Named("results") = results(count, M));
                                Named("count") = count,
                                Named("M") = M);
 }
 
 // add the last order constraint and sort "steps" vector
-arma::vec sort_steps(arma::vec steps, int max)
+arma::vec sort_steps(arma::vec steps, int total)
 {
   steps = resize(steps, steps.n_elem + 1, 1);
-  steps(steps.n_elem - 1) = max;
-  return sort(unique(steps - 1));  // C++ indexing
+  steps(steps.n_elem - 1) = total - 1;
+  return sort(unique(steps));
 }
 
-// count samples to get volume of polytope
-// (splits M samples into batches of size "batch" to decrease memory usage)
+// go from  A[0:from,] ---> A[0:to,]  // C++ indexing!
+// [[Rcpp::export]]
+int count_step(arma::vec k, arma::vec n,
+               arma::mat A, arma::vec b, arma::vec prior,
+               int M, int from, int to, arma::vec start, bool progress = true)
+{
+  mat sample =
+    sampling_binomial_cpp(k, n, A.rows(0, from), b.subvec(0, from),
+                          prior, M, start, 10, progress);
+  return count_samples(sample, A.rows(from + 1, to), b.subvec(from + 1, to));
+}
+
+// count samples stepwise to get volume of polytope
 // [[Rcpp::export]]
 List count_stepwise(arma::vec k, arma::vec n,
                     arma::mat A, arma::vec b, arma::vec prior,
                     arma::vec M, arma::vec steps, int batch,
                     arma::vec start, bool progress = true)
 {
-  steps = sort_steps(steps, A.n_rows);
+  steps = sort_steps(steps, A.n_rows);  // C++ indexing!!
   int S = steps.n_elem;    // number of unique steps
   int D = A.n_cols;        // number of dimensions/parameters
   if (M.n_elem == 1)
@@ -191,24 +174,17 @@ List count_stepwise(arma::vec k, arma::vec n,
   mat sample;
 
   vec cnt = zeros(S);
-  cnt(0) = count_binomial_cpp(k, n,
-      A.rows(0, steps(0)),
+  cnt(0) = count_binomial_cpp(k, n, A.rows(0, steps(0)),
       b.subvec(0, steps(0)), prior, M(0), batch, progress)["count"];
 
   for (int s = 1; s < S ; s++)
-  {
-    sample =
-      sampling_binomial_cpp(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                            prior, (int)M(s), start, 10, progress);
-    cnt(s) = cnt(s) +
-      count_samples(sample,
-                    A.rows(steps(s-1) + 1, steps(s)),
-                    b.subvec(steps(s-1) + 1, steps(s)));
-  }
+    cnt(s) = count_step(k, n, A, b, prior, M(s), steps(s-1), steps(s), start, progress);
+
   return List::create(Named("integral") = prod(cnt / M.rows(0, S-1)),
+                      // Named("results") = results(steps, cnt, M),
                       Named("count") = as<NumericVector>(wrap(cnt)),
                       Named("M") = as<NumericVector>(wrap(M)),
-                      Named("steps") = steps + 1);  // R indexing
+                      Named("steps") = steps);  // R indexing
 }
 
 
