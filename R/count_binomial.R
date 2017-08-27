@@ -20,7 +20,7 @@
 #' @param progress whether a progress bar should be shown.
 #'
 #' @details
-#' Useful to compute the encompassing Bayes factor for testing order constraints (see \code{\link{bf_binomial}}; Hojtink, 2011).
+#' Useful to compute the encompassing Bayes factor for testing order constraints (see \code{\link{bf_binom}}; Hojtink, 2011).
 #'
 #' The stepwise computation of the Bayes factor proceeds as follows:
 #' If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing:
@@ -28,12 +28,18 @@
 #' (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]};
 #' (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
 #'
-#' @return a list with the elements
+#' @return a matrix with the columns
 #' \itemize{
-#'     \item\code{integral}: estimated probability that samples are in polytope
-#'     \item\code{count}: number of samples in polytope
-#'     \item\code{M}: total number of samples
-#'     \item\code{const_map}: logarithm of the binomial constants that have to be considered due to equality constraints
+#'     \item\code{count}: number of samples in polytope / that satisfy order constraints
+#'     \item\code{M}: the  total number of samples in each step
+#'     \item\code{steps}: the \code{"steps"} used to sample from the polytope
+#'         (i.e., the row numbers of \code{A} that were considered  stepwise)
+#' }
+#' with the attributes:
+#' \itemize{
+#'    \item\code{integral}: estimated probability that samples are in polytope
+#'    \item\code{const_map}: logarithm of the binomial constants that
+#'           have to be considered due to equality constraints
 #' }
 #' @examples
 #' # linear order constraint:
@@ -54,20 +60,19 @@
 #' A %*% c(.05, .1, .12, .16, .19, .23) <= b
 #'
 #' # count prior samples and compare to analytical result
-#' prior <- count_binomial(0, 0, A, b, M = 5e5)
-#' prior
+#' prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
+#' prior  # volume = attribute "integral"
 #' (.50)^6 / factorial(6)
 #'
 #' # count posterior samples and get Bayes factor
-#' posterior <- count_binomial(k, n, A, b,
-#'                             M=c(1e5, 2e4), steps = 2)
-#' posterior$integral / prior$integral  # Bayes factor
+#' posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
 #' count_to_bf(posterior, prior)
+#'
 #' @template ref_hoijtink2011
 #' @template ref_fukuda2004
 #' @importFrom Rglpk Rglpk_solve_LP
 #' @export
-count_binomial <- function (k, n, A, b, V, map, prior = c(1, 1),
+count_binom <- function (k, n, A, b, V, map, prior = c(1, 1),
                             M = 10000, steps, batch = 10000,
                             start = -1, progress = TRUE){
 
@@ -81,10 +86,10 @@ count_binomial <- function (k, n, A, b, V, map, prior = c(1, 1),
   if (!missing(b)){
     check_Abknprior(A, b, k, n, prior)
     if (missing(steps) || is.null(steps) || length(steps) == 0){
-      cnt <- as.list(count_binomial_cpp(k, n, A, b, prior, M, batch, progress))
+      count <- count_bin(k, n, A, b, prior, M, batch, progress)
     } else {
       check_stepsA(steps, A)
-      cnt <- count_stepwise(k, n, A, b, prior, M, steps, batch, start, progress)
+      count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch, start, progress)
     }
 
   } else if (!missing(V)){
@@ -96,17 +101,15 @@ count_binomial <- function (k, n, A, b, V, map, prior = c(1, 1),
       count <- count + sum(inside_V(X, V))
       m <- m - batch
     }
-    cnt <- list("integral" = count/M, "count" = count, "M" = M,
-                "const_map_0e" = aggr$const_map_0e)
+    count <- cbind("count" = count, "M" = M, "steps" = NA)
   } else {
     stop("A/b or V must be provided.")
   }
-  cnt$const_map_0e <- aggr$const_map_0e
-  cnt
+  attr(count, "integral") <- get_integral(count)
+  attr(count, "const_map_0e") <- aggr$const_map_0e
+  count
 }
 
-# count_V <- function(X, V){
-#   apply(X, 1, inside_V, V = V)
-# }
-
-
+get_integral <- function(count){
+  prod(count[,"count"]/count[,"M"])
+}

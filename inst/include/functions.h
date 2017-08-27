@@ -9,7 +9,7 @@ using namespace arma;
 
 
 NumericMatrix results(vec count, vec M, vec steps);
-NumericMatrix results(int count, int M);
+NumericMatrix results(int count, int M, int steps);
 
 double x2(vec o, vec e);
 

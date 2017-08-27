@@ -3,7 +3,7 @@
 #' Finds the center/a random point that is within the convex polytope defined by the
 #' linear inequalities \code{A*x <= b}  or by the convex hull over the vertices in the matrix \code{V}.
 #'
-#' @inheritParams count_binomial
+#' @inheritParams count_binom
 #' @param options optional: number of options per item type (only for \eqn{A x \leq b} representation).
 #'     Necessary to account for sum-to-one constraints within multinomial
 #'     distributions (e.g., p_1 + p_2 + p_3 <= 1).
@@ -74,7 +74,7 @@ find_inside <- function(A, b, V, options = NULL, random = FALSE){
       options <- rep(2, ncol(A))
     zeros <- rep(0, sum(options))
     check_Abokprior(A, b, options, zeros, zeros)
-    tmp <- Ab_multinomial(options, A, b, nonneg = TRUE)
+    tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
     A <- tmp$A
     b <- tmp$b
     if (random){

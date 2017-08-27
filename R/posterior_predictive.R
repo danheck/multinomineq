@@ -4,26 +4,26 @@
 #' the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the posterior-predicted frequencies.
 #'
 #' @inheritParams rpmultinom
-#' @inheritParams count_binomial
-#' @inheritParams count_multinomial
+#' @inheritParams count_binom
+#' @inheritParams count_multinom
 #' @param by optional: a vector of the same length as \code{k} indicating factor levels
 #'     by which the posterior-predictive checks should be split (e.g., by item sets).
 # ' @param M number of subsamples from \code{theta}
-#' @seealso \code{\link{sampling_binomial}}/\code{\link{sampling_multinomial}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
+#' @seealso \code{\link{sampling_binom}}/\code{\link{sampling_multinom}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
 #' @template ref_myung2005
 #'
 #' @examples
 #' # uniform samples:  p<.10
 #' theta <- matrix(runif(300*3, 0, .1), 300)
 #' n <- rep(10, 3)
-#' ppp_binomial(theta, c(1,2,0), n)  # ok
-#' ppp_binomial(theta, c(5,4,3), n)  # misfit
+#' ppp_binom(theta, c(1,2,0), n)  # ok
+#' ppp_binom(theta, c(5,4,3), n)  # misfit
 #'
 #' # multinomial (ternary choice)
 #' theta <- matrix(runif(300*2, 0, .05), 300)
-#' ppp_multinomial(theta, c(1,0,9), 3)  # ok
+#' ppp_multinom(theta, c(1,0,9), 3)  # ok
 #' @export
-ppp_binomial <- function(theta, k, n, by){
+ppp_binom <- function(theta, k, n, by){
   if (length(n) == 1)
     n <- rep(n, length(k))
   check_thetakn(theta, k, n)
@@ -35,7 +35,7 @@ ppp_binomial <- function(theta, k, n, by){
                   dimnames = list(levels, c("X2_obs", "X2_pred", "ppp")))
     for (i in 1:length(levels)){
       sel <- by == levels[i]
-      res[i,] <- ppp_binomial(theta[,sel, drop = FALSE], k[sel], n[sel])
+      res[i,] <- ppp_binom(theta[,sel, drop = FALSE], k[sel], n[sel])
     }
 
   } else {
@@ -44,9 +44,9 @@ ppp_binomial <- function(theta, k, n, by){
   res
 }
 
-#' @rdname ppp_binomial
+#' @rdname ppp_binom
 #' @export
-ppp_multinomial <- function(theta, k, options){
+ppp_multinom <- function(theta, k, options){
   check_thetako(theta, k, options)
   ppp_mult(free_to_full(theta, options), k, options)
 

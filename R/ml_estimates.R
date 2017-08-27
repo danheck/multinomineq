@@ -2,7 +2,7 @@
 #'
 #' Get ML estimate for product-binomial/multinomial model with linear inequality constraints.
 #'
-#' @inheritParams count_binomial
+#' @inheritParams count_binom
 #' @inheritParams strategy_marginal
 #' @param n.fit number of calls to \link[stats]{constrOptim}.
 #' @examples
@@ -13,16 +13,16 @@
 #'               0,  0,  1),
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
-#' ml_binomial(c(4,1,23), 40, A, b)
+#' ml_binom(c(4,1,23), 40, A, b)
 #'
 #'
 #'
 #' # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
 #' strat <- list(pattern = c(-1, -2, -3, 4),
 #'            c = .5, ordered = TRUE, prior = c(1,1))
-#' ml_binomial(c(7,3,1, 19), 20, strategy = strat)
+#' ml_binom(c(7,3,1, 19), 20, strategy = strat)
 #' @export
-ml_binomial <- function(k, n, A, b, map, strategy, n.fit = 1){
+ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1){
   if (length(n) == 1) n <- rep(n, length(k))
 
   if (!missing(strategy)){
@@ -38,22 +38,22 @@ ml_binomial <- function(k, n, A, b, map, strategy, n.fit = 1){
   aggr <- map_k_to_A(k, n, A, map)
   options <- rep(2, ncol(A))
   k_all <- add_fixed(aggr$k, aggr$n, options)
-  ml_multinomial(k_all, options, A, b, n.fit = n.fit)
+  ml_multinom(k_all, options, A, b, n.fit = n.fit)
 }
 
-#' @inheritParams count_multinomial
-#' @rdname ml_binomial
+#' @inheritParams count_multinom
+#' @rdname ml_binom
 #' @export
-ml_multinomial <- function(k, options, A, b, n.fit = 1){
+ml_multinom <- function(k, options, A, b, n.fit = 1){
   check_Abokprior(A, b, options, k)
   est <- k / c(tapply(k, rep(1:length(options), options), sum))
   start <- drop_fixed(est, options)
   if (!inside(start, A, b))
     start <- find_inside(A, b, options = options)
-  tmp <- Ab_multinomial(options, A, b, nonneg = TRUE)
+  tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
-  tryCatch (oo <- constrOptim(start, loglik_multinomial, grad = NULL,
+  tryCatch (oo <- constrOptim(start, loglik_multinom, grad = NULL,
                               k = k, options = options,
                               ui = - A, ci = - b, control = list(fnscale = -1)),
             error = function(e) {print(e);
@@ -61,7 +61,7 @@ ml_multinomial <- function(k, options, A, b, n.fit = 1){
   cnt <- 1
   while (cnt < n.fit){
     start <- find_inside(A, b, random = TRUE)
-    oo2 <- constrOptim(start, loglik_multinomial, grad = NULL,
+    oo2 <- constrOptim(start, loglik_multinom, grad = NULL,
                        k = k, options = options, ui = - A, ci = - b,
                        control = list(fnscale = -1))
     cnt <- cnt + 1
@@ -140,17 +140,17 @@ get_error_number <- function(pattern){
 # uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
 loglik <- function (error, k, n, strategy){
   pb <- error_to_prob(error, strategy)
-  loglik_binomial(pb, k, n)
+  loglik_binom(pb, k, n)
 }
 
-loglik_binomial <- function (p, k, n){
+loglik_binom <- function (p, k, n){
   try(ll <- sum(dbinom(x = k, size = n, prob = p, log = TRUE)), silent = TRUE)
   if (is.null(ll) || !is.na(ll) && ll == - Inf && all(k <= n))
     ll <- MIN_LL
   ll
 }
 
-loglik_multinomial <- function (p, k, options){
+loglik_multinom <- function (p, k, options){
   p_all <- add_fixed(p, options)
   ll <- sum(k * log(p_all))
   # tapply(p, oo, function(pp) dmultinom())

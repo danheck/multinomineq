@@ -25,20 +25,24 @@ ppp_bin <- function(theta, k, n) {
     .Call(`_stratsel_ppp_bin`, theta, k, n)
 }
 
-sampling_binomial_cpp <- function(k, n, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
-    .Call(`_stratsel_sampling_binomial_cpp`, k, n, A, b, prior, M, start, burnin, progress)
+sampling_bin <- function(k, n, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
+    .Call(`_stratsel_sampling_bin`, k, n, A, b, prior, M, start, burnin, progress)
 }
 
-count_binomial_cpp <- function(k, n, A, b, prior, M, batch, progress = TRUE) {
-    .Call(`_stratsel_count_binomial_cpp`, k, n, A, b, prior, M, batch, progress)
+count_bin <- function(k, n, A, b, prior, M, batch, progress = TRUE) {
+    .Call(`_stratsel_count_bin`, k, n, A, b, prior, M, batch, progress)
 }
 
-count_step <- function(k, n, A, b, prior, M, from, to, start, progress = TRUE) {
-    .Call(`_stratsel_count_step`, k, n, A, b, prior, M, from, to, start, progress)
+count_step_bin <- function(k, n, A, b, prior, M, from, to, start, progress = TRUE) {
+    .Call(`_stratsel_count_step_bin`, k, n, A, b, prior, M, from, to, start, progress)
 }
 
-count_stepwise <- function(k, n, A, b, prior, M, steps, batch, start, progress = TRUE) {
-    .Call(`_stratsel_count_stepwise`, k, n, A, b, prior, M, steps, batch, start, progress)
+count_stepwise_bin <- function(k, n, A, b, prior, M, steps, batch, start, progress = TRUE) {
+    .Call(`_stratsel_count_stepwise_bin`, k, n, A, b, prior, M, steps, batch, start, progress)
+}
+
+count_auto_bin <- function(k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress = TRUE) {
+    .Call(`_stratsel_count_auto_bin`, k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress)
 }
 
 sampling_hitandrun <- function(A, b, M, start, burnin = 5L, progress = TRUE) {
@@ -94,12 +98,16 @@ ppp_mult <- function(theta, k, options) {
     .Call(`_stratsel_ppp_mult`, theta, k, options)
 }
 
-sampling_multinomial_cpp <- function(k, options, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
-    .Call(`_stratsel_sampling_multinomial_cpp`, k, options, A, b, prior, M, start, burnin, progress)
+sampling_mult <- function(k, options, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
+    .Call(`_stratsel_sampling_mult`, k, options, A, b, prior, M, start, burnin, progress)
 }
 
-count_multinomial_cpp <- function(k, options, A, b, prior, M, batch, progress = TRUE) {
-    .Call(`_stratsel_count_multinomial_cpp`, k, options, A, b, prior, M, batch, progress)
+count_mult <- function(k, options, A, b, prior, M, batch, progress = TRUE) {
+    .Call(`_stratsel_count_mult`, k, options, A, b, prior, M, batch, progress)
+}
+
+count_step_mult <- function(k, options, A, b, prior, M, from, to, start, progress = TRUE) {
+    .Call(`_stratsel_count_step_mult`, k, options, A, b, prior, M, from, to, start, progress)
 }
 
 count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start, progress = TRUE) {

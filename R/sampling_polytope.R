@@ -3,7 +3,7 @@
 #' Uses Gibbs sampling to draw posterior samples for
 #' binomial models with linear inequality-constraints.
 #'
-#' @inheritParams count_binomial
+#' @inheritParams count_binom
 #' @param M number of posterior samples
 #' @param start starting vectors. Must be in the convex polytope (that is, \code{A*start <= b})
 #' @param burnin number of burnin samples that are discarded
@@ -14,7 +14,7 @@
 #'
 #' @return a matrix with posterior samples for the probabilities to choose Option B for each item type
 #' @template ref_myung2005
-#' @seealso \code{\link{count_binomial}}
+#' @seealso \code{\link{count_binom}}
 #' @examples
 #' A <- matrix(c(1, 0, 0,   # x1 < .50
 #'               1, 1, 1,   # x1+x2+x3 < 1
@@ -23,12 +23,12 @@
 #'               0, 0, 1),  # x3 < .1
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(.5, 1, 1, -.2, .1)
-#' samp <- sampling_binomial(c(5,12,7), c(20,20,20), A, b)
+#' samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
 #' head(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0,.6))
 #' @export
-sampling_binomial <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
-                               M = 5000, start, burnin = 10, progress = TRUE){
+sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
+                            M = 5000, start, burnin = 10, progress = TRUE){
   if (length(n) == 1) n <- rep(n, length(k))
   aggr <- map_k_to_A(k, n, A, map)
   k <- aggr$k
@@ -41,8 +41,7 @@ sampling_binomial <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
   } else if (length(start) != ncol(A) || !all(A %*% start <= b)) {
     stop ("'start' must be in the convex polytope:  A*start <= b")
   }
-  samples <- sampling_binomial_cpp(k, n, A, b, prior,
-                                   M, start, burnin, progress)
+  samples <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)
   samples
 }
@@ -52,9 +51,9 @@ sampling_binomial <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
 #' Uses Gibbs sampling to draw posterior samples for
 #' multinomial models with linear inequality-constraints.
 #'
-#' @inheritParams count_multinomial
-#' @inheritParams count_binomial
-#' @inheritParams sampling_binomial
+#' @inheritParams count_multinom
+#' @inheritParams count_binom
+#' @inheritParams sampling_binom
 #' @examples
 #' # binary and ternary choice:
 #' #           (a1,a2   b1,b2,b3)
@@ -68,14 +67,14 @@ sampling_binomial <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
 #'               0, 0, 1),  # b2 < .4
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(.2, 1, -.2, .4)
-#' samp <- sampling_multinomial(k, options, A, b)
+#' samp <- sampling_multinom(k, options, A, b)
 #' head(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0, 1))
 #' @export
-sampling_multinomial <- function (k, options, A, b,
-                                  prior = rep(1, sum(options)),
-                                  M = 5000, start, burnin = 10,
-                                  progress = TRUE){
+sampling_multinom <- function (k, options, A, b,
+                               prior = rep(1, sum(options)),
+                               M = 5000, start, burnin = 10,
+                               progress = TRUE){
   if (missing(start) || any(start < 0)){
     start <- k_to_prob(k, options) # ML estimate
     if (!inside(start, A, b))
@@ -86,11 +85,10 @@ sampling_multinomial <- function (k, options, A, b,
   if (missing(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
-  tmp <- Ab_multinomial(options, A, b)  # sum-to-1 constraints
+  tmp <- Ab_multinom(options, A, b)  # sum-to-1 constraints
   A <- tmp$A
   b <- tmp$b
-  samples <- sampling_multinomial_cpp(k, options, A, b, prior,
-                                      M, start, burnin, progress)
+  samples <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)
   if (is.null(colnames(A)))
     colnames(samples) <- drop_fixed(index_mult(options), options)

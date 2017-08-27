@@ -21,7 +21,7 @@ The constraint that restricts the paramter space most strongly is placed at the 
 }
 \details{
 This function might be helpful to improve the efficiency of the stepwise
-    sampling implemented in \code{\link{count_binomial}} and \code{\link{count_multinomial}}.
+    sampling implemented in \code{\link{count_binom}} and \code{\link{count_multinom}}.
 }
 \examples{
 b <- c(0,0,.30,.70)

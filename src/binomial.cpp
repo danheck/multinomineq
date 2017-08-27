@@ -64,10 +64,10 @@ NumericVector ppp_bin(arma::mat theta, arma::vec k, arma::vec n)
 // => uniform prior sampling if  k=n=b(0,...,0)
 // start: permissible starting values (randomly drawn if start[1]==-1)
 // [[Rcpp::export]]
-arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
-                                arma::mat A, arma::vec b,
-                                arma::vec prior, int M, arma::vec start,
-                                int burnin = 5, double progress = true)
+arma::mat sampling_bin(arma::vec k, arma::vec n,
+                       arma::mat A, arma::vec b,
+                       arma::vec prior, int M, arma::vec start,
+                       int burnin = 5, double progress = true)
 {
   int D = A.n_cols;    // dimensions
   mat X(D, M + burnin);     // initialize posterior (column-major ordering)
@@ -79,11 +79,11 @@ arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
   vec rhs = b;
   uvec Apos, Aneg;
   IntegerVector idx = seq_len(D) - 1;
-  int j=0, steps=100;
+  int j=0, tmp=100;
   for (int i = 1 ; i < M + burnin; i++)
   {
     p.increment();   // update progress bar
-    if(run && i % steps == 0) run = !Progress::check_abort();
+    if(run && i % tmp == 0) run = !Progress::check_abort();
     if (run)
     {
       // copy old and update to new parameters:
@@ -112,10 +112,10 @@ arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n,
 
 
 // [[Rcpp::export]]
-NumericVector count_binomial_cpp(arma::vec k, arma::vec n,
-                                 arma::mat A, arma::vec b,
-                                 arma::vec prior, int M,
-                                 int batch, bool progress = true)
+NumericMatrix count_bin(arma::vec k, arma::vec n,
+                        arma::mat A, arma::vec b,
+                        arma::vec prior, int M,
+                        int batch, bool progress = true)
 {
   Progress p(M/batch, progress);
   bool run = true;
@@ -133,61 +133,99 @@ NumericVector count_binomial_cpp(arma::vec k, arma::vec n,
       todo = todo - batch;
     }
   }
-  return NumericVector::create(Named("integral") = (double)count / M,
-                               // Named("results") = results(count, M));
-                               Named("count") = count,
-                               Named("M") = M);
+  return results(count, M, A.n_rows);
 }
 
-// add the last order constraint and sort "steps" vector
-arma::vec sort_steps(arma::vec steps, int total)
+// add the last order constraint and sort "steps" vector (C++ indexing!)
+arma::vec sort_steps(arma::vec steps, int A_rows)
 {
-  steps = resize(steps, steps.n_elem + 1, 1);
-  steps(steps.n_elem - 1) = total - 1;
+  if (steps.max() != A_rows - 1)
+  {
+    steps = resize(steps, steps.n_elem + 1, 1);
+    steps(steps.n_elem - 1) = A_rows - 1;
+  }
   return sort(unique(steps));
 }
 
 // go from  A[0:from,] ---> A[0:to,]  // C++ indexing!
 // [[Rcpp::export]]
-int count_step(arma::vec k, arma::vec n,
-               arma::mat A, arma::vec b, arma::vec prior,
-               int M, int from, int to, arma::vec start, bool progress = true)
+int count_step_bin(arma::vec k, arma::vec n,
+                   arma::mat A, arma::vec b, arma::vec prior,
+                   int M, int from, int to, arma::vec start, bool progress = true)
 {
   mat sample =
-    sampling_binomial_cpp(k, n, A.rows(0, from), b.subvec(0, from),
-                          prior, M, start, 10, progress);
+    sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
+                 prior, M, start, 10, progress);
   return count_samples(sample, A.rows(from + 1, to), b.subvec(from + 1, to));
 }
 
 // count samples stepwise to get volume of polytope
 // [[Rcpp::export]]
-List count_stepwise(arma::vec k, arma::vec n,
-                    arma::mat A, arma::vec b, arma::vec prior,
-                    arma::vec M, arma::vec steps, int batch,
-                    arma::vec start, bool progress = true)
+NumericMatrix count_stepwise_bin(arma::vec k, arma::vec n,
+                                 arma::mat A, arma::vec b, arma::vec prior,
+                                 arma::vec M, arma::vec steps, int batch,
+                                 arma::vec start, bool progress = true)
 {
-  steps = sort_steps(steps, A.n_rows);  // C++ indexing!!
+  steps = sort_steps(steps - 1, A.n_rows);  // C++ --> R indexing!!
   int S = steps.n_elem;    // number of unique steps
   int D = A.n_cols;        // number of dimensions/parameters
   if (M.n_elem == 1)
     M = M(0) * ones(S);
-  mat sample;
 
-  vec cnt = zeros(S);
-  cnt(0) = count_binomial_cpp(k, n, A.rows(0, steps(0)),
-      b.subvec(0, steps(0)), prior, M(0), batch, progress)["count"];
+  vec count = zeros(S);
+  count(0) = count_bin(k, n, A.rows(0, steps(0)),
+        b.subvec(0, steps(0)), prior, M(0), batch, false)(0,0);
 
   for (int s = 1; s < S ; s++)
-    cnt(s) = count_step(k, n, A, b, prior, M(s), steps(s-1), steps(s), start, progress);
+  {
+    Rcpp::checkUserInterrupt();
+    if (progress) Rcout << (s==1 ? " step: " : " , ") << s;
+    count(s) = count_step_bin(k, n, A, b, prior, M(s),
+          steps(s-1), steps(s), start, false);
+  }
+  return results(count, M, steps + 1); // C++ --> R indexing
+}
 
-  return List::create(Named("integral") = prod(cnt / M.rows(0, S-1)),
-                      // Named("results") = results(steps, cnt, M),
-                      Named("count") = as<NumericVector>(wrap(cnt)),
-                      Named("M") = as<NumericVector>(wrap(M)),
-                      Named("steps") = steps);  // R indexing
+// [[Rcpp::export]]
+NumericMatrix count_auto_bin(arma::vec k, arma::vec n,
+                             arma::mat A, arma::vec b, arma::vec prior,
+                             arma::vec count, arma::vec M, arma::vec steps,
+                             int M_iter, int cmin, int maxiter,
+                             arma::vec start, bool progress = true)
+{
+  steps = steps - 1; // R --> C++ indexing
+  vec inside;
+  mat theta;
+  int i, from;
+  while(count.min() < cmin)
+  {
+    Rcpp::checkUserInterrupt();
+    // find step with smallest count:
+    i = count.index_min();
+    from = (i == 0) ? -1 : steps(i-1);  // i==0: start at A(0,:)
+
+    // sampling for step with minimal counts
+    if (i == 0)
+    {
+      theta = rbeta_mat(M_iter, k + prior(0), n - k + prior(1));
+    }  else {
+      theta = sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
+                           prior, M_iter, start, 5, false);
+    }
+    // count samples
+    inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
+                       b.subvec(from + 1, steps(i)));
+    count(i) += accu(inside);
+    M(i) += M_iter;
+    // store last successful sample (update starting value)
+    // compute precision
+    // Rcout << count << "\n##\n";
+  }
+  return results(count, M, steps + 1); // C++ --> R indexing
 }
 
 
+// ------ hit-and-run: does not seem to increase efficiency
 // not as efficient as random-direction Gibbs sampling
 //  (requires constraints 0<p<1  in Ab representation)
 // [[Rcpp::export]]
@@ -203,11 +241,11 @@ arma::mat sampling_hitandrun(arma::mat A, arma::vec b, int M, arma::vec start,
   double bmax = 1, bmin = 0;
   vec rhs, u, x, z;
   uvec Apos, Aneg;
-  int steps=100;
+  int tmp=100;
   for (int i = 1 ; i < M + burnin; i++)
   {
     p.increment();   // update progress bar
-    if(run && i % steps == 0) run = !Progress::check_abort();
+    if(run && i % tmp == 0) run = !Progress::check_abort();
     if (run)
     {
       // random direction

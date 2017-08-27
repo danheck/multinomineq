@@ -25,7 +25,7 @@
 #' @importFrom stats sd dbeta rbinom dbinom pbeta integrate runif constrOptim rbeta rmultinom
 #' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply parSapplyLB clusterMap
 #' @importFrom Rcpp evalCpp sourceCpp
-#' @importFrom utils head
+#' @importFrom utils head combn
 #' @importFrom quadprog solve.QP
 #' @useDynLib "stratsel", .registration=TRUE
 #'

@@ -66,7 +66,7 @@ double x2(arma::vec o, arma::vec e){
 
 
 // get named NumericMatrix with results
-NumericMatrix results(arma::vec steps, arma::vec count, arma::vec M)
+NumericMatrix results(arma::vec count, arma::vec M, arma::vec steps)
 {
   int S = count.n_elem;
   mat res = join_rows(count, join_rows(M.rows(0, S-1), steps));
@@ -75,12 +75,13 @@ NumericMatrix results(arma::vec steps, arma::vec count, arma::vec M)
   return results;
 }
 
-NumericMatrix results(int count, int M)
+NumericMatrix results(int count, int M, int steps)
 {
-  NumericMatrix results(1,2);
+  NumericMatrix results(1,3);
   results(0,0) = count;
   results(0,1) = M;
-  colnames(results) = CharacterVector::create("count", "M");
+  results(0,2) = steps;
+  colnames(results) = CharacterVector::create("count", "M", "steps");
   return results;
 }
 

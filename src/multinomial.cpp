@@ -168,10 +168,10 @@ NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options)
 }
 
 // [[Rcpp::export]]
-arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
-                                   arma::mat A, arma::vec b,
-                                   arma::vec prior, int M, arma::vec start,
-                                   int burnin = 5, double progress = true)
+arma::mat sampling_mult(arma::vec k, arma::vec options,
+                        arma::mat A, arma::vec b,
+                        arma::vec prior, int M, arma::vec start,
+                        int burnin = 5, double progress = true)
 {
   int D = A.n_cols;  // dimensions
   mat X(D, M + burnin);       // initialize posterior, column-major order
@@ -191,11 +191,11 @@ arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
   vec rhs = b;
   uvec Apos, Aneg;
   IntegerVector idx = seq_len(D) - 1;
-  int j=0, steps=100;
+  int j=0, tmp=100;
   for (int i = 1 ; i < M  + burnin; i++)
   {
     p.increment();   // update progress bar
-    if(run && i % steps == 0) run = !Progress::check_abort();
+    if(run && i % tmp == 0) run = !Progress::check_abort();
     if (run)
     {
       X.col(i) = X.col(i-1);
@@ -223,10 +223,10 @@ arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options,
 
 
 // [[Rcpp::export]]
-NumericVector count_multinomial_cpp(arma::vec k, arma::vec options,
-                                    arma::mat A, arma::vec b,
-                                    arma::vec prior, int M,
-                                    int batch, bool progress = true)
+NumericMatrix count_mult(arma::vec k, arma::vec options,
+                         arma::mat A, arma::vec b,
+                         arma::vec prior, int M,
+                         int batch, bool progress = true)
 {
   Progress p(M/batch, progress);
   bool run = true;
@@ -243,42 +243,42 @@ NumericVector count_multinomial_cpp(arma::vec k, arma::vec options,
       todo = todo - batch;
     }
   }
-  return NumericVector::create(Named("integral") = (double)count / M,
-                               Named("count") = count,
-                               Named("M") = M);
+  return results(count, M, A.n_rows);
+}
+
+// go from  A[0:from,] ---> A[0:to,]  // C++ indexing!
+// [[Rcpp::export]]
+int count_step_mult(arma::vec k, arma::vec options,
+                    arma::mat A, arma::vec b, arma::vec prior,
+                    int M, int from, int to, arma::vec start, bool progress = true)
+{
+  mat sample = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
+                             prior, M, start, 10, progress);
+  return count_samples(sample, A.rows(from + 1, to), b.subvec(from + 1, to));
 }
 
 // [[Rcpp::export]]
-List count_stepwise_multi(arma::vec k, arma::vec options,
-                          arma::mat A, arma::vec b, arma::vec prior,
-                          arma::vec M, arma::vec steps, int batch,
-                          arma::vec start, bool progress = true)
+NumericMatrix count_stepwise_multi(arma::vec k, arma::vec options,
+                                   arma::mat A, arma::vec b, arma::vec prior,
+                                   arma::vec M, arma::vec steps, int batch,
+                                   arma::vec start, bool progress = true)
 {
-  steps = sort_steps(steps, A.n_rows) - 1;  // C++ indexing
+  steps = sort_steps(steps - 1, A.n_rows);  // R --> C++ indexing
   int S = steps.n_elem;    // number of unique steps
   int D = A.n_cols;        // number of dimensions/parameters
   if (M.n_elem == 1)
     M = M(0) * ones(S);
-  mat X;
 
-  vec cnt = zeros(S);
-  cnt(0) = count_multinomial_cpp(k, options,
-      A.rows(0, steps(0)),
-      b.subvec(0, steps(0)), prior, (int)M(0), batch, progress)["count"];
+  vec count = zeros(S);
+  count(0) = count_mult(k, options, A.rows(0, steps(0)),
+        b.subvec(0, steps(0)), prior, (int)M(0), batch, false)(0,0);
 
   for (int s = 1; s < S ; s++)
   {
-    X =
-      sampling_multinomial_cpp(k, options,
-                               A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                               prior, (int)M(s), start, 10, progress);
-    cnt(s) = cnt(s) +
-      count_samples(X,
-                    A.rows(steps(s-1) + 1, steps(s)),
-                    b.subvec(steps(s-1) + 1, steps(s)));
+    Rcpp::checkUserInterrupt();
+    if (progress) Rcout << (s==1 ? " step: " : " , ") << s;
+    count(s) = count_step_mult(k, options, A, b, prior, M(s),
+          steps(s-1), steps(s), start, false);
   }
-  return List::create(Named("integral") = prod(cnt/M),
-                      Named("count") = as<NumericVector>(wrap(cnt)),
-                      Named("M") = as<NumericVector>(wrap(M)),
-                      Named("steps") = steps + 1);  // R indexing
+  return results(count, M, steps + 1); // C++ --> R indexing
 }

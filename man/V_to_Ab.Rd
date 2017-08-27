@@ -38,7 +38,7 @@ Note that the transformation can be very slow and might require days of computin
 For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
 to ensure that all dimensions of the polytope satisfy:  0 <= p_i <= 1.
 For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= p_1+p_2 <=1
-for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinomial}}.
+for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinom}}.
 }
 \examples{
 \dontrun{

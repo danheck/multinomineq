@@ -17,12 +17,18 @@
 #' @param prior the prior parameters of the Dirichlet-shape parameters.
 #'    Must have the same length as \code{k}.
 #' @inheritParams inside
-#' @inheritParams count_binomial
+#' @inheritParams count_binom
 #' @return a list with the elements
+#' @return a matrix with the columns
 #' \itemize{
-#'     \item\code{integral}: estimated probability that samples are in polytope
-#'     \item\code{count}: number of samples in polytope
-#'     \item\code{M}: total number of samples
+#'     \item\code{count}: number of samples in polytope / that satisfy order constraints
+#'     \item\code{M}: the  total number of samples in each step
+#'     \item\code{steps}: the \code{"steps"} used to sample from the polytope
+#'         (i.e., the row numbers of \code{A} that were considered stepwise)
+#' }
+#' with the attributes:
+#' \itemize{
+#'    \item\code{integral}: estimated probability that samples are in polytope
 #' }
 #' @template ref_hoijtink2011
 #' @examples
@@ -44,30 +50,30 @@
 #' b <- c(0, 1, 0, .50)
 #'
 #' # count prior and posterior samples and get BF
-#' prior <- count_multinomial(0, options, A, b, M = 2e5)
-#' posterior <- count_multinomial(k, options, A, b, M = c(2e5))
-#' posterior$integral / prior$integral  # BF for constraints
+#' prior <- count_multinom(0, options, A, b, M = 2e4)
+#' posterior <- count_multinom(k, options, A, b, M = 2e4)
 #' count_to_bf(posterior, prior)
 #'
-#' bf_multinomial(k, options, A, b, M=1000)
+#' bf_multinom(k, options, A, b, M=5e4)
 #' @export
-count_multinomial <- function (k = 0, options, A, b, V,
-                               prior = rep(1, sum(options)),
-                               M, steps, batch = 10000, start = -1, progress = TRUE){
+count_multinom <- function (k = 0, options, A, b, V,
+                            prior = rep(1, sum(options)),
+                            M, steps, batch = 10000, start = -1, progress = TRUE){
   if (length(k) == 1 && k == 0)
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
   check_Mbatch(M, batch)
 
   if (missing(steps) || is.null(steps) || length(steps) == 0){
-    cnt <- as.list(count_multinomial_cpp(k, options, A, b, prior, M, batch, progress))
+    count <- count_mult(k, options, A, b, prior, M, batch, progress)
   } else {
     check_stepsA(steps, A)
-    tmp <- Ab_multinomial(options, A, b)  # sum-to-1 constraints
+    tmp <- Ab_multinom(options, A, b)  # sum-to-1 constraints
     A <- tmp$A
     b <- tmp$b
-    cnt <- count_stepwise_multi(k, options, A, b, prior, M,
-                                steps, batch, start, progress)
+    count <- count_stepwise_multi(k, options, A, b, prior, M,
+                                  steps, batch, start, progress)
   }
-  cnt
+  attr(count, "integral") <- get_integral(count)
+  count
 }

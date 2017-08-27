@@ -182,14 +182,14 @@ check_Mbatch <- function(M, batch){
 }
 
 check_count <- function(count){
-  if (!is.list(count) || ! c("count", "M") %in% names(count))
-    stop ("'prior' / 'posterior' msut be a list with the entries 'count' and 'M")
-  if(any(count$M < 0) ||  any(count$M != round(count$M)))
-    stop ("'M' must contain positive integers.")
-  if(any(count$count < 0) ||  any(count$count != round(count$count)))
-    stop ("'count' must contain positive integers.")
-  if (length(count$count) != length(count$M))
-    stop ("in 'prior'/'posterior': 'count' and 'M' must have equal length.")
+  if (is.null(dim(count)))
+    count <- matrix(count, 1, dimnames = list(NULL, names(count)))
+
+  # if(!is.numeric(count) || ! all(c("count", "M") %in% colnames(count)))
+  #   stop ("'prior' / 'posterior' must be a matrix with the column names 'count' and 'M")
+  if(any(count < 0) ||  any(count != round(count)))
+    stop ("'count' and must contain positive integers.")
+  count
 }
 
 check_io <- function(inside, options){

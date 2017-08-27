@@ -83,7 +83,7 @@ V_to_Ab <- function (V){
 }
 
 
-#' @inheritParams count_multinomial
+#' @inheritParams count_multinom
 #' @rdname V_to_Ab
 #' @param options number of choice options per item type.
 #'    Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.
@@ -91,7 +91,7 @@ V_to_Ab <- function (V){
 #' For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
 #' to ensure that all dimensions of the polytope satisfy:  0 <= p_i <= 1.
 #' For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= p_1+p_2 <=1
-#' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinomial}}.
+#' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinom}}.
 #'
 #' @export
 Ab_to_V <- function (A, b, options = 2){
@@ -101,7 +101,7 @@ Ab_to_V <- function (A, b, options = 2){
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
   check_Ab(A, b, options)
-  tmp <- Ab_multinomial(options, A, b, nonneg = TRUE)
+  tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
@@ -117,7 +117,7 @@ Ab_to_V <- function (A, b, options = 2){
 #' Get or add inequality constraints that multinomial probabilities are
 #' positive and sum to one for all choice options within each item type.
 #'
-#' @inheritParams count_multinomial
+#' @inheritParams count_multinom
 #' @inheritParams Ab_to_V
 #' @param nonneg whether to add constraints that probabilities must be nonnegative
 #' @details
@@ -126,10 +126,10 @@ Ab_to_V <- function (A, b, options = 2){
 #' @examples
 #' # three binary and two ternary choices:
 #' options <- c(2,2,2, 3,3)
-#' Ab_multinomial(options)
-#' Ab_multinomial(options, nonneg = TRUE)
+#' Ab_multinom(options)
+#' Ab_multinom(options, nonneg = TRUE)
 #' @export
-Ab_multinomial <- function (options, A = NULL, b = NULL, nonneg = FALSE){
+Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   S <- sum(options - 1)
   sum_to_one <- matrix(0, length(options), S)
   cnt <- 0

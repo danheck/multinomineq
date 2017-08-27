@@ -37,16 +37,16 @@ test_that('predictions work for one item type', {
   expect_equal(stratsel:::get_error_unique(TTB), 1)
   expect_length(stratsel:::get_error_unique(GUESS), 0)
   expect_equal(stratsel:::get_error_number(TTB), 1)
-  expect_equal(error_to_prob(.123, stratsel:::as_strategy(TTB)), rep(.123, 3))
+  expect_equal(stratsel:::error_to_prob(.123, stratsel:::as_strategy(TTB)), rep(.123, 3))
 
   # probabilistic models
   expect_equal(stratsel:::get_error_unique(WADDprob), sort(abs(WADDprob)))
   expect_equal(stratsel:::get_error_number(WADDprob), 3)
-  expect_equal(error_to_prob(c(.1,.2,.45), stratsel:::as_strategy(WADDprob)),
+  expect_equal(stratsel:::error_to_prob(c(.1,.2,.45), stratsel:::as_strategy(WADDprob)),
                c(.1, 1 - .45, .2))
   # baseline
   e <- c(.1 , .25, .3)
-  expect_equal(error_to_prob(e, stratsel:::as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
+  expect_equal(stratsel:::error_to_prob(e, stratsel:::as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
 
 })
 
@@ -130,7 +130,7 @@ test_that("strategy_to_Ab returns the correct A/b representation",{
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
   expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 
   strat <- list(pattern =-c(4:1),  # A,A,A,A  e1<e2<e3<e4<.5
@@ -138,7 +138,7 @@ test_that("strategy_to_Ab returns the correct A/b representation",{
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
   expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 
   strat <- list(pattern =c(1,-5,2,-3),  # A,A,A,A  e1<e2<e3<e4<.5
@@ -146,6 +146,6 @@ test_that("strategy_to_Ab returns the correct A/b representation",{
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binomial(k, n, pt$A, pt$b, M = 1e6)
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
   expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
 })

@@ -4,8 +4,8 @@
 #' Bayes factor for a user-specified nonlinear order constraint defined via an
 #' indicator function of the parameters: (p11,p12,p13,  p21,p22,...)
 #'
-#' @inheritParams count_multinomial
-#' @inheritParams count_binomial
+#' @inheritParams count_multinom
+#' @inheritParams count_binom
 #' @param inside a function that takes a vector with probabilities
 #'    \code{p=c(p11,p12,p13,  p21,p22,...)} as input and returns \code{1} or \code{TRUE}
 #'    if the order constraints are satisfied and \code{0} or \code{FALSE} if not.
@@ -35,6 +35,6 @@ bf_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)),
     cnt_pr <- cnt_pr + sum(apply(pr, 1, inside))
     todo <- todo - batch
   }
-  count_to_bf(list("count" = cnt_po, "M" = M),
-              list("count" = cnt_pr, "M" = M))
+  count_to_bf(cbind("count" = cnt_po, "M" = M),
+              cbind("count" = cnt_pr, "M" = M))
 }

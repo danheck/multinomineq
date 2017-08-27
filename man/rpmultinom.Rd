@@ -12,7 +12,7 @@ rpbinom(theta, n)
 \arguments{
 \item{theta}{vector with probability parameters. Must sum to one within each option.
 Can be a matrix with one parameter vector per row.
-See \code{\link{sampling_binomial}} and \code{\link{sampling_multinomial}}.}
+See \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{n}{integer vector, specifying the total number of objects for each multinomial distribution.}
 

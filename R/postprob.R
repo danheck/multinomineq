@@ -2,9 +2,9 @@
 #' Transform Bayes Factors to Posterior Model Probabilities
 #'
 #' Computes posterior model probabilities based on objects returned by
-#' \code{\link{bf_binomial}}, \code{\link{bf_multinomial}} and \code{\link{count_to_bf}}.
+#' \code{\link{bf_binom}}, \code{\link{bf_multinom}} and \code{\link{count_to_bf}}.
 #'
-#' @param ... an arbitrary number of Bayes-factor objects with the elements \code{count} and \code{M} indicating how often posterior samples where within the admissible parameter space relative to the same encompassing model. Such lists are returned by \code{\link{count_binomial}} or \code{\link{count_multinomial}}.
+#' @param ... an arbitrary number of Bayes-factor objects with the elements \code{count} and \code{M} indicating how often posterior samples where within the admissible parameter space relative to the same encompassing model. Such lists are returned by \code{\link{count_binom}} or \code{\link{count_multinom}}.
 #' @param prior prior model probabilities. Uniform by default.
 #' @inheritParams count_to_bf
 #' @export

@@ -136,6 +136,7 @@
 #' data(heck2017_raw)
 #' head(heck2017_raw)
 #'
+#' \dontrun{
 #' # get cue values, validities, and predictions
 #' cueA <- heck2017_raw[,paste0("a",1:4)]
 #' cueB <- heck2017_raw[,paste0("b",1:4)]
@@ -161,6 +162,7 @@
 #' pp <- strategy_postprob(freqB[1:4,], rep(40, 4),
 #'                         types$strategies)
 #' round(pp, 3)
+#' }
 "heck2017_raw"
 
 
@@ -198,16 +200,16 @@
 #' tail(swop5$A, 3)
 #' # participant 1, gamble set 1:
 #' p1 <- regenwetter2012[1,-c(1:2)]
-#' inside_multinomial(p1, swop5$options, swop5$A, swop5$b)
+#' inside_multinom(p1, swop5$options, swop5$A, swop5$b)
 #'
 #' \dontrun{
 #' # posterior samples
-#' p <- sampling_multinomial(regenwetter2012[1,-c(1:2)],
-#'                           swop5$options, swop5$A, swop5$b,
-#'                           M=1000, start = swop5$start)
+#' p <- sampling_multinom(regenwetter2012[1,-c(1:2)],
+#'                        swop5$options, swop5$A, swop5$b,
+#'                        M=1000, start = swop5$start)
 #' colMeans(p)
 #' apply(p[,1:6], 2, plot, type = "l")
-#' ppp_multinomial(p, p1, swop5$options)
+#' ppp_multinom(p, p1, swop5$options)
 #' }
 "regenwetter2012"
 

@@ -43,6 +43,7 @@ Individual choice freqeuncies are available as \code{\link{heck2017}}
 data(heck2017_raw)
 head(heck2017_raw)
 
+\dontrun{
 # get cue values, validities, and predictions
 cueA <- heck2017_raw[,paste0("a",1:4)]
 cueB <- heck2017_raw[,paste0("b",1:4)]
@@ -68,6 +69,7 @@ head(heck2017)  # same frequencies (different order)
 pp <- strategy_postprob(freqB[1:4,], rep(40, 4),
                         types$strategies)
 round(pp, 3)
+}
 }
 \references{
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \url{https://doi.org/10.1016/j.cogpsych.2017.05.003}

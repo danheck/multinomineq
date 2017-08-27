@@ -19,27 +19,27 @@ prior <- c(1, 1)
 
 test_that('Bayes factor works as expected', {
   # guessing
-  expect_equal(stratsel:::compute_marginal(k, n, stratsel:::as_strategy(GUESS)),
+  expect_equal(stratsel:::strategy_marginal(k, n, stratsel:::as_strategy(GUESS)),
                sum(lchoose(n, k)) + sum(n)*log(.5))
 
   # TTB
   s1 <- sum(k) + prior[1]
   s2 <- sum(n-k) + prior[2]
-  expect_equal(compute_marginal(k, n, stratsel:::as_strategy(TTB)),
+  expect_equal(strategy_marginal(k, n, stratsel:::as_strategy(TTB)),
                sum(lchoose(n, k)) +
                  pbeta(.5, s1, s2, log = TRUE) +
                  lbeta(s1, s2) - log(.5))
 
   # TTB is best model:
-  expect_named(margs <- select_bf(k, n, preds), names(preds))
+  expect_named(margs <- strategy_postprob(k, n, preds), names(preds))
   expect_gt(margs[1], max(margs[-c(1)]))
 
   # WADD is best model:
-  expect_named(margs <- select_bf(c(0,n[3],0), n, preds), names(preds))
+  expect_named(margs <- strategy_postprob(c(0,n[3],0), n, preds), names(preds))
   expect_gt(margs[2], max(margs[-c(2)]))
 
   # errors
-  expect_error(compute_marginal(k_false, n, stratsel:::as_strategy(TTB)))
+  expect_error(strategy_marginal(k_false, n, stratsel:::as_strategy(TTB)))
 })
 
 # correct results for first 5 participants
@@ -80,8 +80,8 @@ test_that("results match for Heck et al. (2017)", {
   # get predictions
   strategies <- c("baseline",  "WADD", "WADDprob",
                  "TTB",  "TTBprob", "EQW", "GUESS")
-  strats <- predict_multiattribute(cueA, cueB, v, strategies)
-  pp <- unname(select_bf(heck2017[1:5,], rep(40, 4), strats))
+  strats <- strategy_multiattribute(cueA, cueB, v, strategies)
+  pp <- unname(strategy_postprob(heck2017[1:5,], rep(40, 4), strats))
   heck <- unname(pp_heck2017)
   expect_equivalent(pp, heck)
 })

@@ -43,14 +43,13 @@ map_k_to_A <- function (k, n, A, map, prior = c(1, 1)){
   int_kn   <- sum(lbeta(k + prior[1], n - k + prior[2]))
   int_aggr <- sum(lbeta(k_aggr + prior[1], n_aggr - k_aggr + prior[2]))
 
-
   list("k" = k_aggr, "n" = n_aggr, "const_map_0e" = c50 + int_aggr - int_kn)
 }
 
 get_const_map <- function(post, prior){
   const <- 0
-  if (!is.null(post$const_map_0e))
-    const <- post$const_map_0e
+  if (!is.null(attr(post, "const_map_0e")))
+    const <- attr(post, "const_map_0e")
   # if (!is.null(prior$const_map_0e) && const != prior$const_map_0e)
   #   warning("Constants due to equality constraints (because of using 'map') do not match.")
   const
@@ -64,7 +63,7 @@ get_const_map <- function(post, prior){
 # # assignment to columns of A:
 # map <- c(1,-1, 2,-2, .5,.5)
 # k <- c(3,8, 3,6, 5,4)
-# samp <- sampling_binomial(k, rep(10, 6), A, b, map)
+# samp <- sampling_binom(k, rep(10, 6), A, b, map)
 # head(samp)
 # colMeans(samp)
 # apply(samp, 2, plot, type = "l", ylim = c(0,.6))

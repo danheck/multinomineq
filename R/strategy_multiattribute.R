@@ -144,7 +144,7 @@ print.strategy <- function(x, ...){
 #'
 #' Transforms ordered item-type predictions to polytope definition.
 #' This allows to use Monte-Carlo methods to compute the Bayes factor
-#' if the number of item types is large (\code{\link{bf_binomial}}).
+#' if the number of item types is large (\code{\link{bf_binom}}).
 #'
 #' @param strategy a decision strategy returned by \code{\link{strategy_multiattribute}}.
 #'
@@ -169,7 +169,7 @@ print.strategy <- function(x, ...){
 #' n <- rep(20, 4)
 #' m1 <- strategy_postprob(k, n, list(strat, b))
 #' log(m1[1] / m1[2])
-#' bf_binomial(k, n, pt$A, pt$b)["log_bf_0e",]
+#' bf_binom(k, n, pt$A, pt$b)["log_bf_0e",]
 #' @export
 strategy_to_Ab <- function (strategy){
   check_strategy(strategy)

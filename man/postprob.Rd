@@ -7,16 +7,19 @@
 postprob(..., prior, beta = c(0.5, 0.5), samples = 3000)
 }
 \arguments{
-\item{...}{an arbitrary number of Bayes-factor objects with the elements \code{count} and \code{M} indicating how often posterior samples where within the admissible parameter space relative to the same encompassing model. Such lists are returned by \code{\link{count_binomial}} or \code{\link{count_multinomial}}.}
+\item{...}{an arbitrary number of Bayes-factor objects with the elements \code{count} and \code{M} indicating how often posterior samples where within the admissible parameter space relative to the same encompassing model. Such lists are returned by \code{\link{count_binom}} or \code{\link{count_multinom}}.}
 
 \item{prior}{prior model probabilities. Uniform by default.}
 
-\item{beta}{prior parameters of beta distributions for estimating the standard error}
+\item{beta}{prior parameters of beta distributions for estimating the standard error.}
 
-\item{samples}{number of samples from beta distributions used to approximate the standard error. The default is Jeffreys' prior.
+\item{samples}{number of samples from beta distributions used to approximate
+   the standard error. The default is Jeffreys' prior.
 
 The encompassing model is the unconstrained baseline model that assumes a separate,
-unconstrained probability for each observable frequency.
+unconstrained probability for each observable frequency. The Bayes factor is obtained
+as the ratio of posterior/prior samples within an order-constrained subset of the
+parameter space.
 
 The standard error of the (stepwise) encompassing Bayes factor is estimated by sampling
 ratios from beta distributions, with parameters defined by the posterior/prior counts
@@ -24,5 +27,5 @@ ratios from beta distributions, with parameters defined by the posterior/prior c
 }
 \description{
 Computes posterior model probabilities based on objects returned by
-\code{\link{bf_binomial}}, \code{\link{bf_multinomial}} and \code{\link{count_to_bf}}.
+\code{\link{bf_binom}}, \code{\link{bf_multinom}} and \code{\link{count_to_bf}}.
 }

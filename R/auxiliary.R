@@ -7,7 +7,7 @@ MIN_LL <- - 1e300
 
 drop_fixed <- function(k, options = rep(2, length(k) / 2)){
   idx <- cumsum(options)
-  if (is.null(dim(k))){
+  if (is.null(dim(k)) || length(dim(k)) == 1){
     k[- idx]
   } else {
     k[,- idx, drop = FALSE]
@@ -30,7 +30,9 @@ add_fixed <- function(k, sum = 1, options = rep(2, length(k))){
 k_to_prob <- function(k, options = rep(2, length(k) / 2)){
   oo <- rep(1:length(options), options)
   n <- tapply(k, oo, sum)[oo]
-  drop_fixed(k / n, options)
+  ml <- k / n
+  # ml[is.na(ml)] <- runif(sum(is.na(ml)))
+  drop_fixed(ml, options)
 }
 
 index_bin <- function(k){

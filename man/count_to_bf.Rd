@@ -7,18 +7,22 @@
 count_to_bf(posterior, prior, beta = c(0.5, 0.5), samples = 3000)
 }
 \arguments{
-\item{posterior}{a list with the entries \code{count} (number of samples within polytope)
-and \code{M} (total number of samples). Both can be vectors in the stepwise procedure.
-See \code{\link{count_binomial}}.}
+\item{posterior}{a vector (or matrix) with entries (or columns)
+\code{count} = number of posterior samples within polytope and \code{M} =
+total number of samples. See \code{\link{count_binom}}.}
 
-\item{prior}{a list similar as \code{posterior} but based on prior samples.}
+\item{prior}{a vecotr or matrix similar as for \code{posterior}, but based on
+samples from the prior distribution.}
 
-\item{beta}{prior parameters of beta distributions for estimating the standard error}
+\item{beta}{prior parameters of beta distributions for estimating the standard error.}
 
-\item{samples}{number of samples from beta distributions used to approximate the standard error. The default is Jeffreys' prior.
+\item{samples}{number of samples from beta distributions used to approximate
+   the standard error. The default is Jeffreys' prior.
 
 The encompassing model is the unconstrained baseline model that assumes a separate,
-unconstrained probability for each observable frequency.
+unconstrained probability for each observable frequency. The Bayes factor is obtained
+as the ratio of posterior/prior samples within an order-constrained subset of the
+parameter space.
 
 The standard error of the (stepwise) encompassing Bayes factor is estimated by sampling
 ratios from beta distributions, with parameters defined by the posterior/prior counts
@@ -32,13 +36,18 @@ Computes the encompassing Bayes factor (and standard error) defined as the
 ratio of posterior/prior samples that satisfy the order constraints (e.g., of a polytope).
 }
 \examples{
-post  <- list(count = 1447, M = 5000)
-prior <- list(count = 152, M = 5000)
+# vector input
+post  <- c(count = 1447, M = 5000)
+prior <- c(count = 152,  M = 10000)
+count_to_bf(post, prior)
+
+# matrix input (due to nested stepwise procedure)
+post <- cbind(count = c(139, 192), M = c(200, 1000))
 count_to_bf(post, prior)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
 }
 \seealso{
-\code{\link{count_binomial}}, \code{\link{count_multinomial}}
+\code{\link{count_binom}}, \code{\link{count_multinom}}
 }

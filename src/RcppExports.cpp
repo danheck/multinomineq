@@ -86,9 +86,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sampling_binomial_cpp
-arma::mat sampling_binomial_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin, double progress);
-RcppExport SEXP _stratsel_sampling_binomial_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+// sampling_bin
+arma::mat sampling_bin(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin, double progress);
+RcppExport SEXP _stratsel_sampling_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -101,13 +101,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< double >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampling_binomial_cpp(k, n, A, b, prior, M, start, burnin, progress));
+    rcpp_result_gen = Rcpp::wrap(sampling_bin(k, n, A, b, prior, M, start, burnin, progress));
     return rcpp_result_gen;
 END_RCPP
 }
-// count_binomial_cpp
-NumericVector count_binomial_cpp(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch, bool progress);
-RcppExport SEXP _stratsel_count_binomial_cpp(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
+// count_bin
+NumericMatrix count_bin(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int batch, bool progress);
+RcppExport SEXP _stratsel_count_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -119,13 +119,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_binomial_cpp(k, n, A, b, prior, M, batch, progress));
+    rcpp_result_gen = Rcpp::wrap(count_bin(k, n, A, b, prior, M, batch, progress));
     return rcpp_result_gen;
 END_RCPP
 }
-// count_step
-int count_step(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int from, int to, arma::vec start, bool progress);
-RcppExport SEXP _stratsel_count_step(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP startSEXP, SEXP progressSEXP) {
+// count_step_bin
+int count_step_bin(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, int M, int from, int to, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_step_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP startSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -139,13 +139,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type to(toSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_step(k, n, A, b, prior, M, from, to, start, progress));
+    rcpp_result_gen = Rcpp::wrap(count_step_bin(k, n, A, b, prior, M, from, to, start, progress));
     return rcpp_result_gen;
 END_RCPP
 }
-// count_stepwise
-List count_stepwise(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start, bool progress);
-RcppExport SEXP _stratsel_count_stepwise(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP progressSEXP) {
+// count_stepwise_bin
+NumericMatrix count_stepwise_bin(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_stepwise_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -159,7 +159,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_stepwise(k, n, A, b, prior, M, steps, batch, start, progress));
+    rcpp_result_gen = Rcpp::wrap(count_stepwise_bin(k, n, A, b, prior, M, steps, batch, start, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_auto_bin
+NumericMatrix count_auto_bin(arma::vec k, arma::vec n, arma::mat A, arma::vec b, arma::vec prior, arma::vec count, arma::vec M, arma::vec steps, int M_iter, int cmin, int maxiter, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_auto_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type count(countSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type steps(stepsSEXP);
+    Rcpp::traits::input_parameter< int >::type M_iter(M_iterSEXP);
+    Rcpp::traits::input_parameter< int >::type cmin(cminSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_auto_bin(k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -279,9 +302,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sampling_multinomial_cpp
-arma::mat sampling_multinomial_cpp(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin, double progress);
-RcppExport SEXP _stratsel_sampling_multinomial_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+// sampling_mult
+arma::mat sampling_mult(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, arma::vec start, int burnin, double progress);
+RcppExport SEXP _stratsel_sampling_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -294,13 +317,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< double >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampling_multinomial_cpp(k, options, A, b, prior, M, start, burnin, progress));
+    rcpp_result_gen = Rcpp::wrap(sampling_mult(k, options, A, b, prior, M, start, burnin, progress));
     return rcpp_result_gen;
 END_RCPP
 }
-// count_multinomial_cpp
-NumericVector count_multinomial_cpp(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, int batch, bool progress);
-RcppExport SEXP _stratsel_count_multinomial_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
+// count_mult
+NumericMatrix count_mult(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, int batch, bool progress);
+RcppExport SEXP _stratsel_count_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -312,12 +335,32 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type batch(batchSEXP);
     Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(count_multinomial_cpp(k, options, A, b, prior, M, batch, progress));
+    rcpp_result_gen = Rcpp::wrap(count_mult(k, options, A, b, prior, M, batch, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_step_mult
+int count_step_mult(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, int M, int from, int to, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_step_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP startSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< int >::type to(toSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_step_mult(k, options, A, b, prior, M, from, to, start, progress));
     return rcpp_result_gen;
 END_RCPP
 }
 // count_stepwise_multi
-List count_stepwise_multi(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start, bool progress);
+NumericMatrix count_stepwise_multi(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, arma::vec M, arma::vec steps, int batch, arma::vec start, bool progress);
 RcppExport SEXP _stratsel_count_stepwise_multi(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

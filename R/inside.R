@@ -54,11 +54,11 @@ inside <- function(x, A, b, V){
 #'
 #' @inheritParams inside
 #' @param k choice frequencies.
-#'    For \code{inside_binomial}: per item type (e.g.: a1,b1,c1,..)
-#'    For \code{inside_multinomial}: for all choice options ordered by item type
+#'    For \code{inside_binom}: per item type (e.g.: a1,b1,c1,..)
+#'    For \code{inside_multinom}: for all choice options ordered by item type
 #'    (e.g., for ternary choices: a1,a2,a3, b1,b2,b3,..)
-#' @param n only for \code{inside_binomial}: number of choices per item type.
-#' @param options only for \code{inside_multinomial}: number of response options per item type.
+#' @param n only for \code{inside_binom}: number of choices per item type.
+#' @param options only for \code{inside_multinom}: number of response options per item type.
 #' @examples
 #' ############ binomial
 #' # x1<x2<x3<.50:
@@ -68,7 +68,7 @@ inside <- function(x, A, b, V){
 #' b <- c(0, 0, .50)
 #' k <- c( 0, 1, 5)
 #' n <- c(10,10,10)
-#' inside_binomial(k, n, A, b)
+#' inside_binom(k, n, A, b)
 #'
 #' ############ multinomial
 #' # two ternary choices:
@@ -79,10 +79,10 @@ inside <- function(x, A, b, V){
 #' A <- matrix(c(1,-1,0, 0,
 #'               0, 0,1,-1), ncol=4, byrow=TRUE)
 #' b <- c(0, 0)
-#' inside_multinomial(k, options, A, b)
+#' inside_multinom(k, options, A, b)
 #' @seealso \code{\link{inside}}
 #' @export
-inside_binomial <- function(k, n, A, b, V){
+inside_binom <- function(k, n, A, b, V){
   x <- k / n
   if (missing(V)){
     inside(x, A, b)
@@ -91,9 +91,9 @@ inside_binomial <- function(k, n, A, b, V){
   }
 }
 
-#' @rdname inside_binomial
+#' @rdname inside_binom
 #' @export
-inside_multinomial <- function(k, options, A, b, V){
+inside_multinom <- function(k, options, A, b, V){
   k_free <- k[- cumsum(options)]
   sel <- rep(1:length(options), options - 1)
   n <- tapply(k, rep(1:length(options), options), sum)[sel]

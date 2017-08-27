@@ -16,7 +16,7 @@ a list containing the matrix \code{A} and the vector \code{b}
 \description{
 Transforms ordered item-type predictions to polytope definition.
 This allows to use Monte-Carlo methods to compute the Bayes factor
-if the number of item types is large (\code{\link{bf_binomial}}).
+if the number of item types is large (\code{\link{bf_binom}}).
 }
 \details{
 Note: Only works for models without guessing predictions and
@@ -37,5 +37,5 @@ k <- c(2, 20, 18, 0)
 n <- rep(20, 4)
 m1 <- strategy_postprob(k, n, list(strat, b))
 log(m1[1] / m1[2])
-bf_binomial(k, n, pt$A, pt$b)["log_bf_0e",]
+bf_binom(k, n, pt$A, pt$b)["log_bf_0e",]
 }
