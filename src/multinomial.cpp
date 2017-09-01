@@ -293,6 +293,7 @@ NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
 {
   steps = steps - 1; // R --> C++ indexing
   vec inside;
+  uvec inside_idx;
   mat theta;
   mat starts(steps.n_elem, A.n_cols);
   for (int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
@@ -319,6 +320,11 @@ NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
     // count samples
     inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
                        b.subvec(from + 1, steps(i)));
+    if (any(inside))
+    {
+      inside_idx = find(inside);
+      starts.row(i) = theta.row(inside_idx(inside_idx.n_elem - 1));
+    }
     count(i) += accu(inside);
     M(i) += M_iter;
     // store last successful sample (update starting value)

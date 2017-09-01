@@ -196,6 +196,7 @@ NumericMatrix count_auto_bin(arma::vec k, arma::vec n,
 {
   steps = steps - 1; // R --> C++ indexing
   vec inside;
+  uvec inside_idx;
   mat theta;
   mat starts(steps.n_elem, A.n_cols);
   for (int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
@@ -216,12 +217,17 @@ NumericMatrix count_auto_bin(arma::vec k, arma::vec n,
       theta = rbeta_mat(M_iter, k + prior(0), n - k + prior(1));
     }  else {
       theta = sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
-                           prior, M_iter, starts.row(i).t(), 5, false);
-      starts.row(i) = theta.row(M_iter - 1);
+                           prior, M_iter, starts.row(i-1).t(), 5, false);
+      starts.row(i-1) = theta.row(M_iter - 1);
     }
     // count samples
     inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
                        b.subvec(from + 1, steps(i)));
+    if (any(inside))
+    {
+      inside_idx = find(inside);
+      starts.row(i) = theta.row(inside_idx(inside_idx.n_elem - 1));
+    }
     count(i) += accu(inside);
     M(i) += M_iter;
     // compute precision

@@ -104,7 +104,8 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1),
       else steps <- check_stepsA(steps, A)
       zeros <- rep(0, length(steps))
       count <- count_auto_bin(k, n, A, b, prior, zeros, zeros, steps,
-                              M_iter = M, cmin = cmin, maxiter = maxiter, start, progress)
+                              M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
+                              start, progress)
     } else {
       steps <- check_stepsA(steps, A)
       count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch = BATCH, start, progress)

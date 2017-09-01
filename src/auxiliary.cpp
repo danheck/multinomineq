@@ -85,6 +85,7 @@ NumericMatrix results(int count, int M, int steps)
   return results;
 }
 
+// for strategy models: find appropriate value inside linear order cosntraints
 // [[Rcpp::export]]
 NumericVector adj_iterative(NumericVector par,
                             const double c = .50,

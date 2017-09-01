@@ -78,7 +78,8 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     if (cmin > 0){
       zeros <- rep(0, length(steps))
       count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps,
-                               M_iter = M, cmin = cmin, maxiter = maxiter, start, progress)
+                               M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
+                               start, progress)
     } else {
       count <- count_stepwise_multi(k, options, A, b, prior, M,
                                     steps, batch = BATCH, start, progress)
