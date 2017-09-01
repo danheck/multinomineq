@@ -3,7 +3,8 @@
 BOUND <- 1e-10
 MIN_LL <- - 1e300
 
-
+# reduce memory load by counting in batches:
+BATCH <- 50000
 
 drop_fixed <- function(k, options = rep(2, length(k) / 2)){
   idx <- cumsum(options)

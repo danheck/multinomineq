@@ -5,11 +5,9 @@
 \alias{bf_multinom}
 \title{Bayes Factor for Linear Order Constraints}
 \usage{
-bf_binom(k, n, A, b, V, map, prior = c(1, 1), M = 5e+05, steps,
-  batch = 10000)
+bf_binom(k, n, A, b, V, map, prior = c(1, 1), ...)
 
-bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)), M = 5e+05,
-  steps, batch = 10000)
+bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)), ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -32,11 +30,7 @@ is comparatively slow since it solves a linear-programming problem for each poin
 
 \item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
 
-\item{M}{number of posterior samples drawn from the encompassing model}
-
-\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
-
-\item{batch}{size of the batches into which computations are split to reduce memory load}
+\item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}} (e.g., \code{M}, \code{steps}).}
 
 \item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
 The sum of \code{options} must be equal to the length of \code{k}.}
@@ -53,6 +47,8 @@ For more control, use \code{\link{count_binom}} to specifiy how many samples
 should be drawn from the prior and posterior, respectively.
 This is especially recommended if the same prior distribution (and thus the same integral)
 is used for computing BFs for multiple data sets that differ only in \code{k} and \code{n}.
+In this case, the prior integral can be computed once with high precision, whereas the
+posterior integral needs to be computed separately for each unique vector \code{k}.
 }
 \examples{
 k <- c(0, 3, 2, 5, 3, 7)
@@ -69,13 +65,10 @@ A <- matrix(c(1, -1, 0, 0, 0, 0,
             ncol = 6, byrow = TRUE)
 b <- c(0, 0, 0, 0, 0, .50)
 
-# check whether vectors are in polytope:
-inside(c(.05, .1, .12, .16, .19, .23), A, b)  # yes
-inside(c(.05, .3, .12, .16, .19, .53), A, b)  # no
-
 # Bayes factor: unconstrained vs. constrained
 bf_binom(k, n, A, b, prior=c(1, 1), M=2e5)
 bf_binom(k, n, A, b, prior=c(1, 1), M=1e4, steps=c(2,4,5))
+bf_binom(k, n, A, b, prior=c(1, 1), M=1e4, cmin = 100)
 }
 \references{
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}

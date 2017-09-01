@@ -379,3 +379,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// count_auto_mult
+NumericMatrix count_auto_mult(arma::vec k, arma::vec options, arma::mat A, arma::vec b, arma::vec prior, arma::vec count, arma::vec M, arma::vec steps, int M_iter, int cmin, int maxiter, arma::vec start, bool progress);
+RcppExport SEXP _stratsel_count_auto_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type count(countSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type steps(stepsSEXP);
+    Rcpp::traits::input_parameter< int >::type M_iter(M_iterSEXP);
+    Rcpp::traits::input_parameter< int >::type cmin(cminSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_auto_mult(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress));
+    return rcpp_result_gen;
+END_RCPP
+}

@@ -23,17 +23,17 @@
 #'    x[1]*x[6] < x[5]*x[2] & x[3]*x[8] < x[7]*x[4]
 #' bf_nonlinear(k, 8, model2, M=1e5)  # K&H07: BF_0e=1.62
 #' @export
-bf_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)),
-                         M = 5e5, batch = 10000){
+bf_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)), M = 10000){
   check_io(inside, options)
+  check_Mminmax(M)
   todo <- M
   cnt_po <- cnt_pr <- 0
   while (todo > 0){
-    po <- rpdirichlet(min(batch, todo), k + prior, options)
-    pr <- rpdirichlet(min(batch, todo), prior, options)
+    po <- rpdirichlet(min(BATCH, todo), k + prior, options)
+    pr <- rpdirichlet(min(BATCH, todo), prior, options)
     cnt_po <- cnt_po + sum(apply(po, 1, inside))
     cnt_pr <- cnt_pr + sum(apply(pr, 1, inside))
-    todo <- todo - batch
+    todo <- todo - BATCH
   }
   count_to_bf(cbind("count" = cnt_po, "M" = M),
               cbind("count" = cnt_pr, "M" = M))

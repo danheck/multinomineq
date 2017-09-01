@@ -280,5 +280,51 @@ NumericMatrix count_stepwise_multi(arma::vec k, arma::vec options,
     count(s) = count_step_mult(k, options, A, b, prior, M(s),
           steps(s-1), steps(s), start, false);
   }
+  if (progress) Rcout << "\n";
+  return results(count, M, steps + 1); // C++ --> R indexing
+}
+
+// [[Rcpp::export]]
+NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
+                              arma::mat A, arma::vec b, arma::vec prior,
+                              arma::vec count, arma::vec M, arma::vec steps,
+                              int M_iter, int cmin, int maxiter,
+                              arma::vec start, bool progress = true)
+{
+  steps = steps - 1; // R --> C++ indexing
+  vec inside;
+  mat theta;
+  mat starts(steps.n_elem, A.n_cols);
+  for (int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
+  int i, from, iter=0;
+  while(count.min() < cmin)
+  {
+    Rcpp::checkUserInterrupt();
+    if (progress && iter % (maxiter/100) == 0)
+      Rcout << (iter== 0 ? " current cmin: " : " , ") << count.min();
+    iter += 1;
+    // find step with smallest count:
+    i = count.index_min();
+    from = (i == 0) ? -1 : steps(i-1);  // i==0: start at A(0,:)
+
+    // sampling for step with minimal counts
+    if (i == 0)
+    {
+      theta = rpdirichlet_free(M_iter, k + prior, options);
+    }  else {
+      theta = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
+                            prior, M_iter, starts.row(i).t(), 5, false);
+      starts.row(i) = theta.row(M_iter - 1);
+    }
+    // count samples
+    inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
+                       b.subvec(from + 1, steps(i)));
+    count(i) += accu(inside);
+    M(i) += M_iter;
+    // store last successful sample (update starting value)
+    // compute precision
+    // Rcout << count << "\n##\n";
+  }
+  if (progress) Rcout << "\n";
   return results(count, M, steps + 1); // C++ --> R indexing
 }

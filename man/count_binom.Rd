@@ -5,7 +5,7 @@
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
 count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
-  batch = 10000, start = -1, progress = TRUE)
+  start = -1, cmin = 0, maxiter = 500, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -30,13 +30,19 @@ is comparatively slow since it solves a linear-programming problem for each poin
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
-
-\item{batch}{size of the batches into which computations are split to reduce memory load}
+\item{steps}{an integer vector that indicates at which rows the matrix \code{A}
+is split for a stepwise computation of the Bayes factor (see details).
+In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+in each step from the (partially) order-constrained models  using Gibbs sampling.
+If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
 
 \item{start}{only if \code{steps} is defined: a vector with starting values
 within the polytope. If \code{steps = -1}, a random starting value is used
-(but a poitn within the polytope might not be found if the order constraints are strong).}
+(but a point within the polytope might not be found if the order constraints are strong).}
+
+\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
+
+\item{maxiter}{if \code{steps="auto"}: maximum number of sampling runs in the automatic stepwise procedure.}
 
 \item{progress}{whether a progress bar should be shown.}
 }
@@ -93,10 +99,14 @@ prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
 prior  # volume = attribute "integral"
 (.50)^6 / factorial(6)
 
-# count posterior samples and get Bayes factor
+# count posterior samples stepwise
 posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
 count_to_bf(posterior, prior)
 
+# automatic stepwise algorithm
+prior <- count_binom(0, 0, A, b, cmin = 1000)
+posterior <- count_binom(k, n, A, b, cmin = 1000)
+count_to_bf(posterior, prior)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

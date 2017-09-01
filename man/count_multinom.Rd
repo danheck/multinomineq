@@ -4,8 +4,9 @@
 \alias{count_multinom}
 \title{Number of Product-Multinomial Prior/Posterior Samples in Polytope}
 \usage{
-count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)), M,
-  steps, batch = 10000, start = -1, progress = TRUE)
+count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
+  M = 5000, steps, start = -1, cmin = 0, maxiter = 500,
+  progress = TRUE)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -32,13 +33,19 @@ Must have the same length as \code{k}.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{steps}{integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling}
-
-\item{batch}{size of the batches into which computations are split to reduce memory load}
+\item{steps}{an integer vector that indicates at which rows the matrix \code{A}
+is split for a stepwise computation of the Bayes factor (see details).
+In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+in each step from the (partially) order-constrained models  using Gibbs sampling.
+If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
 
 \item{start}{only if \code{steps} is defined: a vector with starting values
 within the polytope. If \code{steps = -1}, a random starting value is used
-(but a poitn within the polytope might not be found if the order constraints are strong).}
+(but a point within the polytope might not be found if the order constraints are strong).}
+
+\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
+
+\item{maxiter}{if \code{steps="auto"}: maximum number of sampling runs in the automatic stepwise procedure.}
 
 \item{progress}{whether a progress bar should be shown.}
 }
@@ -86,7 +93,8 @@ prior <- count_multinom(0, options, A, b, M = 2e4)
 posterior <- count_multinom(k, options, A, b, M = 2e4)
 count_to_bf(posterior, prior)
 
-bf_multinom(k, options, A, b, M=5e4)
+bf_multinom(k, options, A, b, M=1e5)
+bf_multinom(k, options, A, b, steps = 2, cmin = 5000)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

@@ -10,6 +10,7 @@
 /* .Call calls */
 extern SEXP _stratsel_adj_iterative(SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_auto_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_auto_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_samples(SEXP, SEXP, SEXP);
@@ -36,6 +37,7 @@ extern SEXP _stratsel_sum_options(SEXP, SEXP);
 static const R_CallMethodDef CallEntries[] = {
     {"_stratsel_adj_iterative",        (DL_FUNC) &_stratsel_adj_iterative,         3},
     {"_stratsel_count_auto_bin",       (DL_FUNC) &_stratsel_count_auto_bin,       13},
+    {"_stratsel_count_auto_mult",      (DL_FUNC) &_stratsel_count_auto_mult,      13},
     {"_stratsel_count_bin",            (DL_FUNC) &_stratsel_count_bin,             8},
     {"_stratsel_count_mult",           (DL_FUNC) &_stratsel_count_mult,            8},
     {"_stratsel_count_samples",        (DL_FUNC) &_stratsel_count_samples,         3},

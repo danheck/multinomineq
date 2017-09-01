@@ -114,3 +114,7 @@ count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start
     .Call(`_stratsel_count_stepwise_multi`, k, options, A, b, prior, M, steps, batch, start, progress)
 }
 
+count_auto_mult <- function(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress = TRUE) {
+    .Call(`_stratsel_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress)
+}
+

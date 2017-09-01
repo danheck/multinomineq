@@ -102,10 +102,9 @@ check_ko <- function(k, options){
 check_Abokprior <- function (A, b, options, k, prior = rep(1, length(k))){
   check_Ab(A, b, options)
   check_ko(k, options)
-  if (length(prior) != length(k))
-    stop("'prior' must have the same length as 'k'.")
-  if (any(prior != round(prior), prior <0))
-    stop ("'prior' must contain positive integers.")
+  if (is.null(prior) || length(prior) != length(k) ||
+      !is.numeric(prior) || any(prior <0))
+    stop ("'prior' must contain nonnegative numbers and have the same length as 'k'.")
 }
 
 
@@ -148,9 +147,10 @@ check_Vx <- function (V, x){
 }
 
 check_stepsA <- function(steps, A){
-  if (any(steps <= 0) || any(steps >= nrow(A)) || any(steps != round(steps)))
-    stop("'steps' must be a vector with positive integers smaller",
+  if (any(steps <= 0) || any(steps > nrow(A)) || any(steps != round(steps)))
+    stop("'steps' must be a vector with positive integers not larger",
          "\n  than the number of rows of the matrix 'A'.")
+  sort(unique(c(steps, nrow(A))))
 }
 
 check_strategy <- function (strategy){
@@ -174,11 +174,13 @@ check_data_strategy <- function (k, n, strategy){
   check_knp(k, n, strategy$pattern)
 }
 
-check_Mbatch <- function(M, batch){
+check_Mminmax <- function(M, cmin = 0, maxiter = 100){
   if(any(M < 0) ||  any(M != round(M)))
     stop("'M' must contain positive integers.")
-  if(length(batch) != 1 || batch < 0 ||  batch != round(batch))
-    stop("'batch' must be a positive integer.")
+  if(length(cmin) != 1 || cmin < 0 ||  cmin != round(cmin))
+    stop("'cmin' must be a nonnegative integer.")
+  if(length(maxiter) != 1 || maxiter < 1 ||  maxiter != round(maxiter))
+    stop("'maxiter' must be a positive integer.")
 }
 
 check_count <- function(count){

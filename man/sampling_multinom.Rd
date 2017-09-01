@@ -29,7 +29,7 @@ Must have the same length as \code{k}.}
 
 \item{start}{only if \code{steps} is defined: a vector with starting values
 within the polytope. If \code{steps = -1}, a random starting value is used
-(but a poitn within the polytope might not be found if the order constraints are strong).}
+(but a point within the polytope might not be found if the order constraints are strong).}
 
 \item{burnin}{number of burnin samples that are discarded}
 

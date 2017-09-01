@@ -11,12 +11,17 @@
 #' @param n the number of choices per item type.
 #' @param map optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}
 #' @param M number of posterior samples drawn from the encompassing model
-#' @param batch size of the batches into which computations are split to reduce memory load
-#' @param steps integer vector that indicates at which rows the matrix \code{A} is split for a stepwise computation of the Bayes factor (see details). In this case, \code{M} can be a vector with the number of samples drawn in each step from the (partially) order-constrained models using Gibbs sampling
+#' @param steps an integer vector that indicates at which rows the matrix \code{A}
+#'     is split for a stepwise computation of the Bayes factor (see details).
+#'     In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+#'     in each step from the (partially) order-constrained models  using Gibbs sampling.
+#'     If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.
 #' @param prior a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.
 #' @param start only if \code{steps} is defined: a vector with starting values
 #'     within the polytope. If \code{steps = -1}, a random starting value is used
-#'     (but a poitn within the polytope might not be found if the order constraints are strong).
+#'     (but a point within the polytope might not be found if the order constraints are strong).
+#' @param cmin if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
+#' @param maxiter if \code{steps="auto"}: maximum number of sampling runs in the automatic stepwise procedure.
 #' @param progress whether a progress bar should be shown.
 #'
 #' @details
@@ -64,32 +69,45 @@
 #' prior  # volume = attribute "integral"
 #' (.50)^6 / factorial(6)
 #'
-#' # count posterior samples and get Bayes factor
+#' # count posterior samples stepwise
 #' posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
 #' count_to_bf(posterior, prior)
 #'
+#' # automatic stepwise algorithm
+#' prior <- count_binom(0, 0, A, b, cmin = 1000)
+#' posterior <- count_binom(k, n, A, b, cmin = 1000)
+#' count_to_bf(posterior, prior)
+
 #' @template ref_hoijtink2011
 #' @template ref_fukuda2004
 #' @importFrom Rglpk Rglpk_solve_LP
 #' @export
 count_binom <- function (k, n, A, b, V, map, prior = c(1, 1),
-                            M = 10000, steps, batch = 10000,
-                            start = -1, progress = TRUE){
+                         M = 10000, steps, start = -1,
+                         cmin = 0, maxiter = 500, progress = TRUE){
 
+  check_Mminmax(M, cmin, maxiter)
   if (missing(A)) A <- V
+  if (start[1] == -1) start <- find_inside(A, b)
+
   aggr <- map_k_to_A(k, n, A, map, prior)
   k <- aggr$k
   n <- aggr$n
 
-  check_Mbatch(M, batch)
 
   if (!missing(b)){
     check_Abknprior(A, b, k, n, prior)
-    if (missing(steps) || is.null(steps) || length(steps) == 0){
-      count <- count_bin(k, n, A, b, prior, M, batch, progress)
+    if (cmin == 0 && missing(steps)){
+      count <- count_bin(k, n, A, b, prior, M, batch = BATCH, progress)
+    } else if (cmin > 0){
+      if (missing(steps)) steps <- seq(1, nrow(A))
+      else steps <- check_stepsA(steps, A)
+      zeros <- rep(0, length(steps))
+      count <- count_auto_bin(k, n, A, b, prior, zeros, zeros, steps,
+                              M_iter = M, cmin = cmin, maxiter = maxiter, start, progress)
     } else {
-      check_stepsA(steps, A)
-      count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch, start, progress)
+      steps <- check_stepsA(steps, A)
+      count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch = BATCH, start, progress)
     }
 
   } else if (!missing(V)){
@@ -99,7 +117,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1),
     while (m > 0 ){
       X <- rpdirichlet_free(m, a, rep(2, ncol(V)))
       count <- count + sum(inside_V(X, V))
-      m <- m - batch
+      m <- m - BATCH
     }
     count <- cbind("count" = count, "M" = M, "steps" = NA)
   } else {

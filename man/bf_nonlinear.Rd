@@ -4,8 +4,7 @@
 \alias{bf_nonlinear}
 \title{Bayes Factor for Nonlinear Order Constraints}
 \usage{
-bf_nonlinear(k, options, inside, prior = rep(1, sum(options)), M = 5e+05,
-  batch = 10000)
+bf_nonlinear(k, options, inside, prior = rep(1, sum(options)), M = 10000)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -23,8 +22,6 @@ if the order constraints are satisfied and \code{0} or \code{FALSE} if not.}
 Must have the same length as \code{k}.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
-
-\item{batch}{size of the batches into which computations are split to reduce memory load}
 }
 \description{
 Draws prior and posterior samples from product-multinomial model and computes the
