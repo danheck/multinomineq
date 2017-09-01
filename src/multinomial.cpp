@@ -104,7 +104,7 @@ arma::vec sum_options_short(arma::vec k, arma::vec options)
       cnt += 1; // still within the same option
     } else {
       o += 1;   // new option
-      cnt = 0;
+      cnt = 1;
     }
     n(o) += k(i);
   }
@@ -130,8 +130,11 @@ arma::ivec rpm_vec(arma::vec theta, arma::vec n, arma::vec options)
     tt = theta.rows(s0, s1);
     s0 = s1 + 1;
     nn = as_scalar(n(i));
-    tmp = Rcpp::RcppArmadillo::rmultinom(nn, as<NumericVector>(wrap(tt)));
-    k = join_cols(k, tmp);
+    if (nn > 0)
+    {
+      tmp = Rcpp::RcppArmadillo::rmultinom(nn, as<NumericVector>(wrap(tt)));
+      k = join_cols(k, tmp);
+    }
   }
   return k;
 }
@@ -154,10 +157,10 @@ NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options)
   vec n = sum_options(k, options);
   vec n_short = sum_options_short(k, options);
   vec tt, kpp, x2o(M), x2p(M);
-  for(int m = 0; m < M; m++)
+  for (int m = 0; m < M; m++)
   {
-    tt = conv_to< colvec >::from(theta.row(m));
-    kpp = conv_to< vec >::from(rpm_vec(tt, n_short, options));
+    tt = conv_to<colvec>::from(theta.row(m));
+    kpp = conv_to<colvec>::from(rpm_vec(tt, n_short, options));
     x2o(m) = x2(k, tt % n);
     x2p(m) = x2(kpp, tt % n);
   }
