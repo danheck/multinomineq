@@ -25,7 +25,7 @@
 #'     of the beta prior distributions for each binomial rate parameter.
 #' @param start only relevant if \code{steps} is defined or \code{cmin>0}:
 #'     a vector with starting values in the interior of the polytope.
-#'     If missing, the maximum-likelihood estimate is used.
+#'     If missing, an approximate maximum-likelihood estimate is used.
 #' @param cmin if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
 #' @param maxiter if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.
 #' @param burnin number of burnin samples per step that are discarded. Since the
@@ -111,7 +111,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || any(start < 0))
-        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start)$par
+        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start, maxit = 20)$par
       check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){

@@ -29,7 +29,7 @@ Must have the same length as \code{k}.}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
-If missing, the maximum-likelihood estimate is used.}
+If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{burnin}{number of burnin samples per step that are discarded. Since the
 starting values are updated during the stepwise procedure, this

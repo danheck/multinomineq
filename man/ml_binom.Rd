@@ -34,9 +34,9 @@ different parameters for each item type: \code{map=1:ncol(A)}}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
-If missing, the maximum-likelihood estimate is used.}
+If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{...}{further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxiter = 5000}.}
+\item{...}{further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.}
 
 \item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
 The sum of \code{options} must be equal to the length of \code{k}.}

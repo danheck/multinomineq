@@ -33,7 +33,7 @@ of the beta prior distributions for each binomial rate parameter.}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
-If missing, the maximum-likelihood estimate is used.}
+If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{burnin}{number of burnin samples that are discarded. can be chosen to be
 small if the maxmimum-likelihood estimate is used as a starting value.}

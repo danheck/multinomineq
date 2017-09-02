@@ -5,7 +5,7 @@
 #' @inheritParams count_binom
 #' @inheritParams strategy_marginal
 #' @param n.fit number of calls to \link[stats]{constrOptim}.
-#' @param ... further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxiter = 5000}.
+#' @param ... further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.
 #' @return the list returned by the optimizer \code{\link[stats]{constrOptim}}.
 #' @examples
 #' # linear order: p1 < p2 < p3 < .50

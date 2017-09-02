@@ -36,7 +36,7 @@ sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
   n <- aggr$n
   check_Abknprior(A, b, k, n, prior)
   if (missing(start) || any(start < 0))
-    start <-  ml_binom(k, n, A, b, map, n.fit = 1)$par
+    start <-  ml_binom(k, n, A, b, map, n.fit = 1, maxit = 20)$par
   check_start(start, A, b, interior = TRUE)
   samples <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)
@@ -71,7 +71,7 @@ sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
 sampling_multinom <- function (k, options, A, b, prior = rep(1, sum(options)),
                                M = 5000, start, burnin = 10, progress = TRUE){
   if (missing(start) || any(start < 0)){
-    start <-  ml_multinom(k, options, A, b, n.fit = 1)$par
+    start <-  ml_multinom(k, options, A, b, n.fit = 1, maxit = 20)$par
   }
   check_start(start, A, b, interior = TRUE)
   if (missing(k) || (length(k) == 1 && k == 0))

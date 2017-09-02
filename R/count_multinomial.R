@@ -71,7 +71,7 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
   } else {
     steps <- check_stepsA(steps, A)
     if (missing(start) || any(start < 0))
-      start <-  ml_multinom(k, options, A, b, n.fit = 1, start)$par
+      start <-  ml_multinom(k, options, A, b, n.fit = 1, start, maxit = 20)$par
     check_start(start, A, b, interior = TRUE)
 
     if (cmin > 0){

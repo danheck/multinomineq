@@ -41,7 +41,7 @@ If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
-If missing, the maximum-likelihood estimate is used.}
+If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
 
