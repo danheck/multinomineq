@@ -5,7 +5,7 @@
 \title{Number of Product-Multinomial Prior/Posterior Samples in Polytope}
 \usage{
 count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
-  M = 5000, steps, start = -1, cmin = 0, maxiter = 500,
+  M = 5000, steps, start, cmin = 0, maxiter = 500, burnin = 5,
   progress = TRUE)
 }
 \arguments{
@@ -39,13 +39,17 @@ In this case, \code{M} can be chosen to be a vector with the number of samples d
 in each step from the (partially) order-constrained models  using Gibbs sampling.
 If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
 
-\item{start}{only if \code{steps} is defined: a vector with starting values
-within the polytope. If \code{steps = -1}, a random starting value is used
-(but a point within the polytope might not be found if the order constraints are strong).}
+\item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
+a vector with starting values in the interior of the polytope.
+If missing, the maximum-likelihood estimate is used.}
 
 \item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
 
-\item{maxiter}{if \code{steps="auto"}: maximum number of sampling runs in the automatic stepwise procedure.}
+\item{maxiter}{if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.}
+
+\item{burnin}{number of burnin samples per step that are discarded. Since the
+starting values are updated during the stepwise procedure, this
+number can be smaller than in standard MCMC applications.}
 
 \item{progress}{whether a progress bar should be shown.}
 }
@@ -93,8 +97,8 @@ prior <- count_multinom(0, options, A, b, M = 2e4)
 posterior <- count_multinom(k, options, A, b, M = 2e4)
 count_to_bf(posterior, prior)
 
-bf_multinom(k, options, A, b, M=1e5)
-bf_multinom(k, options, A, b, steps = 2, cmin = 5000)
+bf_multinom(k, options, A, b, M=10000)
+bf_multinom(k, options, A, b, cmin = 5000, M = 1000)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

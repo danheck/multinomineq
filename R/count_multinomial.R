@@ -54,35 +54,34 @@
 #' posterior <- count_multinom(k, options, A, b, M = 2e4)
 #' count_to_bf(posterior, prior)
 #'
-#' bf_multinom(k, options, A, b, M=1e5)
-#' bf_multinom(k, options, A, b, steps = 2, cmin = 5000)
+#' bf_multinom(k, options, A, b, M=10000)
+#' bf_multinom(k, options, A, b, cmin = 5000, M = 1000)
 #' @export
 count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)),
-                            M = 5000, steps, start = -1,
-                            cmin = 0, maxiter = 500, progress = TRUE){
-  if (length(k) == 1 && k == 0) k <- rep(0, sum(options))
-  if (start[1] == -1) start <- find_inside(A, b)
-
+                            M = 5000, steps, start, cmin = 0, maxiter = 500,
+                            burnin = 5, progress = TRUE){
+  if (length(k) == 1 && k == 0)
+    k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
   check_Mminmax(M, cmin, maxiter)
 
   if (cmin == 0 && missing(steps)){
     count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
+
   } else {
-    tmp <- Ab_multinom(options, A, b)  # sum-to-1 constraints (for Gibbs sampler!)
-    A <- tmp$A
-    b <- tmp$b
-    if (missing(steps)) steps <- seq(1, nrow(A))
     steps <- check_stepsA(steps, A)
+    if (missing(start) || any(start < 0))
+      start <-  ml_multinom(k, options, A, b, n.fit = 1, start)$par
+    check_start(start, A, b, interior = TRUE)
 
     if (cmin > 0){
       zeros <- rep(0, length(steps))
-      count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps,
+      count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps, ## SUM TO ZERO!!!!
                                M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
-                               start, progress)
+                               start, burnin, progress)
     } else {
-      count <- count_stepwise_multi(k, options, A, b, prior, M,
-                                    steps, batch = BATCH, start, progress)
+      count <- count_stepwise_multi(k, options, A, b, prior, M, steps,
+                                    batch = BATCH, start, burnin, progress)
     }
   }
   attr(count, "integral") <- get_integral(count)

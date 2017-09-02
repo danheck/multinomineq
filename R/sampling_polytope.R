@@ -5,12 +5,13 @@
 #'
 #' @inheritParams count_binom
 #' @param M number of posterior samples
-#' @param start starting vectors. Must be in the convex polytope (that is, \code{A*start <= b})
-#' @param burnin number of burnin samples that are discarded
+#' @param burnin number of burnin samples that are discarded. can be chosen to be
+#'     small if the maxmimum-likelihood estimate is used as a starting value.
 #'
 #' @details
-#' Can be used to obtain posterior samples for binary random utility models that assume a mixture over predefined
-#' preference orders/vertices that jointly define a convex polytope via (A * x <= b).
+#' Can be used to obtain posterior samples for binary random utility models that
+#' assume a mixture over predefined preference orders/vertices that jointly define
+#' a convex polytope via (A * x <= b).
 #'
 #' @return a matrix with posterior samples for the probabilities to choose Option B for each item type
 #' @template ref_myung2005
@@ -34,13 +35,9 @@ sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
   k <- aggr$k
   n <- aggr$n
   check_Abknprior(A, b, k, n, prior)
-  if (missing(start) || any(start < 0)){
-    start <- k/n # ML estimate
-    if (!inside(start, A, b))
-      start <- find_inside(A, b)
-  } else if (length(start) != ncol(A) || !all(A %*% start <= b)) {
-    stop ("'start' must be in the convex polytope:  A*start <= b")
-  }
+  if (missing(start) || any(start < 0))
+    start <-  ml_binom(k, n, A, b, map, n.fit = 1)$par
+  check_start(start, A, b, interior = TRUE)
   samples <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)
   samples
@@ -71,23 +68,15 @@ sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
 #' head(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0, 1))
 #' @export
-sampling_multinom <- function (k, options, A, b,
-                               prior = rep(1, sum(options)),
-                               M = 5000, start, burnin = 10,
-                               progress = TRUE){
+sampling_multinom <- function (k, options, A, b, prior = rep(1, sum(options)),
+                               M = 5000, start, burnin = 10, progress = TRUE){
   if (missing(start) || any(start < 0)){
-    start <- k_to_prob(k, options) # ML estimate
-    if (!inside(start, A, b))
-      start <- find_inside(A, b, options = options)
-  } else if (length(start) != ncol(A) || !all(A %*% start <= b)) {
-    stop ("'start' must be in the convex polytope:  A*start <= b")
+    start <-  ml_multinom(k, options, A, b, n.fit = 1)$par
   }
+  check_start(start, A, b, interior = TRUE)
   if (missing(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_Abokprior(A, b, options, k, prior)
-  tmp <- Ab_multinom(options, A, b)  # sum-to-1 constraints
-  A <- tmp$A
-  b <- tmp$b
   samples <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)
   if (is.null(colnames(A)))

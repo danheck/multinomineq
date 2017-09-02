@@ -11,6 +11,17 @@ check_kn <- function(k = NULL, n = NULL){
 }
 
 
+check_start <- function(start, A, b, interior = TRUE){
+  if (length(start) != ncol(A)) {
+    stop ("'start' must have the same length as the number of columns of 'A'.")
+  }
+  if (!interior && !all(A %*% start <= b)){
+    stop ("'start' must be in the convex polytope:  A*start <= b")
+  } else if (interior && !all(A %*% start < b)){
+    stop ("'start' must be in the interior (not at the boundaries) of convex polytope:  A*start < b")
+  }
+}
+
 check_prior <- function (prior){
   if (is.null(prior) || length(prior) != 2 ||
       !is.numeric(prior) || any(prior <= 0))
@@ -147,6 +158,8 @@ check_Vx <- function (V, x){
 }
 
 check_stepsA <- function(steps, A){
+  if (missing(steps))
+    steps <- 1:nrow(A)
   if (any(steps <= 0) || any(steps > nrow(A)) || any(steps != round(steps)))
     stop("'steps' must be a vector with positive integers not larger",
          "\n  than the number of rows of the matrix 'A'.")

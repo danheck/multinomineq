@@ -9,15 +9,13 @@
 
 /* .Call calls */
 extern SEXP _stratsel_adj_iterative(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_auto_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_auto_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_auto_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_auto_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_count_samples(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_step_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_step_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_stepwise_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_stepwise_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _stratsel_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _stratsel_inside_Ab(SEXP, SEXP, SEXP);
 extern SEXP _stratsel_ppp_bin(SEXP, SEXP, SEXP);
 extern SEXP _stratsel_ppp_mult(SEXP, SEXP, SEXP);
@@ -36,15 +34,13 @@ extern SEXP _stratsel_sum_options(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_stratsel_adj_iterative",        (DL_FUNC) &_stratsel_adj_iterative,         3},
-    {"_stratsel_count_auto_bin",       (DL_FUNC) &_stratsel_count_auto_bin,       13},
-    {"_stratsel_count_auto_mult",      (DL_FUNC) &_stratsel_count_auto_mult,      13},
+    {"_stratsel_count_auto_bin",       (DL_FUNC) &_stratsel_count_auto_bin,       14},
+    {"_stratsel_count_auto_mult",      (DL_FUNC) &_stratsel_count_auto_mult,      14},
     {"_stratsel_count_bin",            (DL_FUNC) &_stratsel_count_bin,             8},
     {"_stratsel_count_mult",           (DL_FUNC) &_stratsel_count_mult,            8},
     {"_stratsel_count_samples",        (DL_FUNC) &_stratsel_count_samples,         3},
-    {"_stratsel_count_step_bin",       (DL_FUNC) &_stratsel_count_step_bin,       10},
-    {"_stratsel_count_step_mult",      (DL_FUNC) &_stratsel_count_step_mult,      10},
-    {"_stratsel_count_stepwise_bin",   (DL_FUNC) &_stratsel_count_stepwise_bin,   10},
-    {"_stratsel_count_stepwise_multi", (DL_FUNC) &_stratsel_count_stepwise_multi, 10},
+    {"_stratsel_count_stepwise_bin",   (DL_FUNC) &_stratsel_count_stepwise_bin,   11},
+    {"_stratsel_count_stepwise_multi", (DL_FUNC) &_stratsel_count_stepwise_multi, 11},
     {"_stratsel_inside_Ab",            (DL_FUNC) &_stratsel_inside_Ab,             3},
     {"_stratsel_ppp_bin",              (DL_FUNC) &_stratsel_ppp_bin,               3},
     {"_stratsel_ppp_mult",             (DL_FUNC) &_stratsel_ppp_mult,              3},

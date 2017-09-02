@@ -15,7 +15,7 @@ drop_fixed <- function(k, options = rep(2, length(k) / 2)){
   }
 }
 
-add_fixed <- function(k, sum = 1, options = rep(2, length(k))){
+add_fixed <- function(k, options = rep(2, length(k)), sum = 1){
   if (length(sum) == 1)
     sum <- rep(sum, length(k))
   oo <- rep(1:length(options), options - 1)

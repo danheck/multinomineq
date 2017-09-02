@@ -5,9 +5,9 @@
 \alias{ml_multinom}
 \title{Maximum-likelihood Estimate}
 \usage{
-ml_binom(k, n, A, b, map, strategy, n.fit = 1)
+ml_binom(k, n, A, b, map, strategy, n.fit = 1, start, ...)
 
-ml_multinom(k, options, A, b, n.fit = 1)
+ml_multinom(k, options, A, b, n.fit = 1, start, ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -21,14 +21,28 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
-\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+\item{map}{optional: numeric vector of the same length as \code{k} with integers
+mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
+thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
+Reversed probabilities \code{1-p} are coded by negative integers.
+Guessing probabilities of .50 are encoded by zeros. The default assumes
+different parameters for each item type: \code{map=1:ncol(A)}}
 
 \item{strategy}{a list that defines the predictions of a strategy, see\code{\link{strategy_multiattribute}}.}
 
 \item{n.fit}{number of calls to \link[stats]{constrOptim}.}
 
+\item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
+a vector with starting values in the interior of the polytope.
+If missing, the maximum-likelihood estimate is used.}
+
+\item{...}{further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxiter = 5000}.}
+
 \item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
 The sum of \code{options} must be equal to the length of \code{k}.}
+}
+\value{
+the list returned by the optimizer \code{\link[stats]{constrOptim}}.
 }
 \description{
 Get ML estimate for product-binomial/multinomial model with linear inequality constraints.
@@ -41,12 +55,12 @@ A <- matrix(c(1, -1,  0,
               0,  0,  1),
             ncol = 3, byrow = TRUE)
 b <- c(0, 0, .50)
-ml_binom(c(4,1,23), 40, A, b)
+ml_binom(c(4,1,23), 40, A, b)[1:2]
 
 
 
 # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
 strat <- list(pattern = c(-1, -2, -3, 4),
-           c = .5, ordered = TRUE, prior = c(1,1))
-ml_binom(c(7,3,1, 19), 20, strategy = strat)
+              c = .5, ordered = TRUE, prior = c(1,1))
+ml_binom(c(7,3,1, 19), 20, strategy = strat)[1:2]
 }

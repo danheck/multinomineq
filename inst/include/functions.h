@@ -8,19 +8,20 @@ using namespace arma;
 // functions that are used in multiple scripts:
 
 
-NumericMatrix results(vec count, vec M, vec steps);
-NumericMatrix results(int count, int M, int steps);
+NumericMatrix results(const vec& count, const vec& M, const vec& steps);
+NumericMatrix results(const unsigned int count, const unsigned int M, const unsigned int steps);
 
-double x2(vec o, vec e);
+double x2(const vec& o, const vec& e);
 
-vec inside_Ab(mat X, mat A, vec b);
-int count_samples(mat X, mat A, vec b);
-int count_samples(vec X, mat A, vec b);
+vec inside_Ab(const mat& X, const mat& A, const vec& b);
+int count_samples(const mat& X, const mat& A, const vec& b);
+int count_samples(const vec& X, const mat& A, const vec& b);
 
-vec sort_steps(vec steps, int max);
+vec sort_steps(vec steps, const unsigned int max);
 
-double rbeta_trunc(double shape1, double shape2, double min, double max);
+double rbeta_trunc(const double shape1, const double shape2,
+                   const double min, const double max);
 
-vec start_random(mat A, vec b, int M, vec start);
+vec start_random(const mat& A, const vec& b, const unsigned int M, vec start);
 
 #endif

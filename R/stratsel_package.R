@@ -26,6 +26,7 @@
 #' @importFrom parallel parSapply clusterExport makeCluster stopCluster parApply parSapplyLB clusterMap
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @importFrom utils head combn
+#' @importFrom graphics hist
 #' @importFrom quadprog solve.QP
 #' @useDynLib "stratsel", .registration=TRUE
 #'

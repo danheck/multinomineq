@@ -33,16 +33,12 @@ count_bin <- function(k, n, A, b, prior, M, batch, progress = TRUE) {
     .Call(`_stratsel_count_bin`, k, n, A, b, prior, M, batch, progress)
 }
 
-count_step_bin <- function(k, n, A, b, prior, M, from, to, start, progress = TRUE) {
-    .Call(`_stratsel_count_step_bin`, k, n, A, b, prior, M, from, to, start, progress)
+count_stepwise_bin <- function(k, n, A, b, prior, M, steps, batch, start, burnin, progress = TRUE) {
+    .Call(`_stratsel_count_stepwise_bin`, k, n, A, b, prior, M, steps, batch, start, burnin, progress)
 }
 
-count_stepwise_bin <- function(k, n, A, b, prior, M, steps, batch, start, progress = TRUE) {
-    .Call(`_stratsel_count_stepwise_bin`, k, n, A, b, prior, M, steps, batch, start, progress)
-}
-
-count_auto_bin <- function(k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress = TRUE) {
-    .Call(`_stratsel_count_auto_bin`, k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress)
+count_auto_bin <- function(k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress = TRUE) {
+    .Call(`_stratsel_count_auto_bin`, k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
 }
 
 sampling_hitandrun <- function(A, b, M, start, burnin = 5L, progress = TRUE) {
@@ -106,15 +102,11 @@ count_mult <- function(k, options, A, b, prior, M, batch, progress = TRUE) {
     .Call(`_stratsel_count_mult`, k, options, A, b, prior, M, batch, progress)
 }
 
-count_step_mult <- function(k, options, A, b, prior, M, from, to, start, progress = TRUE) {
-    .Call(`_stratsel_count_step_mult`, k, options, A, b, prior, M, from, to, start, progress)
+count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start, burnin, progress = TRUE) {
+    .Call(`_stratsel_count_stepwise_multi`, k, options, A, b, prior, M, steps, batch, start, burnin, progress)
 }
 
-count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start, progress = TRUE) {
-    .Call(`_stratsel_count_stepwise_multi`, k, options, A, b, prior, M, steps, batch, start, progress)
-}
-
-count_auto_mult <- function(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress = TRUE) {
-    .Call(`_stratsel_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, progress)
+count_auto_mult <- function(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress = TRUE) {
+    .Call(`_stratsel_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
 }
 

@@ -19,15 +19,24 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
-\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+\item{map}{optional: numeric vector of the same length as \code{k} with integers
+mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
+thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
+Reversed probabilities \code{1-p} are coded by negative integers.
+Guessing probabilities of .50 are encoded by zeros. The default assumes
+different parameters for each item type: \code{map=1:ncol(A)}}
 
-\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
+\item{prior}{a vector with two positive numbers defining the shape parameters
+of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples}
 
-\item{start}{starting vectors. Must be in the convex polytope (that is, \code{A*start <= b})}
+\item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
+a vector with starting values in the interior of the polytope.
+If missing, the maximum-likelihood estimate is used.}
 
-\item{burnin}{number of burnin samples that are discarded}
+\item{burnin}{number of burnin samples that are discarded. can be chosen to be
+small if the maxmimum-likelihood estimate is used as a starting value.}
 
 \item{progress}{whether a progress bar should be shown.}
 }
@@ -39,8 +48,9 @@ Uses Gibbs sampling to draw posterior samples for
 binomial models with linear inequality-constraints.
 }
 \details{
-Can be used to obtain posterior samples for binary random utility models that assume a mixture over predefined
-preference orders/vertices that jointly define a convex polytope via (A * x <= b).
+Can be used to obtain posterior samples for binary random utility models that
+assume a mixture over predefined preference orders/vertices that jointly define
+a convex polytope via (A * x <= b).
 }
 \examples{
 A <- matrix(c(1, 0, 0,   # x1 < .50

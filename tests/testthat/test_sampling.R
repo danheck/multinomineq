@@ -193,7 +193,7 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   expect_equal(unname(colMeans(X)), colMeans(X1[sel,]), tol = .005)
   expect_equal(unname(apply(X, 2, sd)), apply(X1[sel,], 2, sd), tol = .005)
   for (i in 1:ncol(A))
-    expect_equal(quantile_ss(X[,i],X1[sel,i], p), 0, tol = .02)
+    expect_equal(quantile_ss(X[,i],X1[sel,i], p), 0, tol = .03)
 
   rm(X); rm(X1)
   gc()

@@ -26,9 +26,15 @@ admissible parameters as the convex hull over these points
 (if provided, \code{A} and \code{b} are ignored). Note that this method
 is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
 
-\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+\item{map}{optional: numeric vector of the same length as \code{k} with integers
+mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
+thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
+Reversed probabilities \code{1-p} are coded by negative integers.
+Guessing probabilities of .50 are encoded by zeros. The default assumes
+different parameters for each item type: \code{map=1:ncol(A)}}
 
-\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
+\item{prior}{a vector with two positive numbers defining the shape parameters
+of the beta prior distributions for each binomial rate parameter.}
 
 \item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}} (e.g., \code{M}, \code{steps}).}
 
@@ -68,7 +74,7 @@ b <- c(0, 0, 0, 0, 0, .50)
 # Bayes factor: unconstrained vs. constrained
 bf_binom(k, n, A, b, prior=c(1, 1), M=2e5)
 bf_binom(k, n, A, b, prior=c(1, 1), M=1e4, steps=c(2,4,5))
-bf_binom(k, n, A, b, prior=c(1, 1), M=1e4, cmin = 100)
+bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 1000)
 }
 \references{
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}

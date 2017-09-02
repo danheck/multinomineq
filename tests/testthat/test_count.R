@@ -19,14 +19,20 @@ test_that("counting methods work", {
   expect_equal(cnt, cntr(X, A, b))
   expect_equal(cnt / M, V, tol = .005)
 
-  c2 <- count_binom(0, 0, A=A, b=b, M = M, batch = M/10)
+  c2 <- count_binom(0, 0, A=A, b=b, M = M)
   expect_equal(attr(c2, "integral"), V, tol = .005)
-  c3 <- count_binom(0, 0, A=A, b=b, M = M, batch = M)
+  c3 <- count_binom(0, 0, A=A, b=b, M = M)
   expect_equal(attr(c3, "integral"), V, tol = .005)
 
-  c4 <- count_binom(0, 0, A=A, b=b, M = 1e5, batch = 10000, steps = 2:3)
+  c4 <- count_binom(0, 0, A=A, b=b, M = 1e5,  steps = 2:3)
   c4
   expect_equal(attr(c4, "integral"), V, tol = .0005)
+
+  c5 <- count_binom(0, 0, A=A, b=b, M = 1e5,  cmin = 1000)
+  c5
+  expect_equal(attr(c5, "integral"), V, tol = .0005)
+
+
 })
 
 test_that("counting is equivalent for: A/b-method and V-method", {

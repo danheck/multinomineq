@@ -2,7 +2,7 @@ Package: stratsel
 Type: Package
 Title: Bayesian Inference for Inequality/Order-Constrained Multinomial Models
 Version: 0.0.0.9000
-Date: 2017-08-23
+Date: 2017-09-02
 Author: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")))
 Maintainer: Daniel Heck <heck@uni-mannheim.de>
 Description: Outcome-based strategy classification uses model selection methods

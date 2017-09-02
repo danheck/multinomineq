@@ -8,12 +8,12 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-arma::mat rdirichlet(int n, arma::vec alpha)
+arma::mat rdirichlet(const unsigned int n, const arma::vec alpha)
 {
-  int I = alpha.n_elem;
+  unsigned int I = alpha.n_elem;
   mat X(n, I);
   double ai;
-  for (int i = 0; i < I; i++)
+  for (unsigned int i = 0; i < I; i++)
   {
     ai = as_scalar(alpha(i));
     X.col(i) = vec(rgamma(n, ai, 1));
@@ -40,14 +40,14 @@ arma::mat rdirichlet(int n, arma::vec alpha)
 //' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
 //' @export
 // [[Rcpp::export]]
-arma::mat rpdirichlet(int n, arma::vec alpha, arma::vec options)
+arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options)
 {
-  int D = options.n_elem;  // number of conditions/item types
+  unsigned int D = options.n_elem;  // number of conditions/item types
   mat X(n, alpha.n_elem);
   vec sel = cumsum(options) - 1;
   sel.insert_rows(0, - ones(1, 1));
-  int k,l;
-  for (int i = 0; i < D; i++)
+  unsigned int k,l;
+  for (unsigned int i = 0; i < D; i++)
   {
     k = sel(i) + 1;
     l = sel(i + 1);
@@ -59,10 +59,10 @@ arma::mat rpdirichlet(int n, arma::vec alpha, arma::vec options)
 // omit last column for each item type
 //  [a1 a2 a3  b1 b2]  => [a1 a2  b1]
 // [[Rcpp::export]]
-arma::mat rpdirichlet_free(int n, arma::vec alpha, arma::vec options)
+arma::mat rpdirichlet_free(const unsigned int n, const arma::vec alpha, const arma::vec options)
 {
   mat X = rpdirichlet(n, alpha, options);
-  int D = options.n_elem;
+  unsigned int D = options.n_elem;
   vec dep_idx = cumsum(options) - 1;
   for (int i = D - 1; i >= 0; i--)
   {
@@ -73,9 +73,9 @@ arma::mat rpdirichlet_free(int n, arma::vec alpha, arma::vec options)
 
 // remove dependent categories:  (a1,a2, b1,b2,b3)  =>  (a1,  b1,b2)
 // [[Rcpp::export]]
-arma::vec shed_options(arma::vec x, arma::vec options)
+arma::vec shed_options(arma::vec x, const arma::vec options)
 {
-  int D = options.n_elem;
+  unsigned int D = options.n_elem;
   vec sel = cumsum(options) - 1;
   for (int i = D - 1; i >= 0; i--)
     x.shed_row(sel(i));
@@ -84,20 +84,20 @@ arma::vec shed_options(arma::vec x, arma::vec options)
 
 // replicate option per vector:  c(10,20)  =>  c(10,10,  20,20,20)
 // [[Rcpp::export]]
-arma::vec rep_options(arma::vec x, arma::vec options)
+arma::vec rep_options(arma::vec x, const arma::vec options)
 {
   vec y;
-  for (int i = 0; i < options.n_elem; i++)
+  for (unsigned int i = 0; i < options.n_elem; i++)
     y = join_cols(y,repmat(x(i) * ones(1,1), options(i), 1));
   return y;
 }
 
 // sum per option, length equal to options (for k or prior)
-arma::vec sum_options_short(arma::vec k, arma::vec options)
+arma::vec sum_options_short(const arma::vec k, const arma::vec options)
 {
   vec n = zeros(options.n_elem, 1);
-  int o = 0, cnt = 0;
-  for (int i = 0; i < k.n_elem; i++)
+  unsigned int o = 0, cnt = 0;
+  for (unsigned int i = 0; i < k.n_elem; i++)
   {
     if (cnt < options(o))
     {
@@ -113,18 +113,18 @@ arma::vec sum_options_short(arma::vec k, arma::vec options)
 
 // sum per option, length equal to input (for k or prior)
 // [[Rcpp::export]]
-arma::vec sum_options(arma::vec k, arma::vec options)
+arma::vec sum_options(const arma::vec k, const arma::vec options)
 {
   vec n = sum_options_short(k, options);
   return rep_options(n, options);
 }
 
-arma::ivec rpm_vec(arma::vec theta, arma::vec n, arma::vec options)
+arma::ivec rpm_vec(const arma::vec& theta, const arma::vec& n, const arma::vec& options)
 {
-  int I = options.n_elem, s0 = 0, s1, nn;
+  unsigned int I = options.n_elem, s0 = 0, s1, nn;
   ivec k, tmp;
   vec tt;
-  for(int i = 0; i < I; i++)
+  for(unsigned int i = 0; i < I; i++)
   {
     s1 = s0 + options(i) - 1;
     tt = theta.rows(s0, s1);
@@ -141,23 +141,23 @@ arma::ivec rpm_vec(arma::vec theta, arma::vec n, arma::vec options)
 
 
 // [[Rcpp::export]]
-arma::imat rpm_mat(arma::mat theta, arma::vec n, arma::vec options)
+arma::imat rpm_mat(const arma::mat& theta, const arma::vec& n, const arma::vec& options)
 {
   imat k(theta.n_cols, theta.n_rows);
-  for(int i = 0; i < theta.n_rows; i++)
+  for(unsigned int i = 0; i < theta.n_rows; i++)
     k.col(i) = rpm_vec(theta.row(i).t(), n, options);
   return k.t();
 }
 
 // theta: with fixed probabiltiies!
 // [[Rcpp::export]]
-NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options)
+NumericVector ppp_mult(const arma::mat& theta, const arma::vec& k, const arma::vec& options)
 {
-  int M = theta.n_rows;
+  unsigned int M = theta.n_rows;
   vec n = sum_options(k, options);
   vec n_short = sum_options_short(k, options);
   vec tt, kpp, x2o(M), x2p(M);
-  for (int m = 0; m < M; m++)
+  for (unsigned int m = 0; m < M; m++)
   {
     tt = conv_to<colvec>::from(theta.row(m));
     kpp = conv_to<colvec>::from(rpm_vec(tt, n_short, options));
@@ -171,12 +171,12 @@ NumericVector ppp_mult(arma::mat theta, arma::vec k, arma::vec options)
 }
 
 // [[Rcpp::export]]
-arma::mat sampling_mult(arma::vec k, arma::vec options,
-                        arma::mat A, arma::vec b,
-                        arma::vec prior, int M, arma::vec start,
-                        int burnin = 5, double progress = true)
+arma::mat sampling_mult(const arma::vec& k, const arma::vec& options,
+                        const arma::mat& A, const arma::vec& b,
+                        const arma::vec& prior, const unsigned int M, arma::vec start,
+                        const unsigned int burnin = 5, const bool progress = true)
 {
-  int D = A.n_cols;  // dimensions
+  unsigned int D = A.n_cols;  // dimensions
   mat X(D, M + burnin);       // initialize posterior, column-major order
   X.col(0) = start_random(A, b, M, start);
 
@@ -189,35 +189,32 @@ arma::mat sampling_mult(arma::vec k, arma::vec options,
   vec j_low = j_up - rep_options(options - 2, options - 1);
 
   Progress p(M, progress);
-  bool run = true;
   double bmax, bmin, s;
   vec rhs = b;
   uvec Apos, Aneg;
   IntegerVector idx = seq_len(D) - 1;
-  int j=0, tmp=100;
-  for (int i = 1 ; i < M  + burnin; i++)
+  unsigned int j = 0;
+  for (unsigned int i = 1 ; i < M  + burnin; i++)
   {
     p.increment();   // update progress bar
-    if(run && i % tmp == 0) run = !Progress::check_abort();
-    if (run)
+    if(i % 1000 == 0) Rcpp::checkUserInterrupt();
+    X.col(i) = X.col(i-1);
+    idx = sample(idx, D, false);
+    for (unsigned int m = 0; m < D; m++)
     {
-      X.col(i) = X.col(i-1);
-      idx = sample(idx, D, false);
-      for (int m = 0; m < D; m++)
-      {
-        j = m; //idx(m);
-        // scaled truncated beta:
-        s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
-        bmax = 1; bmin = 0;
-        rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / (A.col(j) * s);
-        Aneg = find(A.col(j) < 0);
-        Apos = find(A.col(j) > 0);
-        if (!Aneg.is_empty())
-          bmin = rhs(Aneg).max();
-        if (!Apos.is_empty())
-          bmax = rhs(Apos).min();
-        X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
-      }
+      j = m; //idx(m);
+      // scaled truncated beta:
+      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
+      bmax = 1;
+      bmin = 0;
+      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / (A.col(j) * s);
+      Aneg = find(A.col(j) < 0);
+      Apos = find(A.col(j) > 0);
+      if (!Aneg.is_empty())
+        bmin = rhs(Aneg).max();
+      if (!Apos.is_empty())
+        bmax = rhs(Apos).min();
+      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
     }
   }
   X.shed_cols(0,burnin - 1);
@@ -226,81 +223,82 @@ arma::mat sampling_mult(arma::vec k, arma::vec options,
 
 
 // [[Rcpp::export]]
-NumericMatrix count_mult(arma::vec k, arma::vec options,
-                         arma::mat A, arma::vec b,
-                         arma::vec prior, int M,
-                         int batch, bool progress = true)
+NumericMatrix count_mult(const arma::vec& k, const arma::vec& options,
+                         const arma::mat& A, const arma::vec& b,
+                         const arma::vec& prior, const unsigned int M,
+                         const unsigned int batch, const bool progress = true)
 {
   Progress p(M/batch, progress);
-  bool run = true;
   int count = 0, todo = M;
   mat X(batch, k.n_elem);
   while (todo > 0)
   {
     p.increment();   // update progress bar
-    if (run)
-    {
-      // count prior and posterior samples that match constraints:
-      X = rpdirichlet_free(fmin(todo,batch), k + prior, options);
-      count = count  + count_samples(X, A, b);
-      todo = todo - batch;
-    }
+    Rcpp::checkUserInterrupt();
+    // count prior and posterior samples that match constraints:
+    X = rpdirichlet_free(fmin(todo,batch), k + prior, options);
+    count = count  + count_samples(X, A, b);
+    todo = todo - batch;
   }
   return results(count, M, A.n_rows);
 }
 
-// go from  A[0:from,] ---> A[0:to,]  // C++ indexing!
-// [[Rcpp::export]]
-int count_step_mult(arma::vec k, arma::vec options,
-                    arma::mat A, arma::vec b, arma::vec prior,
-                    int M, int from, int to, arma::vec start, bool progress = true)
-{
-  mat sample = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
-                             prior, M, start, 10, progress);
-  return count_samples(sample, A.rows(from + 1, to), b.subvec(from + 1, to));
-}
 
 // [[Rcpp::export]]
-NumericMatrix count_stepwise_multi(arma::vec k, arma::vec options,
-                                   arma::mat A, arma::vec b, arma::vec prior,
-                                   arma::vec M, arma::vec steps, int batch,
-                                   arma::vec start, bool progress = true)
+NumericMatrix count_stepwise_multi(const arma::vec& k, const arma::vec& options,
+                                   const arma::mat& A, const arma::vec& b, const arma::vec& prior,
+                                   arma::vec M, arma::vec steps, const unsigned int batch,
+                                   arma::vec start, const unsigned int burnin,
+                                   const bool progress = true)
 {
   steps = sort_steps(steps - 1, A.n_rows);  // R --> C++ indexing
-  int S = steps.n_elem;    // number of unique steps
-  int D = A.n_cols;        // number of dimensions/parameters
+  unsigned int S = steps.n_elem;    // number of unique steps
   if (M.n_elem == 1)
     M = M(0) * ones(S);
+  mat starts(S, A.n_cols);
+  for (unsigned int s = 0; s < S; s++) starts.row(s) = start.t(); // dynamic start values
 
-  vec count = zeros(S);
+  mat sample;
+  uvec inside_idx;
+  vec inside, count = zeros(S);
   count(0) = count_mult(k, options, A.rows(0, steps(0)),
         b.subvec(0, steps(0)), prior, (int)M(0), batch, false)(0,0);
 
-  for (int s = 1; s < S ; s++)
+  // go from  A[0:steps(s-1),] ---> A[0:steps(s),]
+  for (unsigned int s = 1; s < S ; s++)
   {
     Rcpp::checkUserInterrupt();
     if (progress) Rcout << (s==1 ? " step: " : " , ") << s;
-    count(s) = count_step_mult(k, options, A, b, prior, M(s),
-          steps(s-1), steps(s), start, false);
+    sample = sampling_mult(k, options, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
+                           prior, M(s), starts.row(s - 1).t(), burnin, false);
+    inside = inside_Ab(sample, A.rows(steps(s-1) + 1, steps(s)),
+                       b.subvec(steps(s-1) + 1, steps(s)));
+    if (any(inside))
+    {
+      inside_idx = find(inside);
+      starts.row(s) = sample.row(inside_idx(inside_idx.n_elem - 1));
+    }
+    count(s) = accu(inside);
   }
   if (progress) Rcout << "\n";
   return results(count, M, steps + 1); // C++ --> R indexing
 }
 
 // [[Rcpp::export]]
-NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
-                              arma::mat A, arma::vec b, arma::vec prior,
+NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
+                              const arma::mat& A, const arma::vec& b, const arma::vec& prior,
                               arma::vec count, arma::vec M, arma::vec steps,
-                              int M_iter, int cmin, int maxiter,
-                              arma::vec start, bool progress = true)
+                              const unsigned int M_iter, const unsigned int cmin, const unsigned int maxiter,
+                              arma::vec start, const unsigned int burnin,
+                              const bool progress = true)
 {
   steps = steps - 1; // R --> C++ indexing
   vec inside;
   uvec inside_idx;
   mat theta;
   mat starts(steps.n_elem, A.n_cols);
-  for (int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
-  int i, from, iter=0;
+  for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
+  int i, from, iter = 0;  // from: can be negative!
   while(count.min() < cmin)
   {
     Rcpp::checkUserInterrupt();
@@ -317,12 +315,11 @@ NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
       theta = rpdirichlet_free(M_iter, k + prior, options);
     }  else {
       theta = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
-                            prior, M_iter, starts.row(i).t(), 5, false);
-      starts.row(i) = theta.row(M_iter - 1);
+                            prior, M_iter, starts.row(i - 1).t(), burnin, false);
+      starts.row(i - 1) = theta.row(M_iter - 1);
     }
     // count samples
-    inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
-                       b.subvec(from + 1, steps(i)));
+    inside = inside_Ab(theta, A.rows(from + 1, steps(i)), b.subvec(from + 1, steps(i)));
     if (any(inside))
     {
       inside_idx = find(inside);
@@ -330,9 +327,7 @@ NumericMatrix count_auto_mult(arma::vec k, arma::vec options,
     }
     count(i) += accu(inside);
     M(i) += M_iter;
-    // store last successful sample (update starting value)
     // compute precision
-    // Rcout << count << "\n##\n";
   }
   if (progress) Rcout << "\n";
   return results(count, M, steps + 1); // C++ --> R indexing

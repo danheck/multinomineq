@@ -4,8 +4,8 @@
 \alias{count_binom}
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
-count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
-  start = -1, cmin = 0, maxiter = 500, progress = TRUE)
+count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps, start,
+  cmin = 0, maxiter = 500, burnin = 5, progress = TRUE)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -24,9 +24,15 @@ admissible parameters as the convex hull over these points
 (if provided, \code{A} and \code{b} are ignored). Note that this method
 is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
 
-\item{map}{optional: numeric vector of the same length as \code{k} with integers mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V}, thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}). Reversed probabilities \code{1-p} are coded by negative integers. Guessing probabilities of .50 are encoded by zeros. The default assumes different parameters for each item type: \code{map=1:ncol(A)}}
+\item{map}{optional: numeric vector of the same length as \code{k} with integers
+mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
+thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
+Reversed probabilities \code{1-p} are coded by negative integers.
+Guessing probabilities of .50 are encoded by zeros. The default assumes
+different parameters for each item type: \code{map=1:ncol(A)}}
 
-\item{prior}{a vector with two positive numbers defining the shape parameters of the beta prior distributions for each binomial rate parameter.}
+\item{prior}{a vector with two positive numbers defining the shape parameters
+of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
@@ -36,13 +42,17 @@ In this case, \code{M} can be chosen to be a vector with the number of samples d
 in each step from the (partially) order-constrained models  using Gibbs sampling.
 If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
 
-\item{start}{only if \code{steps} is defined: a vector with starting values
-within the polytope. If \code{steps = -1}, a random starting value is used
-(but a point within the polytope might not be found if the order constraints are strong).}
+\item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
+a vector with starting values in the interior of the polytope.
+If missing, the maximum-likelihood estimate is used.}
 
 \item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
 
-\item{maxiter}{if \code{steps="auto"}: maximum number of sampling runs in the automatic stepwise procedure.}
+\item{maxiter}{if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.}
+
+\item{burnin}{number of burnin samples per step that are discarded. Since the
+starting values are updated during the stepwise procedure, this
+number can be smaller than in standard MCMC applications.}
 
 \item{progress}{whether a progress bar should be shown.}
 }
@@ -68,7 +78,8 @@ inside the convex polytope defined by
 (2) the convex hull over the vertices V.
 }
 \details{
-Useful to compute the encompassing Bayes factor for testing order constraints (see \code{\link{bf_binom}}; Hojtink, 2011).
+Useful to compute the encompassing Bayes factor for testing order constraints
+(see \code{\link{bf_binom}}; Hojtink, 2011).
 
 The stepwise computation of the Bayes factor proceeds as follows:
 If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three steps by comparing:
@@ -104,8 +115,8 @@ posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
 count_to_bf(posterior, prior)
 
 # automatic stepwise algorithm
-prior <- count_binom(0, 0, A, b, cmin = 1000)
-posterior <- count_binom(k, n, A, b, cmin = 1000)
+prior <- count_binom(0, 0, A, b, M = 1000, cmin = 500)
+posterior <- count_binom(k, n, A, b, M = 1000, cmin = 500)
 count_to_bf(posterior, prior)
 }
 \references{

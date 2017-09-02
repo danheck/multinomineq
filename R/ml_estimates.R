@@ -5,6 +5,8 @@
 #' @inheritParams count_binom
 #' @inheritParams strategy_marginal
 #' @param n.fit number of calls to \link[stats]{constrOptim}.
+#' @param ... further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxiter = 5000}.
+#' @return the list returned by the optimizer \code{\link[stats]{constrOptim}}.
 #' @examples
 #' # linear order: p1 < p2 < p3 < .50
 #' # (cf. WADDprob in ?strategy_multiattribute)
@@ -13,16 +15,16 @@
 #'               0,  0,  1),
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
-#' ml_binom(c(4,1,23), 40, A, b)
+#' ml_binom(c(4,1,23), 40, A, b)[1:2]
 #'
 #'
 #'
 #' # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
 #' strat <- list(pattern = c(-1, -2, -3, 4),
-#'            c = .5, ordered = TRUE, prior = c(1,1))
-#' ml_binom(c(7,3,1, 19), 20, strategy = strat)
+#'               c = .5, ordered = TRUE, prior = c(1,1))
+#' ml_binom(c(7,3,1, 19), 20, strategy = strat)[1:2]
 #' @export
-ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1){
+ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1, start, ...){
   if (length(n) == 1) n <- rep(n, length(k))
 
   if (!missing(strategy)){
@@ -37,25 +39,26 @@ ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1){
   }
   aggr <- map_k_to_A(k, n, A, map)
   options <- rep(2, ncol(A))
-  k_all <- add_fixed(aggr$k, aggr$n, options)
-  ml_multinom(k_all, options, A, b, n.fit = n.fit)
+  k_all <- add_fixed(aggr$k, options = options, sum = aggr$n)
+  ml_multinom(k_all, options, A, b, n.fit = n.fit, start = start,...)
 }
 
 #' @inheritParams count_multinom
 #' @rdname ml_binom
 #' @export
-ml_multinom <- function(k, options, A, b, n.fit = 1){
+ml_multinom <- function(k, options, A, b, n.fit = 1, start, ...){
   check_Abokprior(A, b, options, k)
-  est <- k / c(tapply(k, rep(1:length(options), options), sum))
-  start <- drop_fixed(est, options)
-  if (!inside(start, A, b))
-    start <- find_inside(A, b, options = options)
+  # est <- k / c(tapply(k, rep(1:length(options), options), sum))
+  # start <- drop_fixed(est, options)
   tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
-  tryCatch (oo <- constrOptim(start, loglik_multinom, grad = NULL,
+  if (missing(start) || !all(A %*% start < b))
+    start <- find_inside(A, b, options = options)
+  check_start(start, A, b, interior = TRUE)
+  tryCatch (oo <- constrOptim(theta = start, f = loglik_multinom, grad = NULL,
                               k = k, options = options,
-                              ui = - A, ci = - b, control = list(fnscale = -1)),
+                              ui = - A, ci = - b, control = list(fnscale = -1, ...)),
             error = function(e) {print(e);
               cat("\n\n  (optimization failed with start values =", start, ")\n")})
   cnt <- 1
@@ -67,7 +70,7 @@ ml_multinom <- function(k, options, A, b, n.fit = 1){
     cnt <- cnt + 1
     if (oo2$value > oo$value) oo <- oo2
   }
-  list("estimate" = oo$par, "loglik" = oo$value)
+  oo #list("estimate" = oo$par, "loglik" = oo$value)
 }
 
 # ' Choice Probabilities Implied by Strategy Predictions
@@ -151,7 +154,7 @@ loglik_binom <- function (p, k, n){
 }
 
 loglik_multinom <- function (p, k, options){
-  p_all <- add_fixed(p, options)
+  p_all <- add_fixed(p, options = options, sum = 1)
   ll <- sum(k * log(p_all))
   # tapply(p, oo, function(pp) dmultinom())
   # ll <- sum(dmultinom(x = k, size = n, prob = p, log = TRUE))

@@ -1,4 +1,3 @@
-
 #' Strict Weak Order Polytope for 5 Elements and Ternary Choices
 #'
 #' Facet-defining inequalities of the strict weak order mixture model
@@ -13,6 +12,7 @@
 #'   \item{\code{options}: }{A vector with the number of options (=3) per item type.}
 #' }
 #' @template ref_regenwetter2012
+#' @seealso The corresponding data set \code{\link{regenwetter2012}}.
 #' @examples
 #' data(swop5)
 #' tail(swop5$A)  # A*x <= b
