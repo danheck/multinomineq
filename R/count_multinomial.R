@@ -60,8 +60,8 @@
 count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)),
                             M = 5000, steps, start, cmin = 0, maxiter = 500,
                             burnin = 5, progress = TRUE){
-  if (length(k) == 1 && k == 0)
-    k <- rep(0, sum(options))
+  if (length(k) == 1 && k == 0) k <- rep(0, sum(options))
+  if (length(prior) == 1) prior <- rep(prior, sum(options))
   check_Abokprior(A, b, options, k, prior)
   check_Mminmax(M, cmin, maxiter)
 

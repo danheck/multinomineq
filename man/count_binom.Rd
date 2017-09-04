@@ -51,8 +51,9 @@ If missing, an approximate maximum-likelihood estimate is used.}
 \item{maxiter}{if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.}
 
 \item{burnin}{number of burnin samples per step that are discarded. Since the
-starting values are updated during the stepwise procedure, this
-number can be smaller than in standard MCMC applications.}
+maximum-likelihood estimate is used as a start value (which is updated
+during the stepwise procedure in \code{count_multinom}), the \code{burnin}
+number can be much smaller than in standard MCMC applications.}
 
 \item{progress}{whether a progress bar should be shown.}
 }

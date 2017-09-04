@@ -31,6 +31,7 @@
 sampling_binom <- function (k, n, A, b, map = 1:ncol(A), prior = c(1, 1),
                             M = 5000, start, burnin = 10, progress = TRUE){
   if (length(n) == 1) n <- rep(n, length(k))
+  if (length(prior) == 1) prior <- rep(prior, length(k))
   aggr <- map_k_to_A(k, n, A, map)
   k <- aggr$k
   n <- aggr$n
@@ -76,6 +77,7 @@ sampling_multinom <- function (k, options, A, b, prior = rep(1, sum(options)),
   check_start(start, A, b, interior = TRUE)
   if (missing(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
+  if (length(prior) == 1) prior <- rep(prior, sum(options))
   check_Abokprior(A, b, options, k, prior)
   samples <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
   colnames(samples) <- colnames(A)

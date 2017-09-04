@@ -24,7 +24,7 @@
 #' n <- rep(10, 6)
 #'
 #' # linear order constraint:
-#' # theta1 < theta2 < .... < .50
+#' # prob_1 < prob_2 < .... < .50
 #' A <- matrix(c(1, -1, 0, 0, 0, 0,
 #'               0, 1, -1, 0, 0, 0,
 #'               0, 0, 1, -1, 0, 0,

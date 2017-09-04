@@ -58,8 +58,8 @@ arma::vec start_random(const arma::mat& A, const arma::vec& b,
     if (cnt == fmax(M, 1000))
       stop("Could not find starting values within the polytope");
   }
-  mat theta = reshape(start, 1, start.n_elem);
-  if (!as_scalar(inside_Ab(theta, A, b)))
+  mat prob = reshape(start, 1, start.n_elem);
+  if (!as_scalar(inside_Ab(prob, A, b)))
     Rcout << "not inside Ab!!!! \n" ;
   return start;
 }

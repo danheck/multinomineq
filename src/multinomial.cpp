@@ -119,7 +119,7 @@ arma::vec sum_options(const arma::vec k, const arma::vec options)
   return rep_options(n, options);
 }
 
-arma::ivec rpm_vec(const arma::vec& theta, const arma::vec& n, const arma::vec& options)
+arma::ivec rpm_vec(const arma::vec& prob, const arma::vec& n, const arma::vec& options)
 {
   unsigned int I = options.n_elem, s0 = 0, s1, nn;
   ivec k, tmp;
@@ -127,7 +127,7 @@ arma::ivec rpm_vec(const arma::vec& theta, const arma::vec& n, const arma::vec& 
   for(unsigned int i = 0; i < I; i++)
   {
     s1 = s0 + options(i) - 1;
-    tt = theta.rows(s0, s1);
+    tt = prob.rows(s0, s1);
     s0 = s1 + 1;
     nn = as_scalar(n(i));
     if (nn > 0)
@@ -141,25 +141,25 @@ arma::ivec rpm_vec(const arma::vec& theta, const arma::vec& n, const arma::vec& 
 
 
 // [[Rcpp::export]]
-arma::imat rpm_mat(const arma::mat& theta, const arma::vec& n, const arma::vec& options)
+arma::imat rpm_mat(const arma::mat& prob, const arma::vec& n, const arma::vec& options)
 {
-  imat k(theta.n_cols, theta.n_rows);
-  for(unsigned int i = 0; i < theta.n_rows; i++)
-    k.col(i) = rpm_vec(theta.row(i).t(), n, options);
+  imat k(prob.n_cols, prob.n_rows);
+  for(unsigned int i = 0; i < prob.n_rows; i++)
+    k.col(i) = rpm_vec(prob.row(i).t(), n, options);
   return k.t();
 }
 
-// theta: with fixed probabiltiies!
+// prob: with fixed probabiltiies!
 // [[Rcpp::export]]
-NumericVector ppp_mult(const arma::mat& theta, const arma::vec& k, const arma::vec& options)
+NumericVector ppp_mult(const arma::mat& prob, const arma::vec& k, const arma::vec& options)
 {
-  unsigned int M = theta.n_rows;
+  unsigned int M = prob.n_rows;
   vec n = sum_options(k, options);
   vec n_short = sum_options_short(k, options);
   vec tt, kpp, x2o(M), x2p(M);
   for (unsigned int m = 0; m < M; m++)
   {
-    tt = conv_to<colvec>::from(theta.row(m));
+    tt = conv_to<colvec>::from(prob.row(m));
     kpp = conv_to<colvec>::from(rpm_vec(tt, n_short, options));
     x2o(m) = x2(k, tt % n);
     x2p(m) = x2(kpp, tt % n);
@@ -295,7 +295,7 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
   steps = steps - 1; // R --> C++ indexing
   vec inside;
   uvec inside_idx;
-  mat theta;
+  mat prob;
   mat starts(steps.n_elem, A.n_cols);
   for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
   int i, from, iter = 0;  // from: can be negative!
@@ -312,18 +312,18 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
     // sampling for step with minimal counts
     if (i == 0)
     {
-      theta = rpdirichlet_free(M_iter, k + prior, options);
+      prob = rpdirichlet_free(M_iter, k + prior, options);
     }  else {
-      theta = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
+      prob = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
                             prior, M_iter, starts.row(i - 1).t(), burnin, false);
-      starts.row(i - 1) = theta.row(M_iter - 1);
+      starts.row(i - 1) = prob.row(M_iter - 1);
     }
     // count samples
-    inside = inside_Ab(theta, A.rows(from + 1, steps(i)), b.subvec(from + 1, steps(i)));
+    inside = inside_Ab(prob, A.rows(from + 1, steps(i)), b.subvec(from + 1, steps(i)));
     if (any(inside))
     {
       inside_idx = find(inside);
-      starts.row(i) = theta.row(inside_idx(inside_idx.n_elem - 1));
+      starts.row(i) = prob.row(inside_idx(inside_idx.n_elem - 1));
     }
     count(i) += accu(inside);
     M(i) += M_iter;

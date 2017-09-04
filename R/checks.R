@@ -38,24 +38,24 @@ check_knp <- function(k = NULL, n = NULL, pattern = NULL){
     stop("Length of 'k'/'n', and 'pattern' does not match.")
 }
 
-check_theta <- function  (theta){
-  if (is.null(dim(theta)))
-    stop("'theta' must be a matrix with posterior samples")
-  if (any(theta < 0, theta > 1))
-    stop("'theta' must contain probabilities in [0,1].")
+check_prob <- function  (prob){
+  if (is.null(dim(prob)))
+    stop("'prob' must be a matrix with posterior samples")
+  if (any(prob < 0, prob > 1))
+    stop("'prob' must contain probabilities in [0,1].")
 }
-check_thetakn <- function (theta, k, n){
+check_probkn <- function (prob, k, n){
   check_kn(k, n)
-  check_theta(theta)
-  if (ncol(theta) != length(k))
-    stop("length(k)  must be identical to  ncol(theta).")
+  check_prob(prob)
+  if (ncol(prob) != length(k))
+    stop("length(k)  must be identical to  ncol(prob).")
 }
 
-check_thetako <- function (theta, k, options){
+check_probko <- function (prob, k, options){
   check_ko(k, options)
-  check_theta(theta)
-  if (ncol(theta) != sum(options - 1))
-    stop("ncol(theta)  must be identical to  sum(options-1).")
+  check_prob(prob)
+  if (ncol(prob) != sum(options - 1))
+    stop("ncol(prob)  must be identical to  sum(options-1).")
 }
 
 

@@ -32,8 +32,9 @@ a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{burnin}{number of burnin samples per step that are discarded. Since the
-starting values are updated during the stepwise procedure, this
-number can be smaller than in standard MCMC applications.}
+maximum-likelihood estimate is used as a start value (which is updated
+during the stepwise procedure in \code{count_multinom}), the \code{burnin}
+number can be much smaller than in standard MCMC applications.}
 
 \item{progress}{whether a progress bar should be shown.}
 }

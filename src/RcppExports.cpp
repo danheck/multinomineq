@@ -74,15 +74,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // ppp_bin
-NumericVector ppp_bin(const arma::mat& theta, const arma::vec& k, const arma::vec& n);
-RcppExport SEXP _stratsel_ppp_bin(SEXP thetaSEXP, SEXP kSEXP, SEXP nSEXP) {
+NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec& n);
+RcppExport SEXP _stratsel_ppp_bin(SEXP probSEXP, SEXP kSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type prob(probSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type k(kSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(ppp_bin(theta, k, n));
+    rcpp_result_gen = Rcpp::wrap(ppp_bin(prob, k, n));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -259,28 +259,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // rpm_mat
-arma::imat rpm_mat(const arma::mat& theta, const arma::vec& n, const arma::vec& options);
-RcppExport SEXP _stratsel_rpm_mat(SEXP thetaSEXP, SEXP nSEXP, SEXP optionsSEXP) {
+arma::imat rpm_mat(const arma::mat& prob, const arma::vec& n, const arma::vec& options);
+RcppExport SEXP _stratsel_rpm_mat(SEXP probSEXP, SEXP nSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type prob(probSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type n(nSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rpm_mat(theta, n, options));
+    rcpp_result_gen = Rcpp::wrap(rpm_mat(prob, n, options));
     return rcpp_result_gen;
 END_RCPP
 }
 // ppp_mult
-NumericVector ppp_mult(const arma::mat& theta, const arma::vec& k, const arma::vec& options);
-RcppExport SEXP _stratsel_ppp_mult(SEXP thetaSEXP, SEXP kSEXP, SEXP optionsSEXP) {
+NumericVector ppp_mult(const arma::mat& prob, const arma::vec& k, const arma::vec& options);
+RcppExport SEXP _stratsel_ppp_mult(SEXP probSEXP, SEXP kSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type prob(probSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type k(kSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(ppp_mult(theta, k, options));
+    rcpp_result_gen = Rcpp::wrap(ppp_mult(prob, k, options));
     return rcpp_result_gen;
 END_RCPP
 }

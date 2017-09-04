@@ -25,18 +25,18 @@
 #'
 #' IJ <- dim(karabatsos2004$k.M)
 #' monotonicity <- nirt_to_Ab(IJ[1], IJ[2], axioms = "W1")
-#' pp <- sampling_binom(k = c(karabatsos2004$k.M),
-#'                      n = c(karabatsos2004$n.M),
-#'                      A = monotonicity$A, b = monotonicity$b,
-#'                      prior = c(.5, .5), M = 300)
+#' p <- sampling_binom(k = c(karabatsos2004$k.M),
+#'                     n = c(karabatsos2004$n.M),
+#'                     A = monotonicity$A, b = monotonicity$b,
+#'                     prior = c(.5, .5), M = 300)
 #'
 #' # posterior means (Table 4, p. 120)
-#' post.mean <- matrix(apply(pp, 2, mean), IJ[1],
+#' post.mean <- matrix(apply(p, 2, mean), IJ[1],
 #'                     dimnames = dimnames(karabatsos2004$k.M))
 #' round(post.mean, 2)
 #'
 #' # posterior predictive checks (Table 4, p. 121)
-#' ppp <- ppp_binom(pp, karabatsos2004$k.M, karabatsos2004$n.M,
+#' ppp <- ppp_binom(p, karabatsos2004$k.M, karabatsos2004$n.M,
 #'                  by = 1:prod(IJ))
 #' matrix(ppp[,3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
 #'
@@ -46,18 +46,18 @@
 #'
 #' IJ <- dim(karabatsos2004$k.IIO)
 #' iio <- nirt_to_Ab(IJ[1], IJ[2], axioms = "W2")
-#' pp <- sampling_binom(k = c(karabatsos2004$k.IIO),
-#'                      n = c(karabatsos2004$n.IIO),
-#'                      A = iio$A, b = iio$b,
-#'                      prior = c(.5, .5), M = 2000)
+#' p <- sampling_binom(k = c(karabatsos2004$k.IIO),
+#'                     n = c(karabatsos2004$n.IIO),
+#'                     A = iio$A, b = iio$b,
+#'                     prior = c(.5, .5), M = 2000)
 
 #' # posterior predictive checks (Table 6, p. 122)
-#' ppp <- ppp_binom(theta = pp, k = c(karabatsos2004$k.IIO),
+#' ppp <- ppp_binom(prob = p, k = c(karabatsos2004$k.IIO),
 #'                  n = c(karabatsos2004$n.IIO), by = 1:prod(IJ))
 #' matrix(ppp[,3], 7, dimnames = dimnames(karabatsos2004$k.IIO))
 #'
 #' # for each item:
-#' ppp <- ppp_binom(pp, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
+#' ppp <- ppp_binom(p, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
 #'                  by = rep(1:IJ[2], each = IJ[1]))
 #' ppp[,3]
 "karabatsos2004"

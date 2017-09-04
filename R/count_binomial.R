@@ -29,8 +29,9 @@
 #' @param cmin if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
 #' @param maxiter if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.
 #' @param burnin number of burnin samples per step that are discarded. Since the
-#'     starting values are updated during the stepwise procedure, this
-#'     number can be smaller than in standard MCMC applications.
+#'     maximum-likelihood estimate is used as a start value (which is updated
+#'     during the stepwise procedure in \code{count_multinom}), the \code{burnin}
+#'     number can be much smaller than in standard MCMC applications.
 #' @param progress whether a progress bar should be shown.
 #'
 #' @details
@@ -96,12 +97,12 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
                          steps, start, cmin = 0, maxiter = 500,
                          burnin = 5, progress = TRUE){
 
+  if (length(prior) == 1) prior <- rep(prior, length(k))
   check_Mminmax(M, cmin, maxiter)
   if (missing(A)) A <- V
   aggr <- map_k_to_A(k, n, A, map, prior)
   k <- aggr$k
   n <- aggr$n
-
 
   if (!missing(b)){
     check_Abknprior(A, b, k, n, prior)

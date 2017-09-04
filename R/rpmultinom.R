@@ -1,37 +1,51 @@
 #' Random Sample for Product-Multinomial Distribution
 #'
 #' Generate random samples from independent multinomial distributions.
-#' @param theta vector with probability parameters. Must sum to one within each option.
-#'    Can be a matrix with one parameter vector per row.
+#'
+# ' @param M number of random vectors to draw.
+#' @param prob vector with probability parameters or a matrix with one vector per row,
+#'    (in which case \code{M} is ignored).
+#'    Values must be nonnegative and smaller than 1 for \code{rpbinom} and
+#'    nonnegative and sum to one within each option for \code{rpmultinom}.
 #'    See \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.
-#' @param n integer vector, specifying the total number of objects for each multinomial distribution.
+#' @param n integer vector, specifying the number of trials for each binomial/multinomial distribution
+#'    (note: this is the \code{size} argument in \code{\link[stats]{rmultinom}}).
 #' @param options number of parameters/categories of each multinomial distribution.
+#' @return a matrix with one vector of frequencies per row. For \code{rpbinom}, only
+#'    the frequencies of 'successes' are returned, whereas for \code{rpmultinom}, the
+#'    complete frequency vectors (which sum to \code{n} within each option) are returned.
 #' @examples
 #' # 5 binomials
-#' rpbinom(c(.2, .7, .9, .1, .5), rep(20, 5))
+#' rpbinom(c(.2, .7, .9), c(10, 50, 30))
 #'
 #' # 2 and 3 options:  [a1,a2,  b1,b2,b3]
-#' rpmultinom(c(.5,.5, .3,.6,.1), c(100, 200), c(2, 3))
+#' options <- c(2, 3)
+#' rpmultinom(c(.5,.5,   .3,.6,.1), c(100, 200), options)
 #'
-#' theta <- rpdirichlet(5, rep(1,5), c(2,3))
-#' rpmultinom(theta, c(20, 20), c(2, 3))
+#' prob <- rpdirichlet(5, rep(1,5), options)
+#' rpmultinom(prob, c(20, 50), options)
 #' @export
-rpmultinom <- function(theta, n, options){
-  if(is.null(dim(theta)))
-    theta <- matrix(theta, 1)
-  check_theta(theta)
-  check_o(options)
-  rpm_mat(theta, n, options)
+rpbinom <- function(prob, n){
+  if (length(n) == 1) n <- rep(n, length(prob))
+  if (is.null(dim(prob)))
+    prob <- matrix(prob, 1, length(prob), byrow = TRUE)
+  if (is.null(dim(n)))
+    n <- matrix(n, 1, length(n), byrow = TRUE)
+
+  matrix(rbinom(length(prob), n, prob), nrow = nrow(prob),
+         dimnames = list(NULL, colnames(prob)))
 }
 
-#' @rdname rpmultinom
+#' @rdname rpbinom
 #' @export
-rpbinom <- function(theta, n){
-  options <- rep(2, length(theta))
-  if (length(n) == 1)
-    n <- rep(n, length(theta))
-  if(is.null(dim(theta)))
-    theta <- matrix(theta, 1)
-  k <- rpmultinom(free_to_full(theta, options), n, options)
-  drop_fixed(k)
+rpmultinom <- function(prob, n, options){
+  if (length(n) == 1) n <- rep(n, sum(options))
+  if (is.null(dim(prob)))
+    prob <- matrix(prob, 1, length(prob), byrow = TRUE)
+
+  check_prob(prob)
+  check_o(options)
+  rr <- rpm_mat(prob, n, options)
+  colnames(rr) <- colnames(prob)
+  rr
 }

@@ -21,8 +21,8 @@ rbeta_trunc <- function(shape1, shape2, min, max) {
     .Call(`_stratsel_rbeta_trunc`, shape1, shape2, min, max)
 }
 
-ppp_bin <- function(theta, k, n) {
-    .Call(`_stratsel_ppp_bin`, theta, k, n)
+ppp_bin <- function(prob, k, n) {
+    .Call(`_stratsel_ppp_bin`, prob, k, n)
 }
 
 sampling_bin <- function(k, n, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
@@ -86,12 +86,12 @@ sum_options <- function(k, options) {
     .Call(`_stratsel_sum_options`, k, options)
 }
 
-rpm_mat <- function(theta, n, options) {
-    .Call(`_stratsel_rpm_mat`, theta, n, options)
+rpm_mat <- function(prob, n, options) {
+    .Call(`_stratsel_rpm_mat`, prob, n, options)
 }
 
-ppp_mult <- function(theta, k, options) {
-    .Call(`_stratsel_ppp_mult`, theta, k, options)
+ppp_mult <- function(prob, k, options) {
+    .Call(`_stratsel_ppp_mult`, prob, k, options)
 }
 
 sampling_mult <- function(k, options, A, b, prior, M, start, burnin = 5L, progress = TRUE) {

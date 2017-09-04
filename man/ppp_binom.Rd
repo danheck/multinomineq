@@ -5,19 +5,22 @@
 \alias{ppp_multinom}
 \title{Posterior Predictive p-Values}
 \usage{
-ppp_binom(theta, k, n, by)
+ppp_binom(prob, k, n, by)
 
-ppp_multinom(theta, k, options)
+ppp_multinom(prob, k, options)
 }
 \arguments{
-\item{theta}{vector with probability parameters. Must sum to one within each option.
-Can be a matrix with one parameter vector per row.
+\item{prob}{vector with probability parameters or a matrix with one vector per row,
+(in which case \code{M} is ignored).
+Values must be nonnegative and smaller than 1 for \code{rpbinom} and
+nonnegative and sum to one within each option for \code{rpmultinom}.
 See \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{k}{the number of Option B choices.
 The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
-\item{n}{integer vector, specifying the total number of objects for each multinomial distribution.}
+\item{n}{integer vector, specifying the number of trials for each binomial/multinomial distribution
+(note: this is the \code{size} argument in \code{\link[stats]{rmultinom}}).}
 
 \item{by}{optional: a vector of the same length as \code{k} indicating factor levels
 by which the posterior-predictive checks should be split (e.g., by item sets).}
@@ -30,14 +33,14 @@ the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the posteri
 }
 \examples{
 # uniform samples:  p<.10
-theta <- matrix(runif(300*3, 0, .1), 300)
+prob <- matrix(runif(300*3, 0, .1), 300)
 n <- rep(10, 3)
-ppp_binom(theta, c(1,2,0), n)  # ok
-ppp_binom(theta, c(5,4,3), n)  # misfit
+ppp_binom(prob, c(1,2,0), n)  # ok
+ppp_binom(prob, c(5,4,3), n)  # misfit
 
 # multinomial (ternary choice)
-theta <- matrix(runif(300*2, 0, .05), 300)
-ppp_multinom(theta, c(1,0,9), 3)  # ok
+prob <- matrix(runif(300*2, 0, .05), 300)
+ppp_multinom(prob, c(1,0,9), 3)  # ok
 }
 \references{
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}

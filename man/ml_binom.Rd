@@ -55,7 +55,9 @@ A <- matrix(c(1, -1,  0,
               0,  0,  1),
             ncol = 3, byrow = TRUE)
 b <- c(0, 0, .50)
-ml_binom(c(4,1,23), 40, A, b)[1:2]
+ml_binom(k = c(4,1,23), n = 40, A, b)[1:2]
+ml_multinom(k = c(4,36,  1,39,  23,17),
+            options = c(2,2,2), A, b)[1:2]
 
 
 

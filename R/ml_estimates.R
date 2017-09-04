@@ -15,7 +15,9 @@
 #'               0,  0,  1),
 #'             ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
-#' ml_binom(c(4,1,23), 40, A, b)[1:2]
+#' ml_binom(k = c(4,1,23), n = 40, A, b)[1:2]
+#' ml_multinom(k = c(4,36,  1,39,  23,17),
+#'             options = c(2,2,2), A, b)[1:2]
 #'
 #'
 #'
@@ -56,7 +58,7 @@ ml_multinom <- function(k, options, A, b, n.fit = 1, start, ...){
   if (missing(start) || !all(A %*% start < b))
     start <- find_inside(A, b, options = options)
   check_start(start, A, b, interior = TRUE)
-  tryCatch (oo <- constrOptim(theta = start, f = loglik_multinom, grad = NULL,
+  tryCatch (oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
                               k = k, options = options,
                               ui = - A, ci = - b, control = list(fnscale = -1, ...)),
             error = function(e) {print(e);
@@ -64,13 +66,14 @@ ml_multinom <- function(k, options, A, b, n.fit = 1, start, ...){
   cnt <- 1
   while (cnt < n.fit){
     start <- find_inside(A, b, random = TRUE)
-    oo2 <- constrOptim(start, loglik_multinom, grad = NULL,
+    oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
                        k = k, options = options, ui = - A, ci = - b,
                        control = list(fnscale = -1))
     cnt <- cnt + 1
     if (oo2$value > oo$value) oo <- oo2
   }
-  oo #list("estimate" = oo$par, "loglik" = oo$value)
+  names(oo$par) <- colnames(A)
+  oo
 }
 
 # ' Choice Probabilities Implied by Strategy Predictions
@@ -137,7 +140,7 @@ get_error_number <- function(pattern){
 
 # product binomial loglikelihood with luckiness
 #
-# luckiness: -log(a(theta))   not normalized
+# luckiness: -log(a(prob))   not normalized
 # => complexity of order-constrained models can be compared
 # default:    standard NML; luck=c(1,1)
 # uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
@@ -162,6 +165,21 @@ loglik_multinom <- function (p, k, options){
     ll <- MIN_LL
   ll
 }
+
+
+grad_multinom <- function (p, k, options){
+  p_all <- add_fixed(p, options = options, sum = 1)
+  idx_K <- cumsum(options)
+  K <- k[idx_K]
+  pK <- p_all[idx_K]
+  g <- k[-idx_K] / p - rep(K / pK, options - 1)
+  # check: print(rbind(g = g, numderiv = numDeriv::grad(stratsel:::loglik_multinom, p, k=k, options=options)))
+  # ll <- sum(dmultinom(x = k, size = n, prob = p, log = TRUE))
+  # if (!is.na(g) && ll == - Inf)
+  # g[!is.na(g) & g == ] <- MIN_LL
+  g
+}
+
 
 # count adherence/error rates
 # used to get ML estimate : adherence/n

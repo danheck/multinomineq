@@ -33,23 +33,23 @@ arma::mat rbeta_mat(const unsigned int n, const unsigned int D,
   return rbeta_mat(n, shape1 * ones(D), shape2 * ones(D));
 }
 
-arma::ivec rpb_vec(const arma::vec theta, const arma::vec n)
+arma::ivec rpb_vec(const arma::vec prob, const arma::vec n)
 {
-  unsigned int I = theta.n_elem;
+  unsigned int I = prob.n_elem;
   arma::ivec k(I);
   for(unsigned int i = 0; i < I; i++)
-    k(i) = R::rbinom(n(i), theta(i));
+    k(i) = R::rbinom(n(i), prob(i));
   return k;
 }
 
 // [[Rcpp::export]]
-NumericVector ppp_bin(const arma::mat& theta, const arma::vec& k, const arma::vec& n)
+NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec& n)
 {
-  const unsigned int M = theta.n_rows;
+  const unsigned int M = prob.n_rows;
   vec tt, kpp, x2o(M), x2p(M);
   for(unsigned int m = 0; m < M; m++)
   {
-    tt = conv_to< colvec >::from(theta.row(m));
+    tt = conv_to< colvec >::from(prob.row(m));
     kpp = conv_to< vec >::from(rpb_vec(tt, n));
     x2o(m) = x2(k, tt % n);
     x2p(m) = x2(kpp, tt % n);
@@ -183,7 +183,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
   steps = steps - 1; // R --> C++ indexing
   vec inside;
   uvec inside_idx;
-  mat theta;
+  mat prob;
   mat starts(steps.n_elem, A.n_cols);
   for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
   int i, from, iter = 0;  // from: can be negative!
@@ -200,19 +200,19 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
     // sampling for step with minimal counts
     if (i == 0)
     {
-      theta = rbeta_mat(M_iter, k + prior(0), n - k + prior(1));
+      prob = rbeta_mat(M_iter, k + prior(0), n - k + prior(1));
     }  else {
-      theta = sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
+      prob = sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
                            prior, M_iter, starts.row(i - 1).t(), burnin, false);
-      starts.row(i - 1) = theta.row(M_iter - 1);
+      starts.row(i - 1) = prob.row(M_iter - 1);
     }
     // count samples
-    inside = inside_Ab(theta, A.rows(from + 1, steps(i)),
+    inside = inside_Ab(prob, A.rows(from + 1, steps(i)),
                        b.subvec(from + 1, steps(i)));
     if (any(inside))
     {
       inside_idx = find(inside);
-      starts.row(i) = theta.row(inside_idx(inside_idx.n_elem - 1));
+      starts.row(i) = prob.row(inside_idx(inside_idx.n_elem - 1));
     }
     count(i) += accu(inside);
     M(i) += M_iter;
