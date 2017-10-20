@@ -59,7 +59,7 @@ s2 <- list(pattern = c(-3, -1, +2), c = .5,
            ordered = TRUE, prior = c(1,1))
 
 ### compute NML complexity terms (depends on samples size!)
-n <- c(2, 1, 2)
+n <- c(2, 1, 1)
 c1 <- strategy_cnml(s1, n)
 c2 <- strategy_cnml(s2, n)
 

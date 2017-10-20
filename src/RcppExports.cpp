@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // inside_Ab
 arma::vec inside_Ab(const arma::mat& X, const arma::mat& A, const arma::vec& b);
-RcppExport SEXP _stratsel_inside_Ab(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
+RcppExport SEXP _multinomineq_inside_Ab(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,7 +21,7 @@ END_RCPP
 }
 // count_samples
 int count_samples(const arma::mat& X, const arma::mat& A, const arma::vec& b);
-RcppExport SEXP _stratsel_count_samples(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
+RcppExport SEXP _multinomineq_count_samples(SEXP XSEXP, SEXP ASEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,7 +34,7 @@ END_RCPP
 }
 // start_random
 arma::vec start_random(const arma::mat& A, const arma::vec& b, const unsigned int M, arma::vec start);
-RcppExport SEXP _stratsel_start_random(SEXP ASEXP, SEXP bSEXP, SEXP MSEXP, SEXP startSEXP) {
+RcppExport SEXP _multinomineq_start_random(SEXP ASEXP, SEXP bSEXP, SEXP MSEXP, SEXP startSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -48,7 +48,7 @@ END_RCPP
 }
 // adj_iterative
 NumericVector adj_iterative(NumericVector par, const double c, const double DIFF_BOUND);
-RcppExport SEXP _stratsel_adj_iterative(SEXP parSEXP, SEXP cSEXP, SEXP DIFF_BOUNDSEXP) {
+RcppExport SEXP _multinomineq_adj_iterative(SEXP parSEXP, SEXP cSEXP, SEXP DIFF_BOUNDSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -61,7 +61,7 @@ END_RCPP
 }
 // rbeta_trunc
 double rbeta_trunc(const double shape1, const double shape2, const double min, const double max);
-RcppExport SEXP _stratsel_rbeta_trunc(SEXP shape1SEXP, SEXP shape2SEXP, SEXP minSEXP, SEXP maxSEXP) {
+RcppExport SEXP _multinomineq_rbeta_trunc(SEXP shape1SEXP, SEXP shape2SEXP, SEXP minSEXP, SEXP maxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -75,7 +75,7 @@ END_RCPP
 }
 // ppp_bin
 NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec& n);
-RcppExport SEXP _stratsel_ppp_bin(SEXP probSEXP, SEXP kSEXP, SEXP nSEXP) {
+RcppExport SEXP _multinomineq_ppp_bin(SEXP probSEXP, SEXP kSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,7 +88,7 @@ END_RCPP
 }
 // sampling_bin
 arma::mat sampling_bin(const arma::vec& k, const arma::vec& n, const arma::mat& A, const arma::vec& b, const arma::vec& prior, const unsigned int M, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_sampling_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_sampling_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -107,7 +107,7 @@ END_RCPP
 }
 // count_bin
 NumericMatrix count_bin(const arma::vec& k, const arma::vec& n, const arma::mat& A, const arma::vec& b, const arma::vec& prior, const unsigned int M, const unsigned int batch, const bool progress);
-RcppExport SEXP _stratsel_count_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -125,7 +125,7 @@ END_RCPP
 }
 // count_stepwise_bin
 NumericMatrix count_stepwise_bin(const arma::vec& k, arma::vec& n, const arma::mat& A, arma::vec& b, const arma::vec& prior, arma::vec M, arma::vec steps, const unsigned int batch, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_count_stepwise_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_stepwise_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -146,7 +146,7 @@ END_RCPP
 }
 // count_auto_bin
 NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n, const arma::mat& A, const arma::vec& b, const arma::vec& prior, arma::vec count, arma::vec M, arma::vec steps, const unsigned int M_iter, const unsigned int cmin, const unsigned int maxiter, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_count_auto_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_auto_bin(SEXP kSEXP, SEXP nSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -170,7 +170,7 @@ END_RCPP
 }
 // sampling_hitandrun
 arma::mat sampling_hitandrun(const arma::mat& A, const arma::vec& b, const unsigned int M, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_sampling_hitandrun(SEXP ASEXP, SEXP bSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_sampling_hitandrun(SEXP ASEXP, SEXP bSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -186,7 +186,7 @@ END_RCPP
 }
 // rdirichlet
 arma::mat rdirichlet(const unsigned int n, const arma::vec alpha);
-RcppExport SEXP _stratsel_rdirichlet(SEXP nSEXP, SEXP alphaSEXP) {
+RcppExport SEXP _multinomineq_rdirichlet(SEXP nSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -198,7 +198,7 @@ END_RCPP
 }
 // rpdirichlet
 arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options);
-RcppExport SEXP _stratsel_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -211,7 +211,7 @@ END_RCPP
 }
 // rpdirichlet_free
 arma::mat rpdirichlet_free(const unsigned int n, const arma::vec alpha, const arma::vec options);
-RcppExport SEXP _stratsel_rpdirichlet_free(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_rpdirichlet_free(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -224,7 +224,7 @@ END_RCPP
 }
 // shed_options
 arma::vec shed_options(arma::vec x, const arma::vec options);
-RcppExport SEXP _stratsel_shed_options(SEXP xSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_shed_options(SEXP xSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -236,7 +236,7 @@ END_RCPP
 }
 // rep_options
 arma::vec rep_options(arma::vec x, const arma::vec options);
-RcppExport SEXP _stratsel_rep_options(SEXP xSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_rep_options(SEXP xSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -248,7 +248,7 @@ END_RCPP
 }
 // sum_options
 arma::vec sum_options(const arma::vec k, const arma::vec options);
-RcppExport SEXP _stratsel_sum_options(SEXP kSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_sum_options(SEXP kSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -260,7 +260,7 @@ END_RCPP
 }
 // rpm_mat
 arma::imat rpm_mat(const arma::mat& prob, const arma::vec& n, const arma::vec& options);
-RcppExport SEXP _stratsel_rpm_mat(SEXP probSEXP, SEXP nSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_rpm_mat(SEXP probSEXP, SEXP nSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -273,7 +273,7 @@ END_RCPP
 }
 // ppp_mult
 NumericVector ppp_mult(const arma::mat& prob, const arma::vec& k, const arma::vec& options);
-RcppExport SEXP _stratsel_ppp_mult(SEXP probSEXP, SEXP kSEXP, SEXP optionsSEXP) {
+RcppExport SEXP _multinomineq_ppp_mult(SEXP probSEXP, SEXP kSEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -286,7 +286,7 @@ END_RCPP
 }
 // sampling_mult
 arma::mat sampling_mult(const arma::vec& k, const arma::vec& options, const arma::mat& A, const arma::vec& b, const arma::vec& prior, const unsigned int M, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_sampling_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_sampling_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -305,7 +305,7 @@ END_RCPP
 }
 // count_mult
 NumericMatrix count_mult(const arma::vec& k, const arma::vec& options, const arma::mat& A, const arma::vec& b, const arma::vec& prior, const unsigned int M, const unsigned int batch, const bool progress);
-RcppExport SEXP _stratsel_count_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -323,7 +323,7 @@ END_RCPP
 }
 // count_stepwise_multi
 NumericMatrix count_stepwise_multi(const arma::vec& k, const arma::vec& options, const arma::mat& A, const arma::vec& b, const arma::vec& prior, arma::vec M, arma::vec steps, const unsigned int batch, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_count_stepwise_multi(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_stepwise_multi(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP batchSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -344,7 +344,7 @@ END_RCPP
 }
 // count_auto_mult
 NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options, const arma::mat& A, const arma::vec& b, const arma::vec& prior, arma::vec count, arma::vec M, arma::vec steps, const unsigned int M_iter, const unsigned int cmin, const unsigned int maxiter, arma::vec start, const unsigned int burnin, const bool progress);
-RcppExport SEXP _stratsel_count_auto_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
+RcppExport SEXP _multinomineq_count_auto_mult(SEXP kSEXP, SEXP optionsSEXP, SEXP ASEXP, SEXP bSEXP, SEXP priorSEXP, SEXP countSEXP, SEXP MSEXP, SEXP stepsSEXP, SEXP M_iterSEXP, SEXP cminSEXP, SEXP maxiterSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

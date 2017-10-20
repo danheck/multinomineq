@@ -2,51 +2,51 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 inside_Ab <- function(X, A, b) {
-    .Call(`_stratsel_inside_Ab`, X, A, b)
+    .Call(`_multinomineq_inside_Ab`, X, A, b)
 }
 
 count_samples <- function(X, A, b) {
-    .Call(`_stratsel_count_samples`, X, A, b)
+    .Call(`_multinomineq_count_samples`, X, A, b)
 }
 
 start_random <- function(A, b, M, start) {
-    .Call(`_stratsel_start_random`, A, b, M, start)
+    .Call(`_multinomineq_start_random`, A, b, M, start)
 }
 
 adj_iterative <- function(par, c = .50, DIFF_BOUND = 0.0) {
-    .Call(`_stratsel_adj_iterative`, par, c, DIFF_BOUND)
+    .Call(`_multinomineq_adj_iterative`, par, c, DIFF_BOUND)
 }
 
 rbeta_trunc <- function(shape1, shape2, min, max) {
-    .Call(`_stratsel_rbeta_trunc`, shape1, shape2, min, max)
+    .Call(`_multinomineq_rbeta_trunc`, shape1, shape2, min, max)
 }
 
 ppp_bin <- function(prob, k, n) {
-    .Call(`_stratsel_ppp_bin`, prob, k, n)
+    .Call(`_multinomineq_ppp_bin`, prob, k, n)
 }
 
 sampling_bin <- function(k, n, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
-    .Call(`_stratsel_sampling_bin`, k, n, A, b, prior, M, start, burnin, progress)
+    .Call(`_multinomineq_sampling_bin`, k, n, A, b, prior, M, start, burnin, progress)
 }
 
 count_bin <- function(k, n, A, b, prior, M, batch, progress = TRUE) {
-    .Call(`_stratsel_count_bin`, k, n, A, b, prior, M, batch, progress)
+    .Call(`_multinomineq_count_bin`, k, n, A, b, prior, M, batch, progress)
 }
 
 count_stepwise_bin <- function(k, n, A, b, prior, M, steps, batch, start, burnin, progress = TRUE) {
-    .Call(`_stratsel_count_stepwise_bin`, k, n, A, b, prior, M, steps, batch, start, burnin, progress)
+    .Call(`_multinomineq_count_stepwise_bin`, k, n, A, b, prior, M, steps, batch, start, burnin, progress)
 }
 
 count_auto_bin <- function(k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress = TRUE) {
-    .Call(`_stratsel_count_auto_bin`, k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
+    .Call(`_multinomineq_count_auto_bin`, k, n, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
 }
 
 sampling_hitandrun <- function(A, b, M, start, burnin = 5L, progress = TRUE) {
-    .Call(`_stratsel_sampling_hitandrun`, A, b, M, start, burnin, progress)
+    .Call(`_multinomineq_sampling_hitandrun`, A, b, M, start, burnin, progress)
 }
 
 rdirichlet <- function(n, alpha) {
-    .Call(`_stratsel_rdirichlet`, n, alpha)
+    .Call(`_multinomineq_rdirichlet`, n, alpha)
 }
 
 #' Random Samples from the Product-Dirichlet Distribution
@@ -67,46 +67,46 @@ rdirichlet <- function(n, alpha) {
 #' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
 #' @export
 rpdirichlet <- function(n, alpha, options) {
-    .Call(`_stratsel_rpdirichlet`, n, alpha, options)
+    .Call(`_multinomineq_rpdirichlet`, n, alpha, options)
 }
 
 rpdirichlet_free <- function(n, alpha, options) {
-    .Call(`_stratsel_rpdirichlet_free`, n, alpha, options)
+    .Call(`_multinomineq_rpdirichlet_free`, n, alpha, options)
 }
 
 shed_options <- function(x, options) {
-    .Call(`_stratsel_shed_options`, x, options)
+    .Call(`_multinomineq_shed_options`, x, options)
 }
 
 rep_options <- function(x, options) {
-    .Call(`_stratsel_rep_options`, x, options)
+    .Call(`_multinomineq_rep_options`, x, options)
 }
 
 sum_options <- function(k, options) {
-    .Call(`_stratsel_sum_options`, k, options)
+    .Call(`_multinomineq_sum_options`, k, options)
 }
 
 rpm_mat <- function(prob, n, options) {
-    .Call(`_stratsel_rpm_mat`, prob, n, options)
+    .Call(`_multinomineq_rpm_mat`, prob, n, options)
 }
 
 ppp_mult <- function(prob, k, options) {
-    .Call(`_stratsel_ppp_mult`, prob, k, options)
+    .Call(`_multinomineq_ppp_mult`, prob, k, options)
 }
 
 sampling_mult <- function(k, options, A, b, prior, M, start, burnin = 5L, progress = TRUE) {
-    .Call(`_stratsel_sampling_mult`, k, options, A, b, prior, M, start, burnin, progress)
+    .Call(`_multinomineq_sampling_mult`, k, options, A, b, prior, M, start, burnin, progress)
 }
 
 count_mult <- function(k, options, A, b, prior, M, batch, progress = TRUE) {
-    .Call(`_stratsel_count_mult`, k, options, A, b, prior, M, batch, progress)
+    .Call(`_multinomineq_count_mult`, k, options, A, b, prior, M, batch, progress)
 }
 
 count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start, burnin, progress = TRUE) {
-    .Call(`_stratsel_count_stepwise_multi`, k, options, A, b, prior, M, steps, batch, start, burnin, progress)
+    .Call(`_multinomineq_count_stepwise_multi`, k, options, A, b, prior, M, steps, batch, start, burnin, progress)
 }
 
 count_auto_mult <- function(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress = TRUE) {
-    .Call(`_stratsel_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
+    .Call(`_multinomineq_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
 }
 

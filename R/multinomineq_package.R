@@ -1,4 +1,4 @@
-#' stratsel: Bayesian Inference for Inequality/Order-Constrained Multinomial Models
+#' multinomineq: Bayesian Inference for Inequality-Constrained Multinomial Models
 #'
 #' Strategy classification is used to select the decision strategy that
 #' provides the best account for a vector of observed choice frequencies.
@@ -17,7 +17,7 @@
 #'  \item Statistical inference for order-constrained contingency tables (Klugkist et al., 2007, 2010).
 #' }
 #'
-#' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("stratsel")}.
+#' Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("multinomineq")}.
 #' For convex polytopes, the transformation of vertex to inequality representation requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 #'
 #' @author Daniel W. Heck
@@ -28,7 +28,7 @@
 #' @importFrom utils head combn
 #' @importFrom graphics hist
 #' @importFrom quadprog solve.QP
-#' @useDynLib "stratsel", .registration=TRUE
+#' @useDynLib "multinomineq", .registration=TRUE
 #'
 #' @template ref_broder2003
 #' @template ref_broder2003jepg
@@ -42,7 +42,6 @@
 #' @template ref_hoijtink2011
 #' @template ref_klugkist2007
 #' @template ref_klugkist2010
-
 "_PACKAGE"
 
 

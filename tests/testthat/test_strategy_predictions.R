@@ -34,19 +34,19 @@ test_that('predictions work for one item type', {
   expect_named(strategy_multiattribute(ca, cb, v, strats), strats)
 
   # deterministic models
-  expect_equal(stratsel:::get_error_unique(TTB), 1)
-  expect_length(stratsel:::get_error_unique(GUESS), 0)
-  expect_equal(stratsel:::get_error_number(TTB), 1)
-  expect_equal(stratsel:::error_to_prob(.123, stratsel:::as_strategy(TTB)), rep(.123, 3))
+  expect_equal(multinomineq:::get_error_unique(TTB), 1)
+  expect_length(multinomineq:::get_error_unique(GUESS), 0)
+  expect_equal(multinomineq:::get_error_number(TTB), 1)
+  expect_equal(multinomineq:::error_to_prob(.123, multinomineq:::as_strategy(TTB)), rep(.123, 3))
 
   # probabilistic models
-  expect_equal(stratsel:::get_error_unique(WADDprob), sort(abs(WADDprob)))
-  expect_equal(stratsel:::get_error_number(WADDprob), 3)
-  expect_equal(stratsel:::error_to_prob(c(.1,.2,.45), stratsel:::as_strategy(WADDprob)),
+  expect_equal(multinomineq:::get_error_unique(WADDprob), sort(abs(WADDprob)))
+  expect_equal(multinomineq:::get_error_number(WADDprob), 3)
+  expect_equal(multinomineq:::error_to_prob(c(.1,.2,.45), multinomineq:::as_strategy(WADDprob)),
                c(.1, 1 - .45, .2))
   # baseline
   e <- c(.1 , .25, .3)
-  expect_equal(stratsel:::error_to_prob(e, stratsel:::as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
+  expect_equal(multinomineq:::error_to_prob(e, multinomineq:::as_strategy(baseline, ordered = FALSE, c=1)), 1 - e)
 
 })
 

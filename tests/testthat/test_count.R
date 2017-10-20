@@ -15,7 +15,7 @@ cntr <- function(X, A, b)
 set.seed(124356)
 
 test_that("counting methods work", {
-  cnt <- stratsel:::count_samples(X, A, b)
+  cnt <- multinomineq:::count_samples(X, A, b)
   expect_equal(cnt, cntr(X, A, b))
   expect_equal(cnt / M, V, tol = .005)
 
@@ -75,7 +75,7 @@ test_that("counting is equivalent for: A/b-method and V-method", {
   b <- tmp$b
 
   X <- matrix(runif(2000 * ncol(V)), ncol = ncol(V))
-  vertex <- stratsel:::inside_V(X, V)
+  vertex <- multinomineq:::inside_V(X, V)
   ineq <- apply(X, 1, function(x) all(A %*% x <= b))
   expect_equal(vertex, ineq)
   table(data.frame(vertex, ineq))

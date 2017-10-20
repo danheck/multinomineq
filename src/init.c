@@ -8,58 +8,58 @@
 */
 
 /* .Call calls */
-extern SEXP _stratsel_adj_iterative(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_auto_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_auto_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_samples(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_stepwise_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_inside_Ab(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_ppp_bin(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_ppp_mult(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_rbeta_trunc(SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_rdirichlet(SEXP, SEXP);
-extern SEXP _stratsel_rep_options(SEXP, SEXP);
-extern SEXP _stratsel_rpdirichlet(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_rpdirichlet_free(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_rpm_mat(SEXP, SEXP, SEXP);
-extern SEXP _stratsel_sampling_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_sampling_hitandrun(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_sampling_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_shed_options(SEXP, SEXP);
-extern SEXP _stratsel_start_random(SEXP, SEXP, SEXP, SEXP);
-extern SEXP _stratsel_sum_options(SEXP, SEXP);
+extern SEXP _multinomineq_adj_iterative(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_auto_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_auto_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_samples(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_stepwise_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_count_stepwise_multi(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_inside_Ab(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_ppp_bin(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_ppp_mult(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_rbeta_trunc(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_rdirichlet(SEXP, SEXP);
+extern SEXP _multinomineq_rep_options(SEXP, SEXP);
+extern SEXP _multinomineq_rpdirichlet(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_rpdirichlet_free(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_rpm_mat(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_sampling_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_sampling_hitandrun(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_sampling_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_shed_options(SEXP, SEXP);
+extern SEXP _multinomineq_start_random(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_sum_options(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_stratsel_adj_iterative",        (DL_FUNC) &_stratsel_adj_iterative,         3},
-    {"_stratsel_count_auto_bin",       (DL_FUNC) &_stratsel_count_auto_bin,       14},
-    {"_stratsel_count_auto_mult",      (DL_FUNC) &_stratsel_count_auto_mult,      14},
-    {"_stratsel_count_bin",            (DL_FUNC) &_stratsel_count_bin,             8},
-    {"_stratsel_count_mult",           (DL_FUNC) &_stratsel_count_mult,            8},
-    {"_stratsel_count_samples",        (DL_FUNC) &_stratsel_count_samples,         3},
-    {"_stratsel_count_stepwise_bin",   (DL_FUNC) &_stratsel_count_stepwise_bin,   11},
-    {"_stratsel_count_stepwise_multi", (DL_FUNC) &_stratsel_count_stepwise_multi, 11},
-    {"_stratsel_inside_Ab",            (DL_FUNC) &_stratsel_inside_Ab,             3},
-    {"_stratsel_ppp_bin",              (DL_FUNC) &_stratsel_ppp_bin,               3},
-    {"_stratsel_ppp_mult",             (DL_FUNC) &_stratsel_ppp_mult,              3},
-    {"_stratsel_rbeta_trunc",          (DL_FUNC) &_stratsel_rbeta_trunc,           4},
-    {"_stratsel_rdirichlet",           (DL_FUNC) &_stratsel_rdirichlet,            2},
-    {"_stratsel_rep_options",          (DL_FUNC) &_stratsel_rep_options,           2},
-    {"_stratsel_rpdirichlet",          (DL_FUNC) &_stratsel_rpdirichlet,           3},
-    {"_stratsel_rpdirichlet_free",     (DL_FUNC) &_stratsel_rpdirichlet_free,      3},
-    {"_stratsel_rpm_mat",              (DL_FUNC) &_stratsel_rpm_mat,               3},
-    {"_stratsel_sampling_bin",         (DL_FUNC) &_stratsel_sampling_bin,          9},
-    {"_stratsel_sampling_hitandrun",   (DL_FUNC) &_stratsel_sampling_hitandrun,    6},
-    {"_stratsel_sampling_mult",        (DL_FUNC) &_stratsel_sampling_mult,         9},
-    {"_stratsel_shed_options",         (DL_FUNC) &_stratsel_shed_options,          2},
-    {"_stratsel_start_random",         (DL_FUNC) &_stratsel_start_random,          4},
-    {"_stratsel_sum_options",          (DL_FUNC) &_stratsel_sum_options,           2},
+    {"_multinomineq_adj_iterative",        (DL_FUNC) &_multinomineq_adj_iterative,         3},
+    {"_multinomineq_count_auto_bin",       (DL_FUNC) &_multinomineq_count_auto_bin,       14},
+    {"_multinomineq_count_auto_mult",      (DL_FUNC) &_multinomineq_count_auto_mult,      14},
+    {"_multinomineq_count_bin",            (DL_FUNC) &_multinomineq_count_bin,             8},
+    {"_multinomineq_count_mult",           (DL_FUNC) &_multinomineq_count_mult,            8},
+    {"_multinomineq_count_samples",        (DL_FUNC) &_multinomineq_count_samples,         3},
+    {"_multinomineq_count_stepwise_bin",   (DL_FUNC) &_multinomineq_count_stepwise_bin,   11},
+    {"_multinomineq_count_stepwise_multi", (DL_FUNC) &_multinomineq_count_stepwise_multi, 11},
+    {"_multinomineq_inside_Ab",            (DL_FUNC) &_multinomineq_inside_Ab,             3},
+    {"_multinomineq_ppp_bin",              (DL_FUNC) &_multinomineq_ppp_bin,               3},
+    {"_multinomineq_ppp_mult",             (DL_FUNC) &_multinomineq_ppp_mult,              3},
+    {"_multinomineq_rbeta_trunc",          (DL_FUNC) &_multinomineq_rbeta_trunc,           4},
+    {"_multinomineq_rdirichlet",           (DL_FUNC) &_multinomineq_rdirichlet,            2},
+    {"_multinomineq_rep_options",          (DL_FUNC) &_multinomineq_rep_options,           2},
+    {"_multinomineq_rpdirichlet",          (DL_FUNC) &_multinomineq_rpdirichlet,           3},
+    {"_multinomineq_rpdirichlet_free",     (DL_FUNC) &_multinomineq_rpdirichlet_free,      3},
+    {"_multinomineq_rpm_mat",              (DL_FUNC) &_multinomineq_rpm_mat,               3},
+    {"_multinomineq_sampling_bin",         (DL_FUNC) &_multinomineq_sampling_bin,          9},
+    {"_multinomineq_sampling_hitandrun",   (DL_FUNC) &_multinomineq_sampling_hitandrun,    6},
+    {"_multinomineq_sampling_mult",        (DL_FUNC) &_multinomineq_sampling_mult,         9},
+    {"_multinomineq_shed_options",         (DL_FUNC) &_multinomineq_shed_options,          2},
+    {"_multinomineq_start_random",         (DL_FUNC) &_multinomineq_start_random,          4},
+    {"_multinomineq_sum_options",          (DL_FUNC) &_multinomineq_sum_options,           2},
     {NULL, NULL, 0}
 };
 
-void R_init_stratsel(DllInfo *dll)
+void R_init_multinomineq(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);

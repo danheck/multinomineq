@@ -26,7 +26,7 @@ test_that("NIRT axioms match with Rasch predictions", {
   cprior <- count_binom(0, 0, A, b, M = 5000, progress = FALSE,
                         steps = seq(2,nrow(A) - 1,2), start = start)
   count_to_bf(cpost, cprior)
-  # stratsel:::count_auto_bin(k, n, A, b, M=5000, eps = .05)
+  # multinomineq:::count_auto_bin(k, n, A, b, M=5000, eps = .05)
   expect_silent(tt <- sampling_binom(k, n, A, b, M = 2000, progress =FALSE))
   plot(tt[,1], ty="l")
   expect_silent(ppp <- ppp_binom(tt, k, n))

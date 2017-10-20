@@ -23,7 +23,7 @@ test_that("truncated beta is correct", {
   bmax <- 0.779
   a <- 14
   b <- 4
-  x <- replicate(5000, stratsel:::rbeta_trunc(a, b, bmin, bmax))
+  x <- replicate(5000, multinomineq:::rbeta_trunc(a, b, bmin, bmax))
   y <- rbeta(10000, a, b)
   x2 <- y[y > bmin & y < bmax]
   expect_equal(quantile(x, p), quantile(x2, p), tol = .02)
@@ -81,7 +81,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   b <- 1
   k <- rep(0, sum(options))
   X <- sampling_multinom(k, options, A, b, M = M)
-  X2 <- stratsel:::rdirichlet(M, k + 1)
+  X2 <- multinomineq:::rdirichlet(M, k + 1)
   expect_true(test_sum1_free(X[1:1000,], options))
   expect_equal(unname(colMeans(X)), 1/rep(options, options - 1), tol = .005)
   for (i in 1:ncol(X))
@@ -97,7 +97,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X <- sampling_multinom(k, options, A, b, M = M)
   expect_true(test_sum1_free(X[1:1000,], options))
   expect_equal(unname(colMeans(X)), 1/rep(options, options - 1), tol = .005)
-  expect_equal(unname(quantile(X[,1], p)), p, tol = .01)
+  expect_equal(unname(quantile(X[,1], p)), p, tol = .05)
 
   ################### uniform prior comparison to accept/reject
   # columns:   (a1,  b1,b2)
@@ -114,12 +114,12 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X1 <- sampling_multinom(k, options, A, b = b, M = 2000, start = start)
   expect_true(test_sum1_free(X1, options))
   expect_true(test_Ab(X1, A, b))
-  X2 <- stratsel:::rpdirichlet_free(M*5, k+1, options)
+  X2 <- multinomineq:::rpdirichlet_free(M*5, k+1, options)
   sel <- sel_Ab(X2, A, b)
   for (i in 1:ncol(X1)){
     qqplot(X1[,i],X2[sel,i])
     abline(0,1,col=2)
-    expect_equal(quantile_ss(X1[,i],X2[sel,i],p), 0, tol = .01)
+    expect_equal(quantile_ss(X1[,i],X2[sel,i],p), 0, tol = .05)
   }
 })
 
@@ -135,14 +135,14 @@ test_that("Gibbs sampling for multinomial [posterior]", {
               ncol = sum(options-1), byrow = TRUE)
   b <- c(.7, 1.5, -.2, -.3, 1)
   k <- c(8, 3, 0, 12)
-  n <- stratsel:::sum_options(k, options)
+  n <- multinomineq:::sum_options(k, options)
   expect_equal(c(n), unname(rep(tapply(k, rep(1:length(options), options), sum), options)))
   start <- c(0.2531039, 0.3094770, 0.0494943)
   X <- sampling_multinom(k, options, A, b, M = M, start=start)
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:1000,], A, b))
   # accept-reject
-  X1 <- stratsel:::rpdirichlet_free(M*5, k + 1, options)
+  X1 <- multinomineq:::rpdirichlet_free(M*5, k + 1, options)
   sel <- sel_Ab(X1, A, b)
   par(mfrow=c(2,2))
   for (i in 1:ncol(A)){
@@ -180,7 +180,7 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:100,], A, b))
   # accept-reject
-  X1 <- stratsel:::rpdirichlet_free(M*2, k + 1, options)
+  X1 <- multinomineq:::rpdirichlet_free(M*2, k + 1, options)
   sel <- sel_Ab(X1, A, b)
   cnt <- count_multinom(k, options, A, b, M = 5e5)
   expect_equal(mean(sel), attr(cnt, "integral"), tol = .001) ## integral
@@ -202,8 +202,8 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   data(swop5)
   options <- rep(3, 10)
   k <- rep(0, 30)
-  X <- stratsel:::rpdirichlet_free(M, k + 1, options)
-  int <- stratsel:::count_samples(X, swop5$A, swop5$b)/(M)
+  X <- multinomineq:::rpdirichlet_free(M, k + 1, options)
+  int <- multinomineq:::count_samples(X, swop5$A, swop5$b)/(M)
   cnt <- count_multinom(k, options, swop5$A, swop5$b, M=M)
   expect_equal(int, attr(cnt, "integral"), tol = .001)
 

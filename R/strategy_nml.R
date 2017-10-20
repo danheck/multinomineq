@@ -136,7 +136,7 @@ strategy_cnml <- function(strategy, n, n.fit = 3, cores = 1){
 #'            ordered = TRUE, prior = c(1,1))
 #'
 #' ### compute NML complexity terms (depends on samples size!)
-#' n <- c(2, 1, 2)
+#' n <- c(2, 1, 1)
 #' c1 <- strategy_cnml(s1, n)
 #' c2 <- strategy_cnml(s2, n)
 #'

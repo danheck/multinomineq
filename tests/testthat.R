@@ -1,4 +1,4 @@
 library(testthat)
-library(stratsel)
+library(multinomineq)
 
-test_check("stratsel")
+test_check("multinomineq")
