@@ -7,9 +7,11 @@
 #'
 #' @param A a matrix defining the convex polytope via A*x <= b.
 #'    The columns of A do not include the last choice option per item type and
-#'    thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
-#'    for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).
-#' @param options the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
+#'    thus the number of columns must be equal to \code{sum(options-1)}
+#'    (e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
+#'    is \code{c(a1,a2, b1)}).
+#' @param options the number of choice options per item type,
+#'    e.g., \code{c(3,2)} for a ternary and binary item.
 #'     The sum of \code{options} must be equal to the length of \code{k}.
 #' @param k the number of choices for each alternative ordered by item type, e.g.
 #'     \code{c(a1,a2,a3, b1,b2)}.
@@ -39,7 +41,7 @@
 #'
 #' ### linear order constraints
 #' # a1<a2<a3   AND   b2<b3<.50
-#' # (note: a2<a3 <=> a2<1-a1-a2 <=> a1+2*a2<1)
+#' # (note: a2<a3 <=> a2 < 1-a1-a2 <=> a1+2*a2 < 1)
 #' # matrix A:
 #' #             (a1,a2, b1,b2,b3)
 #' A <- matrix(c(1, -1, 0,  0,  0,

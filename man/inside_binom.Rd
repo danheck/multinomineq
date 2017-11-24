@@ -25,8 +25,11 @@ as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b
 
 \item{V}{a matrix of vertices (one per row) that define the polytope of
 admissible parameters as the convex hull over these points
-(if provided, \code{A} and \code{b} are ignored). Note that this method
-is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
+(if provided, \code{A} and \code{b} are ignored).
+Similar as for \code{A}, columns of \code{V} omit the last value for each
+multinomial condition (e.g., a1,a2,a3,b1,b2 becomes a1,a2,b1).
+Note that this method is comparatively slow since it solves linear-programming problems
+to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.}
 
 \item{options}{only for \code{inside_multinom}: number of response options per item type.}
 }

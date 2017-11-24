@@ -2,9 +2,13 @@
 % Please edit documentation in R/sampling_polytope.R
 \name{sampling_multinom}
 \alias{sampling_multinom}
-\title{Posterior Sampling for Constrained Multinomial Models}
+\alias{sampling_binom}
+\title{Posterior Sampling for Inequality-Constrained Multinomial Models}
 \usage{
-sampling_multinom(k, options, A, b, prior = rep(1, sum(options)), M = 5000,
+sampling_multinom(k, options, A, b, V, prior = rep(1, sum(options)),
+  M = 5000, start, burnin = 10, progress = TRUE)
+
+sampling_binom(k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1), M = 5000,
   start, burnin = 10, progress = TRUE)
 }
 \arguments{
@@ -12,37 +16,75 @@ sampling_multinom(k, options, A, b, prior = rep(1, sum(options)), M = 5000,
 \code{c(a1,a2,a3, b1,b2)}.
 The default \code{k=0} is equivalent to sampling from the prior.}
 
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{the number of choice options per item type,
+e.g., \code{c(3,2)} for a ternary and binary item.
+ The sum of \code{options} must be equal to the length of \code{k}.}
 
-\item{A}{a matrix defining the convex polytope via A*x <= b.
-The columns of A do not include the last choice option per item type and
-thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
-for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
+\item{A}{a matrix with one row for each linear inequality constraint and one
+column for each of the free parameters. The parameter space is defined
+as all probabilities \code{x} that fulfill the order constraints  \code{A*x <= b}.}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
+
+\item{V}{a matrix of vertices (one per row) that define the polytope of
+admissible parameters as the convex hull over these points
+(if provided, \code{A} and \code{b} are ignored).
+Similar as for \code{A}, columns of \code{V} omit the last value for each
+multinomial condition (e.g., a1,a2,a3,b1,b2 becomes a1,a2,b1).
+Note that this method is comparatively slow since it solves linear-programming problems
+to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.}
 
 \item{prior}{the prior parameters of the Dirichlet-shape parameters.
 Must have the same length as \code{k}.}
 
-\item{M}{number of posterior samples drawn from the encompassing model}
+\item{M}{number of posterior samples}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{burnin}{number of burnin samples per step that are discarded. Since the
-maximum-likelihood estimate is used as a start value (which is updated
-during the stepwise procedure in \code{count_multinom}), the \code{burnin}
-number can be much smaller than in standard MCMC applications.}
+\item{burnin}{number of burnin samples that are discarded. Can be chosen to be
+small if the maxmimum-likelihood estimate is used as a starting value.}
 
 \item{progress}{whether a progress bar should be shown.}
+
+\item{n}{the number of choices per item type.}
+
+\item{map}{optional: numeric vector of the same length as \code{k} with integers
+mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
+thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
+Reversed probabilities \code{1-p} are coded by negative integers.
+Guessing probabilities of .50 are encoded by zeros. The default assumes
+different parameters for each item type: \code{map=1:ncol(A)}}
+}
+\value{
+a matrix with posterior samples for the multinomial probability parameters.
 }
 \description{
 Uses Gibbs sampling to draw posterior samples for
-multinomial models with linear inequality-constraints.
+binomial and multinomial models with linear inequality-constraints.
+}
+\details{
+Draws posterior samples for binomial/multinomial random utility models that
+assume a mixture over predefined preference orders/vertices that jointly define
+a convex polytope via the set of inequalities \code{A * x <= b} or as the
+convex hull of a set of vertices \code{V}.
 }
 \examples{
+############### binomial ##########################
+A <- matrix(c(1, 0, 0,   # x1 < .50
+              1, 1, 1,   # x1+x2+x3 < 1
+              0, 2, 2,   # 2*x2+2*x3 < 1
+              0, -1, 0,  # x2 > .2
+              0, 0, 1),  # x3 < .1
+            ncol = 3, byrow = TRUE)
+b <- c(.5, 1, 1, -.2, .1)
+samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
+head(samp)
+apply(samp, 2, plot, type = "l", ylim = c(0,.6))
+
+
+############### multinomial ##########################
 # binary and ternary choice:
 #           (a1,a2   b1,b2,b3)
 k       <- c(15,9,   5,2,17)
@@ -58,4 +100,10 @@ b <- c(.2, 1, -.2, .4)
 samp <- sampling_multinom(k, options, A, b)
 head(samp)
 apply(samp, 2, plot, type = "l", ylim = c(0, 1))
+}
+\references{
+Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
+}
+\seealso{
+\code{\link{count_multinom}}, \code{\link{ml_multinom}}
 }

@@ -121,6 +121,8 @@ check_Abokprior <- function (A, b, options, k, prior = rep(1, length(k))){
 
 
 check_Ab <- function(A, b, options = rep(2, ncol(A))){
+  if (length(options) == 1)
+    options <- rep(options, ncol(A) / (options - 1))
   if (is.null(dim(A)) ||  nrow(A) != length(b))
     stop("'A' must be a matrix with number of rows equal to the length of 'b'.")
   if (!is.numeric(A) || !is.numeric(b) || any(is.na(A)) || any(is.na(b)))
@@ -128,6 +130,7 @@ check_Ab <- function(A, b, options = rep(2, ncol(A))){
   check_ko(rep(0, sum(options)), options)
   if (ncol(A) != sum(options - 1))
     stop ("The number of columns in 'A' must be identical to sum(options-1).' ")
+  options
 }
 
 check_Abx <- function (A, b, x){
@@ -141,9 +144,14 @@ check_Abx <- function (A, b, x){
   }
 }
 
-check_V <- function(V){
+check_V <- function(V, options = 2){
+  if (length(options) == 1)
+    options <- rep(options, ncol(V) / (options - 1))
+  else if (sum(options - 1) != ncol(V))
+    stop ("V and options do not match: sum(options - 1) != ncol(V) ")
   if(is.null(dim(V)) ||  any(V < 0, V > 1))
     stop("The vertex representation 'V' must be provided as a numeric matrix with values in [0,1].")
+  options
 }
 
 check_Vx <- function (V, x){

@@ -1,20 +1,26 @@
 #' Transform Vertex/Inequality Representation of Polytope
 #'
-#' For convex polytopes: Uses \code{rPorta} (\url{https://github.com/TasCL/rPorta})
+#' For convex polytopes: Requires \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 #' to transform the vertex representation to/from the inequality representation.
 #'
 #' @param V a matrix with one vertex of a polytope per row
-#'        (i.e., the admissible preference orders of a random utility model)
+#'        (e.g., the admissible preference orders of a random utility model or any other theory).
+#'        Since the values have to sum up to one within each multinomial condition,
+#'        the last value of each multinomial is omitted
+#'        (e.g., the prediction 1-0-0/0-1 for a tri and binomial becomes 1-0/0).
+#' @inheritParams count_multinom
 #' @details
 #' Choice models can be represented as polytopes if they assume a latent
 #' mixture over a finite number preference patterns (random preference model).
 #' For the general approach and theory underlying binary and ternary choice models,
-#' see Regenwetter et al. (2012, 2014).
+#' see Regenwetter et al. (2012, 2014, 2017).
 #'
-#' Note that the transformation can be very slow and might require days of computing.
+#' Note that the transformation can be very slow and might require days or months
+#' of computing or not converge at all!
 #'
 #' @template ref_regenwetter2012
 #' @template ref_regenwetter2014
+#' @template ref_regenwetter2017
 #' @examples
 #' \dontrun{
 #' ######## (requires rPorta) ########
@@ -68,16 +74,20 @@
 #' }
 #' @export
 V_to_Ab <- function (V){
+  # options <- check_V(V, options)
+  check_V(V)
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
-  check_V(V)
   # use rPorta
   poi <- rPorta::as.poiFile(V)
   ieq <- rPorta::traf(poi)
   unlink("porta.log")
-  if (!all(ieq@inequalities@sign == -1))
-    warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1)")
+  if (!all(ieq@inequalities@sign == -1)){
+    warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1).",
+             "\n  Complete Porta object is returned.")
+    return (ieq)
+  }
   Ab <- ieq@inequalities@num / ieq@inequalities@den
   list("A" = Ab[,1:(ncol(Ab)-1 )], "b" = Ab[,ncol(Ab)])
 }
@@ -95,12 +105,11 @@ V_to_Ab <- function (V){
 #'
 #' @export
 Ab_to_V <- function (A, b, options = 2){
-  if (length(options) == 1)
-    options <- rep(options, ncol(A) / (options - 1))
   if (!requireNamespace("rPorta", quietly = TRUE))
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
-  check_Ab(A, b, options)
+
+  options <- check_Ab(A, b, options)
   tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
@@ -112,9 +121,9 @@ Ab_to_V <- function (A, b, options = 2){
 }
 
 
-#' Inequality Constraints for Product-Multinomial Probabilities
+#' Get Constraints for Product-Multinomial Probabilities
 #'
-#' Get or add inequality constraints that multinomial probabilities are
+#' Get or add inequality constraints (or vertices) to ensure that multinomial probabilities are
 #' positive and sum to one for all choice options within each item type.
 #'
 #' @inheritParams count_multinom
@@ -122,12 +131,19 @@ Ab_to_V <- function (A, b, options = 2){
 #' @param nonneg whether to add constraints that probabilities must be nonnegative
 #' @details
 #' If \code{A} and \code{b} are provided, the constraints are added to these inequality constraints.
+#' @seealso \code{\link{add_fixed}}
 #'
 #' @examples
 #' # three binary and two ternary choices:
 #' options <- c(2,2,2, 3,3)
 #' Ab_multinom(options)
 #' Ab_multinom(options, nonneg = TRUE)
+#'
+#' # convex hull of vertices (binomial and trinomial)
+#' V <- matrix(c(1,  0,0,
+#'               0,  1,0,
+#'               0, .5,.5), 3, 3, byrow = TRUE)
+#' V_multinom(options = c(2, 3),  V)
 #' @export
 Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   S <- sum(options - 1)
@@ -148,3 +164,9 @@ Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   list("A" = A_new, "b" = b_new)
 }
 
+# ' @rdname Ab_multinom
+# ' @inheritParams V_to_Ab
+# ' @export
+# V_multinom <- function (options, V){
+#   see: add_fixed
+# }

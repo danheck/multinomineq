@@ -2,9 +2,9 @@ Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Inequality-Constrained Multinomial Models
 Version: 0.0.0.9000
-Date: 2017-09-11
+Date: 2017-10-22
 Author: c(person("Daniel","Heck",email="heck@uni-mannheim.de",role=c("aut","cre")))
-Maintainer: Daniel Heck <heck@uni-mannheim.de>
+Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Description: Outcome-based strategy classification uses model selection methods
     (Bayes factor, minimum description length) to select the strategy that 
     provides the best account for a vector of observed choice frequencies.

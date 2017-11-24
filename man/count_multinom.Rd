@@ -13,20 +13,25 @@ count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
 \code{c(a1,a2,a3, b1,b2)}.
 The default \code{k=0} is equivalent to sampling from the prior.}
 
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{the number of choice options per item type,
+e.g., \code{c(3,2)} for a ternary and binary item.
+ The sum of \code{options} must be equal to the length of \code{k}.}
 
 \item{A}{a matrix defining the convex polytope via A*x <= b.
 The columns of A do not include the last choice option per item type and
-thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
-for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
+thus the number of columns must be equal to \code{sum(options-1)}
+(e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
+is \code{c(a1,a2, b1)}).}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
 \item{V}{a matrix of vertices (one per row) that define the polytope of
 admissible parameters as the convex hull over these points
-(if provided, \code{A} and \code{b} are ignored). Note that this method
-is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).}
+(if provided, \code{A} and \code{b} are ignored).
+Similar as for \code{A}, columns of \code{V} omit the last value for each
+multinomial condition (e.g., a1,a2,a3,b1,b2 becomes a1,a2,b1).
+Note that this method is comparatively slow since it solves linear-programming problems
+to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.}
 
 \item{prior}{the prior parameters of the Dirichlet-shape parameters.
 Must have the same length as \code{k}.}
@@ -83,7 +88,7 @@ options <- c(3,        4)
 
 ### linear order constraints
 # a1<a2<a3   AND   b2<b3<.50
-# (note: a2<a3 <=> a2<1-a1-a2 <=> a1+2*a2<1)
+# (note: a2<a3 <=> a2 < 1-a1-a2 <=> a1+2*a2 < 1)
 # matrix A:
 #             (a1,a2, b1,b2,b3)
 A <- matrix(c(1, -1, 0,  0,  0,

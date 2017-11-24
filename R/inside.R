@@ -13,8 +13,11 @@
 #' @param b a vector of the same length as the number of rows of \code{A}.
 #' @param V a matrix of vertices (one per row) that define the polytope of
 #'     admissible parameters as the convex hull over these points
-#'     (if provided, \code{A} and \code{b} are ignored). Note that this method
-#'     is comparatively slow since it solves a linear-programming problem for each point (Fukuda, 2004).
+#'     (if provided, \code{A} and \code{b} are ignored).
+#'     Similar as for \code{A}, columns of \code{V} omit the last value for each
+#'     multinomial condition (e.g., a1,a2,a3,b1,b2 becomes a1,a2,b1).
+#'     Note that this method is comparatively slow since it solves linear-programming problems
+#'     to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.
 #'
 #' @seealso \code{\link{Ab_to_V}} and \code{\link{V_to_Ab}} to change between A/b and V representation.
 #' @examples
@@ -23,6 +26,7 @@
 #'               0, 1,-1,
 #'               0, 0, 1), ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
+#'
 #' # vertices: admissible points (corners of polytope)
 #' V <- matrix(c( 0, 0, 0,
 #'                0, 0,.5,
@@ -94,7 +98,7 @@ inside_binom <- function(k, n, A, b, V){
 #' @rdname inside_binom
 #' @export
 inside_multinom <- function(k, options, A, b, V){
-  k_free <- k[- cumsum(options)]
+  k_free <- drop_fixed(k, options)
   sel <- rep(1:length(options), options - 1)
   n <- tapply(k, rep(1:length(options), options), sum)[sel]
   x <- k_free / n

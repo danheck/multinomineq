@@ -1,4 +1,4 @@
-
+library(testthat)
 test_that("transformation of A/b to V representation works",{
   skip_on_cran()
   skip_if_not_installed("rPorta")

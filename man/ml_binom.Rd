@@ -38,8 +38,9 @@ If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{...}{further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.}
 
-\item{options}{the number of choice options per item type, e.g., \code{c(3,2)} for a ternary and binary item.
-The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{the number of choice options per item type,
+e.g., \code{c(3,2)} for a ternary and binary item.
+ The sum of \code{options} must be equal to the length of \code{k}.}
 }
 \value{
 the list returned by the optimizer \code{\link[stats]{constrOptim}}.

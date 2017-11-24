@@ -11,12 +11,16 @@ Ab_to_V(A, b, options = 2)
 }
 \arguments{
 \item{V}{a matrix with one vertex of a polytope per row
-(i.e., the admissible preference orders of a random utility model)}
+(e.g., the admissible preference orders of a random utility model or any other theory).
+Since the values have to sum up to one within each multinomial condition,
+the last value of each multinomial is omitted
+(e.g., the prediction 1-0-0/0-1 for a tri and binomial becomes 1-0/0).}
 
 \item{A}{a matrix defining the convex polytope via A*x <= b.
 The columns of A do not include the last choice option per item type and
-thus the number of columns must be equal to \code{sum(options-1)} (e.g., the column order of \code{A}
-for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
+thus the number of columns must be equal to \code{sum(options-1)}
+(e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
+is \code{c(a1,a2, b1)}).}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
@@ -24,16 +28,17 @@ for \code{k = c(a1,a2,a2, b1,b2)} is \code{c(a1,a2, b1)}).}
 Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.}
 }
 \description{
-For convex polytopes: Uses \code{rPorta} (\url{https://github.com/TasCL/rPorta})
+For convex polytopes: Requires \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 to transform the vertex representation to/from the inequality representation.
 }
 \details{
 Choice models can be represented as polytopes if they assume a latent
 mixture over a finite number preference patterns (random preference model).
 For the general approach and theory underlying binary and ternary choice models,
-see Regenwetter et al. (2012, 2014).
+see Regenwetter et al. (2012, 2014, 2017).
 
-Note that the transformation can be very slow and might require days of computing.
+Note that the transformation can be very slow and might require days or months
+of computing or not converge at all!
 
 For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
 to ensure that all dimensions of the polytope satisfy:  0 <= p_i <= 1.
@@ -96,4 +101,6 @@ V_to_Ab(V)
 Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
 
 Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
+
+Regenwetter, M., & Robinson, M. M. (2017). The construct–behavior gap in behavioral decision research: A challenge beyond replicability. Psychological Review, 124(5), 533-550. https://doi.org/10.1037/rev0000067
 }

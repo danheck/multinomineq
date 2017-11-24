@@ -1,0 +1,1 @@
+#' @references Regenwetter, M., & Robinson, M. M. (2017). The construct–behavior gap in behavioral decision research: A challenge beyond replicability. Psychological Review, 124(5), 533-550. https://doi.org/10.1037/rev0000067
