@@ -1,3 +1,4 @@
+library("testthat")
 # models of Hilbig & Moshagen (2014)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)

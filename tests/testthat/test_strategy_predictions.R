@@ -1,3 +1,4 @@
+library("testthat")
 # models of Hilbig & Moshagen (2014)
 v <- c(.9, .8, .7, .6)
 cuesA <- matrix(c(1, 1, 1, -1,

@@ -1,3 +1,4 @@
+library("testthat")
 d <- 4
 A <- matrix(c(1, -1, 0, 0,
               0, 1, -1, 0,

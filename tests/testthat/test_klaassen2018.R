@@ -1,4 +1,3 @@
-library("multinomineq")
 library("testthat")
 
 # simulated data in Table 1

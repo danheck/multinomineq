@@ -12,9 +12,9 @@ V <- matrix(c( 0, 0, 0,
 #                1,0,0,
 #                1,0,1,
 #                0,1,1), ncol = 3, byrow = TRUE)
-V <- t(apply(V, 1, multinomineq:::add_fixed, options = options))
+# add_fixed(V, options)
 k <- c(3,4,2,  1,5)
-Ab <- V_to_Ab(V[,c(1:2,4)])
+Ab <- V_to_Ab(V)
 
 test_that("posterior sampling for vertex representation works", {
 
@@ -22,7 +22,7 @@ test_that("posterior sampling for vertex representation works", {
   u <- rpdirichlet(1e5, 1 + k, options, p_drop = TRUE)
   sel <- apply(u, 1, inside, A=Ab$A, b = Ab$b)
   s.AR <- u[sel,,drop = FALSE]
-  s.V <- sampling_V(k, options, V, M = 5000, start = s.AR[nrow(s.AR),])
+  s.V <- sampling_multinom(k, options, V = V, M = 5000, start = s.AR[nrow(s.AR),])
 
   # check whether all samples are inside polytope
   expect_true(all(apply(s.V, 1, inside, A = Ab$A, b = Ab$b)))
