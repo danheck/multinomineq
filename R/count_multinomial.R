@@ -30,7 +30,8 @@
 #' }
 #' with the attributes:
 #' \itemize{
-#'    \item\code{integral}: estimated probability that samples are in polytope
+#'    \item\code{proportion}: estimated probability that samples are in polytope
+#'    \item\code{se}: standard error of probability estimate
 #' }
 #' @template ref_hoijtink2011
 #' @examples
@@ -86,6 +87,5 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
                                     batch = BATCH, start, burnin, progress)
     }
   }
-  attr(count, "integral") <- get_integral(count)
-  count
+  as_ineq_count(count)
 }

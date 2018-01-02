@@ -53,7 +53,8 @@
 #' }
 #' with the attributes:
 #' \itemize{
-#'    \item\code{integral}: estimated probability that samples are in polytope
+#'    \item\code{proportion}: estimated probability that samples are in polytope
+#'    \item\code{se}: standard error of probability estimate
 #'    \item\code{const_map}: logarithm of the binomial constants that
 #'           have to be considered due to equality constraints
 #' }
@@ -77,7 +78,7 @@
 #'
 #' # count prior samples and compare to analytical result
 #' prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
-#' prior  # volume = attribute "integral"
+#' prior  # volume = attribute "proportion"
 #' (.50)^6 / factorial(6)
 #'
 #' # count posterior samples stepwise
@@ -130,7 +131,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     m <- M
     a <- c(rbind(k + prior[1], n - k + prior[2]))
     while (m > 0 ){
-      X <- rpdirichlet_free(m, a, rep(2, ncol(V)))
+      X <- rpdirichlet(m, a, rep(2, ncol(V)), p_drop = TRUE)
       count <- count + sum(inside_V(X, V))
       m <- m - BATCH
     }
@@ -138,11 +139,8 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
   } else {
     stop("A/b or V must be provided.")
   }
-  attr(count, "integral") <- get_integral(count)
-  attr(count, "const_map_0e") <- aggr$const_map_0e
+  count <- as_ineq_count(count)
+  attr(count, "const_map_0u") <- aggr$const_map_0u
   count
 }
 
-get_integral <- function(count){
-  prod(count[,"count"]/count[,"M"])
-}

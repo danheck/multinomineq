@@ -9,12 +9,18 @@
 #'     total number of samples. See \code{\link{count_binom}}.
 #' @param prior a vecotr or matrix similar as for \code{posterior}, but based on
 #'     samples from the prior distribution.
-#' @param beta prior parameters of beta distributions for estimating the standard error.
-#' @param samples number of samples from beta distributions used to approximate
-#'    the standard error. The default is Jeffreys' prior.
+#' @param exact_prior optional: the exact prior probabability of the order constraints.
+#'     For instance, \code{exact_prior=1/factorial(4)} if pi1<pi2<pi3<pi4 (and if  the prior is symmetric).
+#'     If provided, \code{prior} is ignored.
+#' @param log whether to return the log-Bayes factor instead of the Bayes factor
+#' @param beta prior shape parameters of the beta distributions used for approximating the
+#'     standard errors of the Bayes-factor estimates. The default is Jeffreys' prior.
+#' @param samples number of samples from beta distributions used to compute
+#'    standard errors.
 #'
-#' The encompassing model is the unconstrained baseline model that assumes a separate,
-#' unconstrained probability for each observable frequency. The Bayes factor is obtained
+#'
+#' The unconstrained (encompassing) model is the saturated baseline model that assumes a separate,
+#' independent probability for each observable frequency. The Bayes factor is obtained
 #' as the ratio of posterior/prior samples within an order-constrained subset of the
 #' parameter space.
 #'
@@ -34,33 +40,62 @@
 #' # matrix input (due to nested stepwise procedure)
 #' post <- cbind(count = c(139, 192), M = c(200, 1000))
 #' count_to_bf(post, prior)
+#'
+#' # exact prior probability known
+#' count_to_bf(posterior = c(count = 1447, M = 10000),
+#'             exact_prior = 1/factorial(4))
 #' @export
-count_to_bf <- function (posterior, prior, beta = c(.5, .5), samples = 3000){
+count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
+                         beta = c(1/2, 1/2), samples = 3000){
   posterior <- check_count(posterior)
-  prior <- check_count(prior)
   const <- 0
-  if (!is.null(attr(posterior, "const_map_0e"))){
-    const <- attr(posterior, "const_map_0e")
+  if (!is.null(attr(posterior, "const_map_0u"))){
+    const <- attr(posterior, "const_map_0u")
   }
-  est <- sum(log(posterior[,1] / posterior[,2])) -
-    sum(log(prior[,1] / prior[,2])) + const
+  s_post  <- sampling_proportion(posterior[,1], posterior[,2], log = TRUE,
+                                 beta = beta, samples = samples)
 
-  bpost  <- sampling_integral(posterior[,1], posterior[,2], log = TRUE, beta, samples)
-  bprior <- sampling_integral(prior[,1], prior[,2], log = TRUE, beta, samples)
-  lbf_0e <- bpost - bprior + const
-  lbf_e0 <- bprior - bpost + const
+  if (missing(exact_prior)){
+    prior <- check_count(prior)
+    s_prior <- sampling_proportion(prior[,1], prior[,2], log = TRUE,
+                                   beta = beta, samples = samples)
 
-  bf <- matrix(
-    c(exp(est),  exp(-est), est, - est,
-      sd(exp(lbf_0e)), sd(exp(lbf_e0)), sd(lbf_0e), sd(lbf_e0)),
-    4, 2,  dimnames = list(c("bf_0e", "bf_e0", "log_bf_0e", "log_bf_e0"),
-                           c("BF", "SE")))
+  } else{
+    if (is.null(exact_prior) || !is.numeric(exact_prior) || length(exact_prior) != 1 ||
+        exact_prior < 0 || exact_prior > 1)
+      stop("'prior' must be a probability in the interval [0,1].")
+    s_prior <- log(exact_prior)
+    prior <- t(c(exact_prior, 1))
+  }
+
+  l_post <- log(posterior[,1] / posterior[,2])
+  l_prior <- log(prior[,1] / prior[,2])
+  est <- sum(l_post) - sum(l_prior) + const
+  est_0n0 <- sum(l_post) - log(1 - exp(sum(l_post)))
+
+  lbf_0u <- s_post - s_prior + const
+  lbf_u0 <- s_prior - s_post + const
+  lbf_0n0 <- s_post - log(1 - exp(s_post))
+
+  if (log){
+    bf <- matrix(c(est, - est, est_0n0,
+                   sd(lbf_0u), sd(lbf_u0), sd(lbf_0n0)), 3, 2)
+  } else{
+    bf <- matrix(c(exp(est),  exp(-est), exp(est_0n0),
+                   sd(exp(lbf_0u)), sd(exp(lbf_u0)), sd(exp(lbf_0n0))), 3, 2)
+  }
+  dimnames(bf) <- list(paste0(ifelse(log, "log_", ""),
+                              c("bf_0u", "bf_u0", "bf_00'")), c("bf", "se"))
   bf
 }
 
+# check_bf <- function(bf){
+#   is.matrix(bf) && dim(bf) == c(3,2) && identical(dimnames(bf), DIMNAMES_BF)
+# }
+
 precision_count <- function(count, M, log = TRUE,
                             beta = c(.5, .5), samples = 5000){
-  s <- sampling_integral(count, M, log = TRUE, beta, samples)
+  s <- sampling_proportion(count, M, log = TRUE, beta, samples)
   if (log){
     sd(s)
   } else {
@@ -68,7 +103,7 @@ precision_count <- function(count, M, log = TRUE,
   }
 }
 
-sampling_integral <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 5000){
+sampling_proportion <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 5000){
   S <- length(count)
   if (length(M) == 1)
     M <- rep(M, S)
@@ -84,13 +119,13 @@ sampling_integral <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 
   }
 }
 
-sampling_beta <- function (count, M, beta = c(.5, .5), samples = 5000){
-  S <- length(count)
-  if (length(M) == 1)
-    M <- rep(M, S)
-  probs <- matrix(NA, samples, S)
-  for (s in 1:S){
-    probs[,s]  = rbeta(samples, count[s] + beta[1], M[s] - count[s]  + beta[2])
-  }
-  probs
-}
+# sampling_beta <- function (count, M, beta = c(.5, .5), samples = 5000){
+#   S <- length(count)
+#   if (length(M) == 1)
+#     M <- rep(M, S)
+#   probs <- matrix(NA, samples, S)
+#   for (s in 1:S){
+#     probs[,s]  = rbeta(samples, count[s] + beta[1], M[s] - count[s]  + beta[2])
+#   }
+#   probs
+# }
