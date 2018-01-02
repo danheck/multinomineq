@@ -22,13 +22,11 @@ extern SEXP _multinomineq_ppp_mult(SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_rbeta_trunc(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_rdirichlet(SEXP, SEXP);
 extern SEXP _multinomineq_rep_options(SEXP, SEXP);
-extern SEXP _multinomineq_rpdirichlet(SEXP, SEXP, SEXP);
-extern SEXP _multinomineq_rpdirichlet_free(SEXP, SEXP, SEXP);
+extern SEXP _multinomineq_rpdirichlet(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_rpm_mat(SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_sampling_bin(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_sampling_hitandrun(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_sampling_mult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _multinomineq_shed_options(SEXP, SEXP);
 extern SEXP _multinomineq_start_random(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _multinomineq_sum_options(SEXP, SEXP);
 
@@ -47,13 +45,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_multinomineq_rbeta_trunc",          (DL_FUNC) &_multinomineq_rbeta_trunc,           4},
     {"_multinomineq_rdirichlet",           (DL_FUNC) &_multinomineq_rdirichlet,            2},
     {"_multinomineq_rep_options",          (DL_FUNC) &_multinomineq_rep_options,           2},
-    {"_multinomineq_rpdirichlet",          (DL_FUNC) &_multinomineq_rpdirichlet,           3},
-    {"_multinomineq_rpdirichlet_free",     (DL_FUNC) &_multinomineq_rpdirichlet_free,      3},
+    {"_multinomineq_rpdirichlet",          (DL_FUNC) &_multinomineq_rpdirichlet,           4},
     {"_multinomineq_rpm_mat",              (DL_FUNC) &_multinomineq_rpm_mat,               3},
     {"_multinomineq_sampling_bin",         (DL_FUNC) &_multinomineq_sampling_bin,          9},
     {"_multinomineq_sampling_hitandrun",   (DL_FUNC) &_multinomineq_sampling_hitandrun,    6},
     {"_multinomineq_sampling_mult",        (DL_FUNC) &_multinomineq_sampling_mult,         9},
-    {"_multinomineq_shed_options",         (DL_FUNC) &_multinomineq_shed_options,          2},
     {"_multinomineq_start_random",         (DL_FUNC) &_multinomineq_start_random,          4},
     {"_multinomineq_sum_options",          (DL_FUNC) &_multinomineq_sum_options,           2},
     {NULL, NULL, 0}

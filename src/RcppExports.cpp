@@ -197,40 +197,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rpdirichlet
-arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options);
-RcppExport SEXP _multinomineq_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
+arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options, const bool p_drop);
+RcppExport SEXP _multinomineq_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP, SEXP p_dropSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const unsigned int >::type n(nSEXP);
     Rcpp::traits::input_parameter< const arma::vec >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< const arma::vec >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rpdirichlet(n, alpha, options));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rpdirichlet_free
-arma::mat rpdirichlet_free(const unsigned int n, const arma::vec alpha, const arma::vec options);
-RcppExport SEXP _multinomineq_rpdirichlet_free(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const unsigned int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rpdirichlet_free(n, alpha, options));
-    return rcpp_result_gen;
-END_RCPP
-}
-// shed_options
-arma::vec shed_options(arma::vec x, const arma::vec options);
-RcppExport SEXP _multinomineq_shed_options(SEXP xSEXP, SEXP optionsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const arma::vec >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(shed_options(x, options));
+    Rcpp::traits::input_parameter< const bool >::type p_drop(p_dropSEXP);
+    rcpp_result_gen = Rcpp::wrap(rpdirichlet(n, alpha, options, p_drop));
     return rcpp_result_gen;
 END_RCPP
 }

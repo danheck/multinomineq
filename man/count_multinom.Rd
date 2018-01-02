@@ -71,7 +71,8 @@ a matrix with the columns
 }
 with the attributes:
 \itemize{
-   \item\code{integral}: estimated probability that samples are in polytope
+   \item\code{proportion}: estimated probability that samples are in polytope
+   \item\code{se}: standard error of probability estimate
 }
 }
 \description{

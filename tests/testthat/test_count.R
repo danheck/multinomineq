@@ -20,17 +20,17 @@ test_that("counting methods work", {
   expect_equal(cnt / M, V, tol = .005)
 
   c2 <- count_binom(0, 0, A=A, b=b, M = M)
-  expect_equal(attr(c2, "integral"), V, tol = .005)
+  expect_equal(attr(c2, "proportion"), V, tol = 5*attr(c2, "se"))
   c3 <- count_binom(0, 0, A=A, b=b, M = M)
-  expect_equal(attr(c3, "integral"), V, tol = .005)
+  expect_equal(attr(c3, "proportion"), V, tol = 5*attr(c3, "se"))
 
   c4 <- count_binom(0, 0, A=A, b=b, M = 1e5,  steps = 2:3)
   c4
-  expect_equal(attr(c4, "integral"), V, tol = .0005)
+  expect_equal(attr(c4, "proportion"), V, tol = 5*attr(c4, "se"))
 
   c5 <- count_binom(0, 0, A=A, b=b, M = 1e5,  cmin = 1000)
   c5
-  expect_equal(attr(c5, "integral"), V, tol = .0005)
+  expect_equal(attr(c5, "proportion"), V, tol = 5*attr(c5, "se"))
 
 
 })

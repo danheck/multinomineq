@@ -54,6 +54,7 @@ test_that("NIRT axioms match with Rasch predictions", {
 
 test_that("ISOP matches the results of sirt package",{
   if(FALSE){
+    library(sirt)
     data(data.read)
     dat <- as.matrix( data.read)
     dat.resp <- 1 - is.na(dat) # response indicator matrix

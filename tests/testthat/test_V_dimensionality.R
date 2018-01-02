@@ -40,26 +40,29 @@ test_that("dimensionality of V works", {
   expect_true(inside(p_free, V = V_free))
   expect_true(inside(multinomineq:::add_fixed(p_free, options), V=V))
 
-  d <- c(1,0,0,0,0,0,0,0,0)
-  p
 
-  sampling_V(k = c(4,2,19,4,2,15), options = rep(3,3), V_free, M = 30) #, start = s.Ab[20000,])
+  # undebug(multinomineq:::sampling_V)
+  expect_silent(pp <- sampling_multinom(k = c(4,2,3,  19,4,2,  2,15,10),
+                                        options = rep(3,3), V = V_free, M = 100))
+  expect_true(all(inside(pp, V = V_free)))
+  expect_true(all(inside(add_fixed(pp, options), V = V)))
 
-  library(Rglpk)
-
-  # variables: c(lambda, alpha_1, ..., alpha_M)
-  obj <- c(1, rep(0, nrow(V)))
-
-  mat <- rbind(rep(c(0, 1), c(1, nrow(V))), # sum(alpha) = 1
-               cbind(d, - t(V)))            # intersection p+lambda*d = sum(alpha*V)
-  dir <- c(rep("==", 1 + ncol(V)))
-  rhs <- c(1, - p)
-  lp <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE)
-  target <- p + (lp$optimum+.000000001) * d
-  inside(target, V = V)
-  p[d] + lp$optimum
-  target
-  p
+  ################### here: V with fixed dimensions!
+  # library(Rglpk)
+  # d <- c(1,0,0, 0,0,0, 0,0,0)
+  # # variables: c(lambda, alpha_1, ..., alpha_M)
+  # obj <- c(1, rep(0, nrow(V)))
+  #
+  # mat <- rbind(rep(c(0, 1), c(1, nrow(V))), # sum(alpha) = 1
+  #              cbind(d, - t(V)))            # intersection p+lambda*d = sum(alpha*V)
+  # dir <- c(rep("==", 1 + ncol(V)))
+  # rhs <- c(1, - p)
+  # lp <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE)
+  # target <- p + (lp$optimum+.000000001) * d
+  # inside(target, V = V)
+  # p[d] + lp$optimum
+  # target
+  # p
 
   ####  alpha >= 0 by default in Rglpk!
   # M <- nrow(V)

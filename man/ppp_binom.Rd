@@ -7,25 +7,28 @@
 \usage{
 ppp_binom(prob, k, n, by)
 
-ppp_multinom(prob, k, options)
+ppp_multinom(prob, k, options, p_drop = TRUE)
 }
 \arguments{
-\item{prob}{vector with probability parameters or a matrix with one vector per row,
-(in which case \code{M} is ignored).
-Values must be nonnegative and smaller than 1 for \code{rpbinom} and
-nonnegative and sum to one within each option for \code{rpmultinom}.
-See \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
+\item{prob}{vector with probabilities or a matrix with one probability vector per row.
+For \code{rpbinom}: probabilities of a success for each option.
+For \code{rpmultinom}: probabilities of all categories excluding
+the last category for each option (cf. \code{p_drop}).
+See also \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{k}{the number of Option B choices.
 The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
 
 \item{n}{integer vector, specifying the number of trials for each binomial/multinomial distribution
-(note: this is the \code{size} argument in \code{\link[stats]{rmultinom}}).}
+Note that this is the \code{size} argument in \code{rmultinom}, cf. \code{\link[stats]{Multinom}}.}
 
 \item{by}{optional: a vector of the same length as \code{k} indicating factor levels
 by which the posterior-predictive checks should be split (e.g., by item sets).}
 
-\item{options}{number of parameters/categories of each multinomial distribution.}
+\item{options}{number of categories/probabilities for each option/multinomial distribution.}
+
+\item{p_drop}{whether the output matrix includes the last probability for each category
+(which is not a free parameter since probabilities must sum to one).}
 }
 \description{
 Uses posterior samples to get posterior-predicted frequencies and compare

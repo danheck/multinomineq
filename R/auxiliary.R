@@ -37,28 +37,24 @@ BATCH <- 50000
 drop_fixed <- function(x, options = 2)
   UseMethod("drop_fixed", x)
 
-#' @rdname drop_fixed
 #' @export
 drop_fixed.matrix <- function(x, options = 2){
-  if (length(options) == 1)
-    options <- rep(options, ncol(V) / (options - 1))
+  options <- rep_options(options, x[1,], p_drop = FALSE)
   xn <- x[,- cumsum(options), drop = FALSE]
   if (is.null(colnames(xn)))
     colnames(xn) <- index_mult(options, fixed = FALSE)
   xn
 }
 
-#' @rdname drop_fixed
 #' @export
 drop_fixed.data.frame <- function(x, options = 2){
   drop_fixed.matrix(x, options)
 }
 
-#' @rdname drop_fixed
 #' @export
 drop_fixed.default <- function(x, options = 2){
-  if (length(options) == 1)
-    options <- rep(options, length(x) / options)
+  options <- rep_options(options, x, p_drop = FALSE)
+  check_ko(k = x, options = options, label = "x")
   xn <- x[- cumsum(options)]
   if (is.null(names(xn)))
     names(xn) <- index_mult(options, fixed = FALSE)
@@ -75,11 +71,10 @@ add_fixed <- function(x, options = 2, sum = 1){
   UseMethod("add_fixed", x)
 }
 
-#' @rdname drop_fixed
+# ' @rdname drop_fixed
 #' @export
 add_fixed.matrix <- function(x, options = 2, sum = 1){
-  if (length(options) == 1)
-    options <- rep(options, ncol(V) / (options - 1))
+  options <- rep_options(options, x[1,])
   if (length(sum) == 1)
     sum <- rep(sum, length(options))
   xn <- matrix(NA, nrow(x), sum(options))
@@ -98,13 +93,13 @@ add_fixed.matrix <- function(x, options = 2, sum = 1){
   xn
 }
 
-#' @rdname drop_fixed
+# ' @rdname drop_fixed
 #' @export
 add_fixed.data.frame <- function(x, options = 2, sum = 1){
   add_fixed.matrix(x, options, sum)
 }
 
-#' @rdname drop_fixed
+# ' @rdname drop_fixed
 #' @export
 add_fixed.default <- function(x, options = 2, sum = 1){
   add_fixed.matrix(t(x), options, sum)[1,]
@@ -119,9 +114,23 @@ add_fixed.default <- function(x, options = 2, sum = 1){
   # k_all
 }
 
+
+
 index_free_to_fixed <- function(i, options){
   option <- rep(1:length(options), options - 1)[i]
   i + option - 1
+}
+
+rep_options <- function(options, x, p_drop = TRUE){
+  if (length(options) == 1){
+    times <- length(x) / (options - p_drop)
+    if (times != round(times))
+      stop("Check input: The length/number of columns of 'x' is not a multiple of (options-1)")
+    options <- rep(options, times)
+  } else if (length(x) != sum(options - p_drop)){
+    stop("Length of 'options' does not match number of frequencies/probabilities/columns.")
+  }
+  options
 }
 
 k_to_prob <- function(k, options = rep(2, length(k) / 2)){

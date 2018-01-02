@@ -4,7 +4,8 @@
 \alias{count_to_bf}
 \title{Compute Bayes Factor Using Prior/Posterior Counts}
 \usage{
-count_to_bf(posterior, prior, beta = c(0.5, 0.5), samples = 3000)
+count_to_bf(posterior, prior, exact_prior, log = FALSE, beta = c(1/2, 1/2),
+  samples = 3000)
 }
 \arguments{
 \item{posterior}{a vector (or matrix) with entries (or columns)
@@ -14,13 +15,21 @@ total number of samples. See \code{\link{count_binom}}.}
 \item{prior}{a vecotr or matrix similar as for \code{posterior}, but based on
 samples from the prior distribution.}
 
-\item{beta}{prior parameters of beta distributions for estimating the standard error.}
+\item{exact_prior}{optional: the exact prior probabability of the order constraints.
+For instance, \code{exact_prior=1/factorial(4)} if pi1<pi2<pi3<pi4 (and if  the prior is symmetric).
+If provided, \code{prior} is ignored.}
 
-\item{samples}{number of samples from beta distributions used to approximate
-   the standard error. The default is Jeffreys' prior.
+\item{log}{whether to return the log-Bayes factor instead of the Bayes factor}
 
-The encompassing model is the unconstrained baseline model that assumes a separate,
-unconstrained probability for each observable frequency. The Bayes factor is obtained
+\item{beta}{prior shape parameters of the beta distributions used for approximating the
+standard errors of the Bayes-factor estimates. The default is Jeffreys' prior.}
+
+\item{samples}{number of samples from beta distributions used to compute
+   standard errors.
+
+
+The unconstrained (encompassing) model is the saturated baseline model that assumes a separate,
+independent probability for each observable frequency. The Bayes factor is obtained
 as the ratio of posterior/prior samples within an order-constrained subset of the
 parameter space.
 
@@ -29,7 +38,13 @@ ratios from beta distributions, with parameters defined by the posterior/prior c
 (see Hoijtink, 2011; p. 211).}
 }
 \value{
-a matrix with estiamtes (first column) and standard errors (second column) for the Bayes factor and log BF of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
+a matrix with two columns (Bayes factor and SE of approximation) and three rows:
+    \itemize{
+      \item \code{`bf_0u`}:  constrained vs. unconstrained (saturated) model
+      \item \code{`bf_u0`}:  unconstrained vs. constrained model
+      \item \code{`bf_00'`}: constrained vs. complement of inequality-constrained model
+             (e.g., pi>.2 becomes pi<=.2; this assumes identical equality constraints for both models)
+    }
 }
 \description{
 Computes the encompassing Bayes factor (and standard error) defined as the
@@ -44,6 +59,10 @@ count_to_bf(post, prior)
 # matrix input (due to nested stepwise procedure)
 post <- cbind(count = c(139, 192), M = c(200, 1000))
 count_to_bf(post, prior)
+
+# exact prior probability known
+count_to_bf(posterior = c(count = 1447, M = 10000),
+            exact_prior = 1/factorial(4))
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

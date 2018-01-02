@@ -19,9 +19,9 @@ Ab <- V_to_Ab(V[,c(1:2,4)])
 test_that("posterior sampling for vertex representation works", {
 
   ###### check: accept-reject
-  u <- rpdirichlet(1e5, 1 + k, options)
-  sel <- apply(u[,c(1:2,4)], 1, inside, A=Ab$A, b = Ab$b)
-  s.AR <- u[sel,c(1:2,4),drop = FALSE]
+  u <- rpdirichlet(1e5, 1 + k, options, p_drop = TRUE)
+  sel <- apply(u, 1, inside, A=Ab$A, b = Ab$b)
+  s.AR <- u[sel,,drop = FALSE]
   s.V <- sampling_V(k, options, V, M = 5000, start = s.AR[nrow(s.AR),])
 
   # check whether all samples are inside polytope

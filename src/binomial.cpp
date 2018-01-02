@@ -7,8 +7,7 @@ using namespace Rcpp;
 // sample from truncated beta distribution using the inverse cdf method
 // [[Rcpp::export]]
 double rbeta_trunc(const double shape1, const double shape2,
-                   const double min, const double max)
-{
+                   const double min, const double max){
   double pmin = R::pbeta(min, shape1, shape2, 0, false);
   double pmax = R::pbeta(max, shape1, shape2, 0, false);
   double u = R::runif(0, 1);
@@ -16,25 +15,21 @@ double rbeta_trunc(const double shape1, const double shape2,
 }
 
 // beta-distribution sampling (for conjugate beta)
-arma::mat rbeta_mat(const unsigned int n, const arma::vec shape1, const arma::vec shape2)
-{
+arma::mat rbeta_mat(const unsigned int n, const arma::vec shape1, const arma::vec shape2){
   const unsigned int D = shape1.n_elem;
   mat X(n, D);
-  for (unsigned int d = 0 ; d < D ; d++)
-  {
+  for (unsigned int d = 0 ; d < D ; d++){
     X.col(d) = vec(rbeta(n, shape1(d), shape2(d)));
   }
   return X;
 }
 
 arma::mat rbeta_mat(const unsigned int n, const unsigned int D,
-                    const double shape1, const double shape2)
-{
+                    const double shape1, const double shape2){
   return rbeta_mat(n, shape1 * ones(D), shape2 * ones(D));
 }
 
-arma::ivec rpb_vec(const arma::vec prob, const arma::vec n)
-{
+arma::ivec rpb_vec(const arma::vec prob, const arma::vec n){
   unsigned int I = prob.n_elem;
   arma::ivec k(I);
   for(unsigned int i = 0; i < I; i++)
@@ -43,12 +38,10 @@ arma::ivec rpb_vec(const arma::vec prob, const arma::vec n)
 }
 
 // [[Rcpp::export]]
-NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec& n)
-{
+NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec& n){
   const unsigned int M = prob.n_rows;
   vec tt, kpp, x2o(M), x2p(M);
-  for(unsigned int m = 0; m < M; m++)
-  {
+  for(unsigned int m = 0; m < M; m++){
     tt = conv_to< colvec >::from(prob.row(m));
     kpp = conv_to< vec >::from(rpb_vec(tt, n));
     x2o(m) = x2(k, tt % n);
@@ -68,8 +61,7 @@ NumericVector ppp_bin(const arma::mat& prob, const arma::vec& k, const arma::vec
 arma::mat sampling_bin(const arma::vec& k, const arma::vec& n,
                        const arma::mat& A, const arma::vec& b,
                        const arma::vec& prior, const unsigned int M, arma::vec start,
-                       const unsigned int burnin = 5, const bool progress = true)
-{
+                       const unsigned int burnin = 5, const bool progress = true){
   unsigned int D = A.n_cols;    // dimensions
   mat X(D, M + burnin);     // initialize posterior (column-major ordering)
   X.col(0) = start_random(A, b, M, start);
@@ -80,16 +72,14 @@ arma::mat sampling_bin(const arma::vec& k, const arma::vec& n,
   uvec Apos, Aneg;
   IntegerVector idx = seq_len(D) - 1;
   unsigned int j = 0;
-  for (unsigned int i = 1 ; i < M + burnin; i++)
-  {
+  for (unsigned int i = 1 ; i < M + burnin; i++){
     p.increment();   // update progress bar
     if(i % 1000 == 0) Rcpp::checkUserInterrupt();
     // copy old and update to new parameters:
     X.col(i) = X.col(i-1);
     idx = sample(idx, D, false);
 
-    for (unsigned int m = 0; m < D; m++)
-    {
+    for (unsigned int m = 0; m < D; m++){
       j = idx(m);
       // get min/max for truncated beta:
       bmax = 1.; bmin = 0.;
@@ -112,13 +102,11 @@ arma::mat sampling_bin(const arma::vec& k, const arma::vec& n,
 NumericMatrix count_bin(const arma::vec& k, const arma::vec& n,
                         const arma::mat& A, const arma::vec& b,
                         const arma::vec& prior, const unsigned int M,
-                        const unsigned int batch, const bool progress = true)
-{
+                        const unsigned int batch, const bool progress = true){
   Progress p(M/batch, progress);
   int count = 0, todo = M;
   mat X;
-  while (todo > 0)
-  {
+  while (todo > 0){
     p.increment();   // update progress bar
     Rcpp::checkUserInterrupt();
     // count prior and posterior samples that match constraints:
@@ -137,8 +125,7 @@ NumericMatrix count_stepwise_bin(const arma::vec& k, arma::vec& n,
                                  const arma::mat& A, arma::vec& b, const arma::vec& prior,
                                  arma::vec M, arma::vec steps, const unsigned int batch,
                                  arma::vec start, const unsigned int burnin,
-                                 const bool progress = true)
-{
+                                 const bool progress = true){
   steps = sort_steps(steps - 1, A.n_rows);  // C++ --> R indexing!!
   unsigned int S = steps.n_elem;    // number of unique steps
   if (M.n_elem == 1)
@@ -153,16 +140,14 @@ NumericMatrix count_stepwise_bin(const arma::vec& k, arma::vec& n,
         b.subvec(0, steps(0)), prior, M(0), batch, false)(0,0);
 
   // go from  A[0:steps(s-1),] ---> A[0:steps(s),]
-  for (unsigned int s = 1; s < S ; s++)
-  {
+  for (unsigned int s = 1; s < S ; s++){
     Rcpp::checkUserInterrupt();
     if (progress) Rcout << (s==1 ? " step: " : " , ") << s;
     sample = sampling_bin(k, n, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
                           prior, M(s), starts.row(s-1).t(), burnin, false);
     inside = inside_Ab(sample, A.rows(steps(s-1) + 1, steps(s)),
                        b.subvec(steps(s-1) + 1, steps(s)));
-    if (any(inside))
-    {
+    if (any(inside)){
       inside_idx = find(inside);
       starts.row(s) = sample.row(inside_idx(inside_idx.n_elem - 1));
     }
@@ -178,8 +163,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
                              arma::vec count, arma::vec M, arma::vec steps,
                              const unsigned int M_iter, const unsigned int cmin,
                              const unsigned int maxiter, arma::vec start,
-                             const unsigned int burnin, const bool progress = true)
-{
+                             const unsigned int burnin, const bool progress = true){
   steps = steps - 1; // R --> C++ indexing
   vec inside;
   uvec inside_idx;
@@ -187,8 +171,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
   mat starts(steps.n_elem, A.n_cols);
   for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
   int i, from, iter = 0;  // from: can be negative!
-  while(count.min() < cmin)
-  {
+  while(count.min() < cmin){
     Rcpp::checkUserInterrupt();
     if (progress && iter % (maxiter/100) == 0)
       Rcout << (iter== 0 ? " current cmin: " : " , ") << count.min();
@@ -198,8 +181,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
     from = (i == 0) ? -1 : steps(i-1);  // i==0: start at A(0,:)
 
     // sampling for step with minimal counts
-    if (i == 0)
-    {
+    if (i == 0){
       prob = rbeta_mat(M_iter, k + prior(0), n - k + prior(1));
     }  else {
       prob = sampling_bin(k, n, A.rows(0, from), b.subvec(0, from),
@@ -209,8 +191,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
     // count samples
     inside = inside_Ab(prob, A.rows(from + 1, steps(i)),
                        b.subvec(from + 1, steps(i)));
-    if (any(inside))
-    {
+    if (any(inside)){
       inside_idx = find(inside);
       starts.row(i) = prob.row(inside_idx(inside_idx.n_elem - 1));
     }
@@ -229,8 +210,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
 // [[Rcpp::export]]
 arma::mat sampling_hitandrun(const arma::mat& A, const arma::vec& b,
                              const unsigned int M, arma::vec start,
-                             const unsigned int burnin = 5, const bool progress = true)
-{
+                             const unsigned int burnin = 5, const bool progress = true){
   unsigned int D = A.n_cols;    // dimensions
   mat X(D, M + burnin);     // initialize posterior (column-major ordering)
   X.col(0) = start_random(A, b, M, start);
@@ -239,8 +219,7 @@ arma::mat sampling_hitandrun(const arma::mat& A, const arma::vec& b,
   double bmax = 1, bmin = 0;
   vec rhs, u, x, z;
   uvec Apos, Aneg;
-  for (unsigned int i = 1 ; i < M + burnin; i++)
-  {
+  for (unsigned int i = 1 ; i < M + burnin; i++){
     p.increment();   // update progress bar
     if(i % 1000 == 0) Rcpp::checkUserInterrupt();
     // random direction

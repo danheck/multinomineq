@@ -46,9 +46,11 @@ ppp_binom <- function(prob, k, n, by){
 
 #' @rdname ppp_binom
 #' @export
-ppp_multinom <- function(prob, k, options){
-  check_probko(prob, k, options)
-  ppp_mult(free_to_full(prob, options), k, options)
+ppp_multinom <- function(prob, k, options, p_drop = TRUE){
+  check_probko(prob, k, options, p_drop = p_drop)
+  if (p_drop)
+    prob <- add_fixed(prob, options)
+  ppp_mult(prob, k, options)
 
   ### TODO: by factor (necessary within C++!  => multinomial sampling)
   # idea: provide integer vector and use   find(by == i)  in RcppArmadillo
@@ -79,19 +81,20 @@ pred_mult <- function(tf, k, options){
   k_pred
 }
 
-free_to_full <- function(prob, options){
-  oo <- rep(1:length(options), options - 1)
-  if (is.null(dim(prob))){
-    p_J <- 1 - tapply(prob, oo, function(x) sum(x))
-    full <- unlist(mapply(c, by(prob, oo, list), p_J))
-  } else {
-    p_J <- by(data.frame(t(prob)), oo, function(x) 1 - colSums(x))
-    o_list <- mapply(rbind, by(t(prob), oo, list), p_J, SIMPLIFY = FALSE)
-    full <- t(do.call("rbind", o_list))
-    colnames(full) <- index_mult(options)
-  }
-  full
-}
+# redundant due to add_fixed!
+# free_to_full <- function(prob, options){
+#   oo <- rep(1:length(options), options - 1)
+#   if (is.null(dim(prob))){
+#     p_J <- 1 - tapply(prob, oo, function(x) sum(x))
+#     full <- unlist(mapply(c, by(prob, oo, list), p_J))
+#   } else {
+#     p_J <- by(data.frame(t(prob)), oo, function(x) 1 - colSums(x))
+#     o_list <- mapply(rbind, by(t(prob), oo, list), p_J, SIMPLIFY = FALSE)
+#     full <- t(do.call("rbind", o_list))
+#     colnames(full) <- index_mult(options)
+#   }
+#   full
+# }
 
 # bin_to_mult <- function(k){
 #   list("k" = rep(k, each = 2), "options" = rep(2, length(k)))

@@ -138,12 +138,6 @@ Ab_to_V <- function (A, b, options = 2){
 #' options <- c(2,2,2, 3,3)
 #' Ab_multinom(options)
 #' Ab_multinom(options, nonneg = TRUE)
-#'
-#' # convex hull of vertices (binomial and trinomial)
-#' V <- matrix(c(1,  0,0,
-#'               0,  1,0,
-#'               0, .5,.5), 3, 3, byrow = TRUE)
-#' V_multinom(options = c(2, 3),  V)
 #' @export
 Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   S <- sum(options - 1)
@@ -164,6 +158,11 @@ Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
   list("A" = A_new, "b" = b_new)
 }
 
+# ' # convex hull of vertices (binomial and trinomial)
+# ' V <- matrix(c(1,  0,0,
+# '               0,  1,0,
+# '               0, .5,.5), 3, 3, byrow = TRUE)
+# ' V_multinom(options = c(2, 3),  V)
 # ' @rdname Ab_multinom
 # ' @inheritParams V_to_Ab
 # ' @export

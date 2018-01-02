@@ -40,7 +40,7 @@ k <- c(19,132,     0, 9,       11, 52,     6,97)
 # Model2: p000*p101 < p100*p001 & p010*p111 < p110*p011
 model2 <- function(x)
    x[1]*x[6] < x[5]*x[2] & x[3]*x[8] < x[7]*x[4]
-bf_nonlinear(k, 8, model2, M=1e5)  # K&H07: BF_0e=1.62
+bf_nonlinear(k, 8, model2, M=1e5)  # K&H07: bf_0u=1.62
 }
 \references{
 Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}

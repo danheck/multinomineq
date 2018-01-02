@@ -130,22 +130,22 @@ test_that("strategy_to_Ab returns the correct A/b representation",{
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
 
   strat <- list(pattern =-c(4:1),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
 
   strat <- list(pattern =c(1,-5,2,-3),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
   m1 <- strategy_postprob(k, n, list(strat, b))
-  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0e",1], tol = 3*bf["log_bf_0e",2])
+  bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
+  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
 })

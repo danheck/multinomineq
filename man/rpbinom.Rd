@@ -3,23 +3,26 @@
 \name{rpbinom}
 \alias{rpbinom}
 \alias{rpmultinom}
-\title{Random Sample for Product-Multinomial Distribution}
+\title{Random Generation for Independent Multinomial Distributions}
 \usage{
 rpbinom(prob, n)
 
-rpmultinom(prob, n, options)
+rpmultinom(prob, n, options, p_drop = TRUE)
 }
 \arguments{
-\item{prob}{vector with probability parameters or a matrix with one vector per row,
-(in which case \code{M} is ignored).
-Values must be nonnegative and smaller than 1 for \code{rpbinom} and
-nonnegative and sum to one within each option for \code{rpmultinom}.
-See \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
+\item{prob}{vector with probabilities or a matrix with one probability vector per row.
+For \code{rpbinom}: probabilities of a success for each option.
+For \code{rpmultinom}: probabilities of all categories excluding
+the last category for each option (cf. \code{p_drop}).
+See also \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{n}{integer vector, specifying the number of trials for each binomial/multinomial distribution
-(note: this is the \code{size} argument in \code{\link[stats]{rmultinom}}).}
+Note that this is the \code{size} argument in \code{rmultinom}, cf. \code{\link[stats]{Multinom}}.}
 
-\item{options}{number of parameters/categories of each multinomial distribution.}
+\item{options}{number of categories/probabilities for each option/multinomial distribution.}
+
+\item{p_drop}{whether the output matrix includes the last probability for each category
+(which is not a free parameter since probabilities must sum to one).}
 }
 \value{
 a matrix with one vector of frequencies per row. For \code{rpbinom}, only
@@ -27,16 +30,22 @@ a matrix with one vector of frequencies per row. For \code{rpbinom}, only
    complete frequency vectors (which sum to \code{n} within each option) are returned.
 }
 \description{
-Generate random samples from independent multinomial distributions.
+Generates random draws from independent multinomial distributions (= product-multinomial \code{pmultinom}).
 }
 \examples{
-# 5 binomials
-rpbinom(c(.2, .7, .9), c(10, 50, 30))
+# 3 binomials
+rpbinom(prob = c(.2, .7, .9), n = c(10, 50, 30))
 
 # 2 and 3 options:  [a1,a2,  b1,b2,b3]
-options <- c(2, 3)
-rpmultinom(c(.5,.5,   .3,.6,.1), c(100, 200), options)
+rpmultinom(prob = c(a1=.5,   b1=.3,b2=.6),
+           n = c(10, 20), options = c(2, 3))
+# or:
+rpmultinom(prob = c(a1=.5,a2=.5,   b1=.3,b2=.6,b3=.1),
+           n = c(10, 20), options = c(2, 3),
+           p_drop = FALSE)
 
-prob <- rpdirichlet(5, rep(1,5), options)
-rpmultinom(prob, c(20, 50), options)
+# matrix with one probability vector per row:
+p <- rpdirichlet(n = 6, alpha = c(1,1,  1,1,1),
+                 options = c(2, 3))
+rpmultinom(prob = p, n = c(20, 50), options = c(2,3))
 }

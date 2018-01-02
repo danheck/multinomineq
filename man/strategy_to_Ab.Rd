@@ -37,5 +37,5 @@ k <- c(2, 20, 18, 0)
 n <- rep(20, 4)
 m1 <- strategy_postprob(k, n, list(strat, b))
 log(m1[1] / m1[2])
-bf_binom(k, n, pt$A, pt$b)["log_bf_0e",]
+bf_binom(k, n, pt$A, pt$b, log = TRUE)
 }

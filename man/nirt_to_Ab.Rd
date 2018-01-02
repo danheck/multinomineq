@@ -54,7 +54,9 @@ Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dich
 
 Mokken, R. J. (1971). A theory and procedure of scale analysis: With applications in political research (Vol. 1). Berlin: Walter de Gruyter.
 
-Scheiblechner, H. (1995). Isotonic ordinal probabilistic models (ISOP). Psychometrika, 60(2), 281–304. \url{https://doi.org/10.1007/BF02301417}
+Scheiblechner, H. (1995). Isotonic ordinal probabilistic models (ISOP).
+Psychometrika, 60(2), 281–304. \url{https://doi.org/10.1007/BF02301417}
 
-Scheiblechner, H. (1999). Additive conjoint isotonic probabilistic models (ADISOP). Psychometrika, 64(3), 295–316. \url{https://doi.org/10.1007/BF02294297}
+Scheiblechner, H. (1999). Additive conjoint isotonic probabilistic models (ADISOP).
+Psychometrika, 64(3), 295–316. \url{https://doi.org/10.1007/BF02294297}
 }

@@ -12,12 +12,15 @@ line_clipping <- function (p, V, d, dim = NULL){
     d <- as.numeric(1:ncol(V) == dim)
   obj <- c(1, rep(0, nrow(V)))
 
-  mat.pos <- rbind(rep(c(0, 1), c(1, nrow(V))), # sum(alpha) = 1
-                   cbind(d, - t(V)))            # intersection p+lambda*d = sum(alpha*V)
-  mat.neg <- rbind(rep(c(0, 1), c(1, nrow(V))), cbind(-d, - t(V)))
+  mat.pos <- rbind(rep(c(0, 1),        # first constraint:  sum(alpha) = 1
+                       c(1, nrow(V))),
+                   cbind(d, - t(V)))   # second constraint: p+lambda*d = sum(alpha*V)  [intersection]
+  mat.neg <- rbind(rep(c(0, 1),
+                       c(1, nrow(V))),
+                   cbind(-d, - t(V)))
   dir <- c(rep("==", 1 + ncol(V)))
   rhs <- c(1, - p)
-  lp.pos <- Rglpk_solve_LP(obj, mat.pos, dir, rhs, max = TRUE)
+  lp.pos <- Rglpk_solve_LP(obj, mat.pos, dir, rhs, max = TRUE)  # constraints weights alpha>0 by default! [=> bounds]
   lp.neg <- Rglpk_solve_LP(obj, mat.neg, dir, rhs, max = TRUE)
   # check:
   # target <- p + (lp$optimum+.000000001) * d

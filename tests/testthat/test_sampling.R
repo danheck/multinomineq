@@ -114,7 +114,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X1 <- sampling_multinom(k, options, A, b = b, M = 2000, start = start)
   expect_true(test_sum1_free(X1, options))
   expect_true(test_Ab(X1, A, b))
-  X2 <- multinomineq:::rpdirichlet_free(M*5, k+1, options)
+  X2 <- rpdirichlet(M*5, k+1, options, p_drop = TRUE)
   sel <- sel_Ab(X2, A, b)
   for (i in 1:ncol(X1)){
     qqplot(X1[,i],X2[sel,i])
@@ -142,7 +142,7 @@ test_that("Gibbs sampling for multinomial [posterior]", {
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:1000,], A, b))
   # accept-reject
-  X1 <- multinomineq:::rpdirichlet_free(M*5, k + 1, options)
+  X1 <- rpdirichlet(M*5, k + 1, options, p_drop = TRUE)
   sel <- sel_Ab(X1, A, b)
   par(mfrow=c(2,2))
   for (i in 1:ncol(A)){
@@ -180,10 +180,10 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:100,], A, b))
   # accept-reject
-  X1 <- multinomineq:::rpdirichlet_free(M*2, k + 1, options)
+  X1 <- rpdirichlet(M*2, k + 1, options, p_drop = TRUE)
   sel <- sel_Ab(X1, A, b)
   cnt <- count_multinom(k, options, A, b, M = 5e5)
-  expect_equal(mean(sel), attr(cnt, "integral"), tol = .001) ## integral
+  expect_equal(mean(sel), attr(cnt, "proportion"), tol = attr(cnt, "se")) ## integral
   par(mfrow=c(2,2))
   for (i in 1:ncol(A)){
     plot(density(X[,i]), xlim = 0:1, main = i)
@@ -202,10 +202,10 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   data(swop5)
   options <- rep(3, 10)
   k <- rep(0, 30)
-  X <- multinomineq:::rpdirichlet_free(M, k + 1, options)
+  X <- rpdirichlet(M, k + 1, options, p_drop = TRUE)
   int <- multinomineq:::count_samples(X, swop5$A, swop5$b)/(M)
   cnt <- count_multinom(k, options, swop5$A, swop5$b, M=M)
-  expect_equal(int, attr(cnt, "integral"), tol = .001)
+  expect_equal(int, attr(cnt, "proportion"), tol = 5*attr(cnt, "se"))
 
   # X2 <- sampling_multinom(k, swop5$options, swop5$A, swop5$b,
   #                         M = 500, start = swop5$start)

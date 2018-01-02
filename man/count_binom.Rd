@@ -70,7 +70,8 @@ a matrix with the columns
 }
 with the attributes:
 \itemize{
-   \item\code{integral}: estimated probability that samples are in polytope
+   \item\code{proportion}: estimated probability that samples are in polytope
+   \item\code{se}: standard error of probability estimate
    \item\code{const_map}: logarithm of the binomial constants that
           have to be considered due to equality constraints
 }
@@ -111,7 +112,7 @@ A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
 
 # count prior samples and compare to analytical result
 prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
-prior  # volume = attribute "integral"
+prior  # volume = attribute "proportion"
 (.50)^6 / factorial(6)
 
 # count posterior samples stepwise

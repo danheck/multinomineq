@@ -15,8 +15,8 @@ Either a vector or a matrix/data frame (one person per row).}
 \item{strategy}{a list that defines the predictions of a strategy, see\code{\link{strategy_multiattribute}}.}
 }
 \description{
-Computes the logarithm of the integral over the likelihood function weighted
-by the prior distribution of the error probabilities.
+Computes the logarithm of the marginal likelihood, defined as the integral
+over the likelihood function weighted by the prior distribution of the error probabilities.
 }
 \examples{
 k <- c(1,11,18)

@@ -56,26 +56,24 @@ rdirichlet <- function(n, alpha) {
 #'
 #' @param n number of samples
 #' @param alpha Dirichlet parameters concatenated across independent conditions
-#'     (e.g., a1,a2,a3,  b1,b2,b3, ..)
-#' @param options the number of choice options per item type, e.g., \code{c(3,2)}
-#'     for a ternary and binary condition. The sum of \code{options} must be equal to the length of \code{alpha}.
+#'     (e.g., a1,a2,  b1,b2,b3)
+#' @param options the number of choice options per item type, e.g., \code{c(2,3)}
+#'     for a binary and ternary condition.
+#'     The sum of \code{options} must be equal to the length of \code{alpha}.
+#' @param p_drop whether the output matrix includes the last probability for each category
+#'     (which is not a free parameter since probabilities must sum to one).
+#'
 #' @examples
 #' # standard uniform Dirichlet
 #' rpdirichlet(5, c(1,1,1,1), 4)
+#' rpdirichlet(5, c(1,1,1,1), 4, p_drop = FALSE)
 #'
 #' # two ternary outcomes: (a1,a2,a3,  b1,b2,b3)
 #' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
+#' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3), p_drop = FALSE)
 #' @export
-rpdirichlet <- function(n, alpha, options) {
-    .Call(`_multinomineq_rpdirichlet`, n, alpha, options)
-}
-
-rpdirichlet_free <- function(n, alpha, options) {
-    .Call(`_multinomineq_rpdirichlet_free`, n, alpha, options)
-}
-
-shed_options <- function(x, options) {
-    .Call(`_multinomineq_shed_options`, x, options)
+rpdirichlet <- function(n, alpha, options, p_drop = TRUE) {
+    .Call(`_multinomineq_rpdirichlet`, n, alpha, options, p_drop)
 }
 
 rep_options <- function(x, options) {

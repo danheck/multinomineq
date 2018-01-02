@@ -11,13 +11,15 @@ postprob(..., prior, beta = c(0.5, 0.5), samples = 3000)
 
 \item{prior}{prior model probabilities. Uniform by default.}
 
-\item{beta}{prior parameters of beta distributions for estimating the standard error.}
+\item{beta}{prior shape parameters of the beta distributions used for approximating the
+standard errors of the Bayes-factor estimates. The default is Jeffreys' prior.}
 
-\item{samples}{number of samples from beta distributions used to approximate
-   the standard error. The default is Jeffreys' prior.
+\item{samples}{number of samples from beta distributions used to compute
+   standard errors.
 
-The encompassing model is the unconstrained baseline model that assumes a separate,
-unconstrained probability for each observable frequency. The Bayes factor is obtained
+
+The unconstrained (encompassing) model is the saturated baseline model that assumes a separate,
+independent probability for each observable frequency. The Bayes factor is obtained
 as the ratio of posterior/prior samples within an order-constrained subset of the
 parameter space.
 

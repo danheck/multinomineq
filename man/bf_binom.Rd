@@ -5,9 +5,10 @@
 \alias{bf_multinom}
 \title{Bayes Factor for Linear Order Constraints}
 \usage{
-bf_binom(k, n, A, b, V, map, prior = c(1, 1), ...)
+bf_binom(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...)
 
-bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)), ...)
+bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)), log = FALSE,
+  ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -39,14 +40,23 @@ different parameters for each item type: \code{map=1:ncol(A)}}
 \item{prior}{a vector with two positive numbers defining the shape parameters
 of the beta prior distributions for each binomial rate parameter.}
 
-\item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}} (e.g., \code{M}, \code{steps}).}
+\item{log}{whether to return the log-Bayes factor instead of the Bayes factor}
+
+\item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}}
+(e.g., \code{M}, \code{steps}).}
 
 \item{options}{the number of choice options per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 }
 \value{
-a matrix with estiamtes (first column) and standard errors (second column) for the Bayes factor and log BF of the order-constrained vs. encompassing (\code{bf_0e}) and the encompassing vs. order-constrained (\code{bf_e0}) model
+a matrix with two columns (Bayes factor and SE of approximation) and three rows:
+    \itemize{
+      \item \code{`bf_0u`}:  constrained vs. unconstrained (saturated) model
+      \item \code{`bf_u0`}:  unconstrained vs. constrained model
+      \item \code{`bf_00'`}: constrained vs. complement of inequality-constrained model
+             (e.g., pi>.2 becomes pi<=.2; this assumes identical equality constraints for both models)
+    }
 }
 \description{
 Computes the Bayes factor for linear order-constraints (specified via: A*x <= b)
@@ -55,10 +65,11 @@ for product-binomial/-multinomial models.
 \details{
 For more control, use \code{\link{count_binom}} to specifiy how many samples
 should be drawn from the prior and posterior, respectively.
-This is especially recommended if the same prior distribution (and thus the same integral)
+This is especially recommended if the same prior distribution (and thus the same prior probability/integral)
 is used for computing BFs for multiple data sets that differ only in \code{k} and \code{n}.
-In this case, the prior integral can be computed once with high precision, whereas the
-posterior integral needs to be computed separately for each unique vector \code{k}.
+In this case, the prior probability/proportion of the parameter space in line with the
+inequality constraints can be computed once with high precision (or even analytically),
+and only the posterior probability/proportion needs to be estimated separately for each unique vector \code{k}.
 }
 \examples{
 k <- c(0, 3, 2, 5, 3, 7)

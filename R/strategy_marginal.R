@@ -1,8 +1,8 @@
 #########################
 #' Log-Marginal Likelihood for Decision Strategy
 #'
-#' Computes the logarithm of the integral over the likelihood function weighted
-#' by the prior distribution of the error probabilities.
+#' Computes the logarithm of the marginal likelihood, defined as the integral
+#' over the likelihood function weighted by the prior distribution of the error probabilities.
 #'
 #' @param k observed frequencies of Option B.
 #'          Either a vector or a matrix/data frame (one person per row).

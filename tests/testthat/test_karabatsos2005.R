@@ -21,19 +21,19 @@ testthat::test_that("results match to those of Karabatsos (2005)", {
   s <- c(15, 17, 18)
   prior <- pbeta(1, 4, 1) - pbeta(.5, 4, 1)
   post  <- pbeta(1, 4+s, 1+31-s) - pbeta(.5, 4+s, 1+31-s)
-  bf_0e <- post/prior
-  bf_1e <- (1-post)/(1-prior)
+  bf_0u <- post/prior
+  bf_1u <- (1-post)/(1-prior)
 
   H0 <- list(pattern = c(1), c = .5, ordered = FALSE, prior = c(1, 4)) # tau_violations, tau_ok
   en <- list(pattern = c(1), c =  1, ordered = FALSE, prior = c(1, 4))
   expect_silent(bf <- strategy_postprob(cbind(c(15, 17, 18)), cbind(rep(31,3)), list(H0, en)))
-  expect_equal(bf[,1] / bf[,2], bf_0e)
+  expect_equal(bf[,1] / bf[,2], bf_0u)
 
   H0 <- list(pattern = c(1), c = .5, ordered = FALSE, prior = c(1, 4)) # tau_violations, tau_ok
   H1 <- list(pattern = c(-1),c = .5, ordered = FALSE, prior = c(4, 1))
   expect_silent(bf <- strategy_postprob(cbind(c(15, 17, 18)), cbind(rep(31,3)), list(H0, H1)))
 
-  expect_equal(bf[,1] / bf[,2], bf_0e/bf_1e)
+  expect_equal(bf[,1] / bf[,2], bf_0u/bf_1u)
 
 
 

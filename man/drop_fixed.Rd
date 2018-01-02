@@ -2,35 +2,17 @@
 % Please edit documentation in R/auxiliary.R
 \name{drop_fixed}
 \alias{drop_fixed}
-\alias{drop_fixed.matrix}
-\alias{drop_fixed.data.frame}
-\alias{drop_fixed.default}
 \alias{add_fixed}
-\alias{add_fixed.matrix}
-\alias{add_fixed.data.frame}
-\alias{add_fixed.default}
 \title{Drop or Add Fixed Dimensions for Multinomial Probabilities/Frequencies}
 \usage{
 drop_fixed(x, options = 2)
 
-\method{drop_fixed}{matrix}(x, options = 2)
-
-\method{drop_fixed}{data.frame}(x, options = 2)
-
-\method{drop_fixed}{default}(x, options = 2)
-
 add_fixed(x, options = 2, sum = 1)
-
-\method{add_fixed}{matrix}(x, options = 2, sum = 1)
-
-\method{add_fixed}{data.frame}(x, options = 2, sum = 1)
-
-\method{add_fixed}{default}(x, options = 2, sum = 1)
 }
 \arguments{
 \item{x}{a vector (typically \code{k}, \code{n}, or \code{prior}) or
-a matrix (typically \code{A} or \code{V}), in which case the fixed dimension
-is dropped column-wise.}
+a matrix (typically \code{A} or \code{V}), in which case the fixed dimensions
+are dropped/added column-wise.}
 
 \item{options}{the number of choice options per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.

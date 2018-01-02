@@ -2,10 +2,8 @@
 check_kn <- function(k = NULL, n = NULL){
   if(length(k) != length(n))
     stop("Length of 'k' and 'n' does not match.")
-
   if(any(n < 0) || any(n != round(n)))
     stop("'n' must contain positive integers.")
-
   if(any(k < 0) || any(k > n) || any(k != round(k)))
     stop("'k' must contain positive integers smaller or equal to 'n'.")
 }
@@ -32,7 +30,6 @@ check_knp <- function(k = NULL, n = NULL, pattern = NULL){
   check_kn(k, n)
   if(any(is.na(pattern)))
     stop("'pattern' must not contain missings.")
-
   l <- length(n)
   if( l != length(pattern))
     stop("Length of 'k'/'n', and 'pattern' does not match.")
@@ -40,7 +37,7 @@ check_knp <- function(k = NULL, n = NULL, pattern = NULL){
 
 check_prob <- function  (prob){
   if (is.null(dim(prob)))
-    stop("'prob' must be a matrix with posterior samples")
+    stop("'prob' must be a matrix (usually the posterior samples).")
   if (any(prob < 0, prob > 1))
     stop("'prob' must contain probabilities in [0,1].")
 }
@@ -51,11 +48,13 @@ check_probkn <- function (prob, k, n){
     stop("length(k)  must be identical to  ncol(prob).")
 }
 
-check_probko <- function (prob, k, options){
+check_probko <- function (prob, k, options, p_drop = TRUE){
   check_ko(k, options)
   check_prob(prob)
-  if (ncol(prob) != sum(options - 1))
-    stop("ncol(prob)  must be identical to  sum(options-1).")
+  if (p_drop && ncol(prob) != sum(options - 1))
+    stop("If p_drop==TRUE: Number of probabilities must be identical to  sum(options-1).")
+  if (!p_drop && ncol(prob) != sum(options))
+    stop("If p_drop==FALSE: Number of probabilities must be identical to  sum(options).")
 }
 
 
@@ -104,10 +103,10 @@ check_o <- function(options)
   if (any(options != round(options), options <0))
     stop ("'options' must contain positive integers.")
 
-check_ko <- function(k, options){
+check_ko <- function(k, options, label = "k"){
   check_o(options)
   if (length(k) != sum(options))
-    stop("'k' must have the same length as sum(options).")
+    stop("'", label, "' must have the same length as sum(options).")
 }
 
 check_Abokprior <- function (A, b, options, k, prior = rep(1, length(k))){
@@ -145,13 +144,13 @@ check_Abx <- function (A, b, x){
 }
 
 check_V <- function(V, options = 2){
-  if (length(options) == 1)
-    options <- rep(options, ncol(V) / (options - 1))
-  else if (sum(options - 1) != ncol(V))
-    stop ("V and options do not match: sum(options - 1) != ncol(V) ")
   if(is.null(dim(V)) ||  any(V < 0, V > 1))
     stop("The vertex representation 'V' must be provided as a numeric matrix with values in [0,1].")
-  options
+  # if (length(options) == 1)
+  #   options <- rep(options, ncol(V) / (options - 1))
+  # else if (sum(options - 1) != ncol(V))
+  #   stop ("V and options do not match: sum(options - 1) != ncol(V) ")
+  rep_options(options, V[1,])
 }
 
 check_Vx <- function (V, x){
