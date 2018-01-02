@@ -42,7 +42,9 @@ round(post.mean, 2)
 # posterior predictive checks (Table 4, p. 121)
 ppp <- ppp_binom(p, karabatsos2004$k.M, karabatsos2004$n.M,
                  by = 1:prod(IJ))
-matrix(ppp[,3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
+ppp <- matrix(ppp[,3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
+round(ppp, 2)
+
 
 ######################################################
 ##### Testing invariant item ordering (IIO)      #####
@@ -53,7 +55,7 @@ iio <- nirt_to_Ab(IJ[1], IJ[2], axioms = "W2")
 p <- sampling_binom(k = c(karabatsos2004$k.IIO),
                     n = c(karabatsos2004$n.IIO),
                     A = iio$A, b = iio$b,
-                    prior = c(.5, .5), M = 2000)
+                    prior = c(.5, .5), M = 300)
 # posterior predictive checks (Table 6, p. 122)
 ppp <- ppp_binom(prob = p, k = c(karabatsos2004$k.IIO),
                  n = c(karabatsos2004$n.IIO), by = 1:prod(IJ))
@@ -62,7 +64,7 @@ matrix(ppp[,3], 7, dimnames = dimnames(karabatsos2004$k.IIO))
 # for each item:
 ppp <- ppp_binom(p, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
                  by = rep(1:IJ[2], each = IJ[1]))
-ppp[,3]
+round(ppp[,3], 2)
 }
 \references{
 Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \url{https://doi.org/10.1177/0146621603260678}

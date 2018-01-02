@@ -209,7 +209,8 @@ check_count <- function(count){
 
   # if(!is.numeric(count) || ! all(c("count", "M") %in% colnames(count)))
   #   stop ("'prior' / 'posterior' must be a matrix with the column names 'count' and 'M")
-  if(any(count < 0) ||  any(count != round(count)))
+  cc <- count[,c("count","M")]
+  if(any(cc < 0) ||  any(cc != round(cc)))
     stop ("'count' and must contain positive integers.")
   count
 }
