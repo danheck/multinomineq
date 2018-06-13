@@ -8,6 +8,38 @@ BATCH <- 50000
 
 
 ############################# S3 methods: drop / add fixed dimensions
+#' Converts Binary to Multinomial Frequencies
+#'
+#' Converts the number of "hits" in the binary choice format to the observed
+#' frequencies across  for all response categories (i.e., the multinomial format).
+#'
+#' @inheritParams count_binom
+#'
+#' @details
+#' In \code{multinomineq}, binary choice frequencies are represented by the number
+#' of "hits" for each item type/condition (the vector \code{k}) and by the total
+#' number of responses per item type/condition (the scalar or vector \code{n}).
+#'
+#' In the multinomial format, the vector \code{k} includes all response categories
+#' (not only the number of "hits"). This requires to define a vector \code{options},
+#' which indicates how many categories belong to one item type/condition (since
+#' the total number of responses per item type is fixed).
+#'
+#' @examples
+#' k <- c(1, 5, 8, 10)
+#' n <- 10
+#' binom_to_multinom(k, n)
+#'
+#' @export
+binom_to_multinom <- function(k, n){
+  if (length(n) == 1) n <- rep(n, length(k))
+  check_kn(k, n)
+  options <- rep(2, length(k))
+  k_fixed <- add_fixed(k, options, n)
+  list(k = k_fixed, options = options)
+}
+
+############################# S3 methods: drop / add fixed dimensions
 
 #' Drop or Add Fixed Dimensions for Multinomial Probabilities/Frequencies
 #'
@@ -69,6 +101,13 @@ drop_fixed.default <- function(x, options = 2){
 #' @export
 add_fixed <- function(x, options = 2, sum = 1){
   UseMethod("add_fixed", x)
+}
+
+# ' @rdname drop_fixed
+#' @export
+add_fixed.mcmc <- function(x, options = 2, sum = 1){
+  as.mcmc(add_fixed.matrix(x, options = options, sum = sum),
+          start = start(x), thin = thin(x), end = end(x))
 }
 
 # ' @rdname drop_fixed

@@ -10,7 +10,7 @@
 #' @export
 postprob <- function(..., prior, beta = c(.5, .5), samples = 3000){
   dots <- list(...)
-  if (missing(prior)){
+  if (missing(prior) || is.null(prior)){
     prior <- rep(1, length(dots))
   } else if (any(prior < 0) || length(prior) != length(dots)){
     stop("'prior' must be positive and have the same length as the number of BFs.")

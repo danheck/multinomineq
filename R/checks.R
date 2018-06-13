@@ -86,7 +86,7 @@ check_knpcp <- function(k, n, pred, c, prior = c(1, 1)){
   check_knp(k, n, pred)
   if (!is.numeric(c) || length(c) != 1 || c < 0 || c > 1)
     stop("'c' must be in the interval [0,1].")
-  if (!missing(prior) &&
+  if (!missing(prior) && !is.null(prior) &&
       (length(prior) != 2 || any(prior < 0) || !is.numeric(prior)))
     stop("'prior' must be a numeric vector with two postive numbers.")
 }
@@ -165,7 +165,7 @@ check_Vx <- function (V, x){
 }
 
 check_stepsA <- function(steps, A){
-  if (missing(steps))
+  if (missing(steps) || is.null(steps))
     steps <- 1:nrow(A)
   if (any(steps <= 0) || any(steps > nrow(A)) || any(steps != round(steps)))
     stop("'steps' must be a vector with positive integers not larger",

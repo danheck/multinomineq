@@ -16,7 +16,7 @@
 # -2,-3  => reversed parameter (1-p) in A matrix
 # 0      => constant probability .50
 map_k_to_A <- function (k, n, A, map, prior = c(1, 1)){
-  if (missing(map))
+  if (missing(map) || is.null(map))
     map <- 1:ncol(A)
   if (length(k) == 1) k <- rep(k, length(map))
   if (length(n) == 1) n <- rep(n, length(k))

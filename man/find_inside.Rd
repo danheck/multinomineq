@@ -4,7 +4,7 @@
 \alias{find_inside}
 \title{Find a Point/Parameter Vector Within a Convex Polytope}
 \usage{
-find_inside(A, b, V, options = NULL, random = FALSE)
+find_inside(A, b, V, options = NULL, random = FALSE, probs = TRUE)
 }
 \arguments{
 \item{A}{a matrix with one row for each linear inequality constraint and one
@@ -28,6 +28,10 @@ By default, parameters are assumed to be independent.}
 
 \item{random}{if \code{TRUE}, random starting values in the interior are generated.
 If \code{FALSE}, the center of the polytope is computed using linear programming.}
+
+\item{probs}{only for \code{A*x<b} representation: whether to add
+inequality constraints that the variables are probabilities (nonnegative and
+sum to 1 within each option)}
 }
 \description{
 Finds the center/a random point that is within the convex polytope defined by the

@@ -34,6 +34,8 @@
 #'    \item\code{se}: standard error of probability estimate
 #' }
 #' @template ref_hoijtink2011
+#' @seealso \code{\link{bf_multinom}}, \code{\link{count_binom}}
+#'
 #' @examples
 #' ### frequencies:
 #' #           (a1,a2,a3, b1,b2,b3,b4)
@@ -62,30 +64,59 @@
 #' @export
 count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)),
                             M = 5000, steps, start, cmin = 0, maxiter = 500,
-                            burnin = 5, progress = TRUE){
+                            burnin = 5, progress = TRUE, cpu = 1){
+
+  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
+    arg <- lapply(as.list(match.call())[-1],
+                  function(i) tryCatch(eval(i), error = function(e) NULL))
+    count <- run_parallel(arg, fun = "count_multinom", cpu = cpu, simplify = "count")
+    return(count)
+  }
+
   if (length(k) == 1 && k == 0) k <- rep(0, sum(options))
   if (length(prior) == 1) prior <- rep(prior, sum(options))
-  check_Abokprior(A, b, options, k, prior)
-  check_Mminmax(M, cmin, maxiter)
 
-  if (cmin == 0 && missing(steps)){
-    count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
+  if (!missing(b) && !is.null(b)){
+    check_Abokprior(A, b, options, k, prior)
+    check_Mminmax(M, cmin, maxiter)
+
+    if (cmin == 0 && (missing(steps) || is.null(steps))){
+      count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
+
+    } else {
+      steps <- check_stepsA(steps, A)
+      if (missing(start) || is.null(start) || any(start < 0))
+        start <-  ml_multinom(k, options, A, b, n.fit = 1, start, maxit = 20)$par
+      check_start(start, A, b, interior = TRUE)
+
+      if (cmin > 0){
+        zeros <- rep(0, length(steps))
+        count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps, ## SUM TO ZERO!!!!
+                                 M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
+                                 start, burnin, progress)
+      } else {
+        count <- count_stepwise_multi(k, options, A, b, prior, M, steps,
+                                      batch = BATCH, start, burnin, progress)
+      }
+    }
+
+  } else if (!missing(V) && !is.null(V)){
+    check_Vx(V, drop_fixed(k, options))
+    count <- 0
+    m <- M
+    a <- k + prior #c(rbind(k + prior[1], n - k + prior[2]))
+    if (progress) pb <- txtProgressBar(0, M, style = 3)
+    while (m > 0 ){
+      X <- rpdirichlet(n = round(BATCH/1000), alpha = a, options = options, p_drop = TRUE)
+      count <- count + sum(inside_V(X, V))
+      m <- m - round(BATCH/1000)
+      if (progress) setTxtProgressBar(pb, M - m)
+    }
+    if (progress) close(pb)
+    count <- cbind("count" = count, "M" = M, "steps" = NA)
 
   } else {
-    steps <- check_stepsA(steps, A)
-    if (missing(start) || any(start < 0))
-      start <-  ml_multinom(k, options, A, b, n.fit = 1, start, maxit = 20)$par
-    check_start(start, A, b, interior = TRUE)
-
-    if (cmin > 0){
-      zeros <- rep(0, length(steps))
-      count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps, ## SUM TO ZERO!!!!
-                               M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
-                               start, burnin, progress)
-    } else {
-      count <- count_stepwise_multi(k, options, A, b, prior, M, steps,
-                                    batch = BATCH, start, burnin, progress)
-    }
+    stop("A/b or V must be provided.")
   }
   as_ineq_count(count)
 }

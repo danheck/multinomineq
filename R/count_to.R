@@ -55,7 +55,7 @@ count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
   s_post  <- sampling_proportion(posterior[,1], posterior[,2], log = TRUE,
                                  beta = beta, samples = samples)
 
-  if (missing(exact_prior)){
+  if (missing(exact_prior) || is.null(exact_prior)){
     prior <- check_count(prior)
     s_prior <- sampling_proportion(prior[,1], prior[,2], log = TRUE,
                                    beta = beta, samples = samples)
@@ -77,16 +77,19 @@ count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
   lbf_u0 <- s_prior - s_post + const
   lbf_0n0 <- s_post - log(1 - exp(s_post))
 
-  if (log){
-    bf <- matrix(c(est, - est, est_0n0,
-                   sd(lbf_0u), sd(lbf_u0), sd(lbf_0n0)), 3, 2)
-  } else{
-    bf <- matrix(c(exp(est),  exp(-est), exp(est_0n0),
-                   sd(exp(lbf_0u)), sd(exp(lbf_u0)), sd(exp(lbf_0n0))), 3, 2)
-  }
-  dimnames(bf) <- list(paste0(ifelse(log, "log_", ""),
-                              c("bf_0u", "bf_u0", "bf_00'")), c("bf", "se"))
+  bf <- cbind("bf" = c("bf_0u" = est, "bf_u0" = -est, "bf_00'" = est_0n0),
+              t(sapply(list(lbf_0u, lbf_u0, lbf_0n0),
+                       summary_samples, exp = !log)))
+  if(!log) bf[,"bf"] <- exp(bf[,"bf"])
   bf
+}
+
+#' @importFrom stats quantile
+summary_samples <- function(samples, probs = c(.05, .95), exp = FALSE){
+  if(exp) samples <- exp(samples)
+  qq <- quantile(samples, .05)
+  c("se" = sd(samples),
+    "ci" = quantile(samples, probs))
 }
 
 # check_bf <- function(bf){

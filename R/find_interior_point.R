@@ -4,6 +4,9 @@
 #' linear inequalities \code{A*x <= b}  or by the convex hull over the vertices in the matrix \code{V}.
 #'
 #' @inheritParams count_binom
+#' @param probs only for \code{A*x<b} representation: whether to add
+#'     inequality constraints that the variables are probabilities (nonnegative and
+#'     sum to 1 within each option)
 #' @param options optional: number of options per item type (only for \eqn{A x \leq b} representation).
 #'     Necessary to account for sum-to-one constraints within multinomial
 #'     distributions (e.g., p_1 + p_2 + p_3 <= 1).
@@ -55,9 +58,9 @@
 #' find_inside(V = V)
 #' find_inside(V = V, random = TRUE)
 #' @export
-find_inside <- function(A, b, V, options = NULL, random = FALSE){
+find_inside <- function(A, b, V, options = NULL, random = FALSE, probs = TRUE){
 
-  if (!missing(V)){
+  if (!missing(V) && !is.null(V)){
     # convex combination of vertices
     check_V(V)
     if (random){
@@ -70,13 +73,15 @@ find_inside <- function(A, b, V, options = NULL, random = FALSE){
       stop("No point found inside of convex hull of V.")
 
   } else {
-    if (missing(options))
+    if (missing(options) || is.null(options))
       options <- rep(2, ncol(A))
-    zeros <- rep(0, sum(options))
-    check_Abokprior(A, b, options, zeros, zeros)
-    tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
-    A <- tmp$A
-    b <- tmp$b
+    if (probs){
+      zeros <- rep(0, sum(options))
+      check_Abokprior(A, b, options, zeros, zeros)
+      tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
+      A <- tmp$A
+      b <- tmp$b
+    }
     if (random){
       u <- runif(ncol(A), 0,1)
       B <- diag(ncol(A)) #matrix(runif(ncol(A)^2, -1,1), ncol(A))

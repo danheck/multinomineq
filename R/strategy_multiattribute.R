@@ -122,7 +122,7 @@ strategy_multiattribute <- function (cueA, cueB, v, strategy,
   }
 }
 
-#' @rdname print
+# ' @rdname print
 #' @export
 print.strategy <- function(x, ...){
   p <- x$pattern

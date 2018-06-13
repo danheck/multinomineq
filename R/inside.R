@@ -88,7 +88,7 @@ inside <- function(x, A, b, V){
 #' @export
 inside_binom <- function(k, n, A, b, V){
   x <- k / n
-  if (missing(V)){
+  if (missing(V) || is.null(V)){
     inside(x, A, b)
   } else {
     inside(x, V = V)
@@ -102,7 +102,7 @@ inside_multinom <- function(k, options, A, b, V){
   sel <- rep(1:length(options), options - 1)
   n <- tapply(k, rep(1:length(options), options), sum)[sel]
   x <- k_free / n
-  if (missing(V)){
+  if (missing(V) || is.null(V)){
     inside(x, A, b)
   } else {
     inside(x, V = V)

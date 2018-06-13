@@ -26,8 +26,9 @@
 ppp_binom <- function(prob, k, n, by){
   if (length(n) == 1)
     n <- rep(n, length(k))
+  if (is.list(prob)) prob <- do.call("rbind", prob)
   check_probkn(prob, k, n)
-  if (!missing(by)){
+  if (!missing(by) && !is.null(by)){
     if (length(by) != length(k))
       stop("length of 'by' does not match length of 'k'.")
     levels <- unique(by)
@@ -47,6 +48,7 @@ ppp_binom <- function(prob, k, n, by){
 #' @rdname ppp_binom
 #' @export
 ppp_multinom <- function(prob, k, options, p_drop = TRUE){
+  if (is.list(prob)) prob <- do.call("rbind", prob)
   check_probko(prob, k, options, p_drop = p_drop)
   if (p_drop)
     prob <- add_fixed(prob, options)

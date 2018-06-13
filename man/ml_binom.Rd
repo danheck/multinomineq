@@ -7,7 +7,7 @@
 \usage{
 ml_binom(k, n, A, b, map, strategy, n.fit = 1, start, ...)
 
-ml_multinom(k, options, A, b, n.fit = 1, start, ...)
+ml_multinom(k, options, A, b, V, n.fit = 1, start, ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -36,11 +36,20 @@ different parameters for each item type: \code{map=1:ncol(A)}}
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{...}{further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.}
+\item{...}{further arguments passed to the list of \code{control} arguments in
+\code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.}
 
 \item{options}{the number of choice options per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
+
+\item{V}{a matrix of vertices (one per row) that define the polytope of
+admissible parameters as the convex hull over these points
+(if provided, \code{A} and \code{b} are ignored).
+Similar as for \code{A}, columns of \code{V} omit the last value for each
+multinomial condition (e.g., a1,a2,a3,b1,b2 becomes a1,a2,b1).
+Note that this method is comparatively slow since it solves linear-programming problems
+to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.}
 }
 \value{
 the list returned by the optimizer \code{\link[stats]{constrOptim}}.
@@ -49,7 +58,7 @@ the list returned by the optimizer \code{\link[stats]{constrOptim}}.
 Get ML estimate for product-binomial/multinomial model with linear inequality constraints.
 }
 \examples{
-# linear order: p1 < p2 < p3 < .50
+# predicted linear order: p1 < p2 < p3 < .50
 # (cf. WADDprob in ?strategy_multiattribute)
 A <- matrix(c(1, -1,  0,
               0,  1, -1,
@@ -61,9 +70,31 @@ ml_multinom(k = c(4,36,  1,39,  23,17),
             options = c(2,2,2), A, b)[1:2]
 
 
-
 # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
 strat <- list(pattern = c(-1, -2, -3, 4),
               c = .5, ordered = TRUE, prior = c(1,1))
 ml_binom(c(7,3,1, 19), 20, strategy = strat)[1:2]
+
+
+# vertex representation (one prediction per row)
+V <- matrix(c(
+  # strict weak orders
+  0, 1, 0, 1, 0, 1,  # a < b < c
+  1, 0, 0, 1, 0, 1,  # b < a < c
+  0, 1, 0, 1, 1, 0,  # a < c < b
+  0, 1, 1, 0, 1, 0,  # c < a < b
+  1, 0, 1, 0, 1, 0,  # c < b < a
+  1, 0, 1, 0, 0, 1,  # b < c < a
+
+  0, 0, 0, 1, 0, 1,  # a ~ b < c
+  0, 1, 0, 0, 1, 0,  # a ~ c < b
+  1, 0, 1, 0, 0, 0,  # c ~ b < a
+  0, 1, 0, 1, 0, 0,  # a < b ~ c
+  1, 0, 0, 0, 0, 1,  # b < a ~ c
+  0, 0, 1, 0, 1, 0,  # c < a ~ b
+
+  0, 0, 0, 0, 0, 0   # a ~ b ~ c
+  ), byrow = TRUE, ncol = 6)
+ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1),
+            options = c(3,3,3), V = V)
 }

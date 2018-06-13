@@ -29,11 +29,11 @@ the latent trait are tested directly.
 
 The axioms are as follows:
 \itemize{
-  \item{\code{"W1"}}{Weak row/subject independence: Persons can be ordered on
+  \item{\code{"W1"}: }{Weak row/subject independence: Persons can be ordered on
                       an ordinal scale independent of items.}
-  \item{\code{"W2"}}{Weak column/item independence: Items can be ordered on
+  \item{\code{"W2"}: }{Weak column/item independence: Items can be ordered on
                       an ordinal scale independent of persons}
-  \item{\code{"DC"}}{Double cancellation: A necessary condition for a joint
+  \item{\code{"DC"}: }{Double cancellation: A necessary condition for a joint
                      ordering of (person,item) pairs and an additive representation
                      (i.e., an interval scale).}
 }

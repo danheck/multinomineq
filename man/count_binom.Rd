@@ -5,7 +5,7 @@
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
 count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps, start,
-  cmin = 0, maxiter = 500, burnin = 5, progress = TRUE)
+  cmin = 0, maxiter = 500, burnin = 5, progress = TRUE, cpu = 1)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -39,26 +39,32 @@ of the beta prior distributions for each binomial rate parameter.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{steps}{an integer vector that indicates at which rows the matrix \code{A}
+\item{steps}{an integer vector that indicates the row numbers at which the matrix \code{A}
 is split for a stepwise computation of the Bayes factor (see details).
-In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+\code{M} can be a vector with the number of samples drawn
 in each step from the (partially) order-constrained models  using Gibbs sampling.
-If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
+If \code{cmin>0}, samples are drawn for each step until \code{count[i]>=cmin}.}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
+\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
+If \code{steps} is not defined, \code{steps=c(1,2,3,4,...)} by default.}
 
 \item{maxiter}{if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.}
 
 \item{burnin}{number of burnin samples per step that are discarded. Since the
-maximum-likelihood estimate is used as a start value (which is updated
-during the stepwise procedure in \code{count_multinom}), the \code{burnin}
-number can be much smaller than in standard MCMC applications.}
+maximum-likelihood estimate is used as a start value (which is updated for each step in
+the stepwise procedure in \code{count_multinom}), the \code{burnin}
+number can be smaller than in other MCMC applications.}
 
-\item{progress}{whether a progress bar should be shown.}
+\item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
+
+\item{cpu}{either the number of CPUs used for parallel sampling, or a parallel
+cluster  (e.g., \code{cl <- parallel::makeCluster(3)}).
+All arguments of the function call are passed directly to each core,
+and thus the total number of samples is \code{M*number_cpu}.}
 }
 \value{
 a matrix with the columns
@@ -83,7 +89,9 @@ inside the convex polytope defined by
 (2) the convex hull over the vertices V.
 }
 \details{
-Useful to compute the encompassing Bayes factor for testing order constraints
+Counts the number of random samples drawn from beta distributions that satisfy
+the convex, linear-inequalitiy constraints. The function is useful to compute
+the encompassing Bayes factor for testing inequality-constrained models
 (see \code{\link{bf_binom}}; Hojtink, 2011).
 
 The stepwise computation of the Bayes factor proceeds as follows:
@@ -93,8 +101,8 @@ If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three st
 (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
 }
 \examples{
-# linear order constraint:
-# x1 < x2 < .... < x6 < .50
+### a set of linear order constraints:
+### x1 < x2 < .... < x6 < .50
 A <- matrix(c(1, -1, 0, 0, 0, 0,
               0, 1, -1, 0, 0, 0,
               0, 0, 1, -1, 0, 0,
@@ -104,28 +112,34 @@ A <- matrix(c(1, -1, 0, 0, 0, 0,
             ncol = 6, byrow = TRUE)
 b <- c(0, 0, 0, 0, 0, .50)
 
+### check whether a specific vector is inside the polytope:
+A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
+
+
+### observed frequencies and number of observations:
 k <- c(0, 3, 2, 5, 3, 7)
 n <- rep(10, 6)
 
-# check whether specific vector is in polytope:
-A \%*\% c(.05, .1, .12, .16, .19, .23) <= b
-
-# count prior samples and compare to analytical result
+### count prior samples and compare to analytical result
 prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
-prior  # volume = attribute "proportion"
+prior    # to get the proportion: attr(prior, "proportion")
 (.50)^6 / factorial(6)
 
-# count posterior samples stepwise
-posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
+### count posterior samples + get Bayes factor
+posterior <- count_binom(k, n, A, b, M=5000, steps=1:4)
 count_to_bf(posterior, prior)
 
-# automatic stepwise algorithm
+### automatic stepwise algorithm
 prior <- count_binom(0, 0, A, b, M = 1000, cmin = 500)
 posterior <- count_binom(k, n, A, b, M = 1000, cmin = 500)
 count_to_bf(posterior, prior)
+
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
 
 Fukuda, K. (2004). Is there an efficient way of determining whether a given point q is in the convex hull of a given finite set S of points in Rd? Retrieved from \url{http://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}
+}
+\seealso{
+\code{\link{bf_binom}}, \code{\link{count_multinom}}
 }

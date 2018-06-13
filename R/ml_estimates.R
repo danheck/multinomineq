@@ -5,10 +5,12 @@
 #' @inheritParams count_binom
 #' @inheritParams strategy_marginal
 #' @param n.fit number of calls to \link[stats]{constrOptim}.
-#' @param ... further arguments passed to the \code{control} list of \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.
+#' @param ... further arguments passed to the list of \code{control} arguments in
+#'     \code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.
+#'
 #' @return the list returned by the optimizer \code{\link[stats]{constrOptim}}.
 #' @examples
-#' # linear order: p1 < p2 < p3 < .50
+#' # predicted linear order: p1 < p2 < p3 < .50
 #' # (cf. WADDprob in ?strategy_multiattribute)
 #' A <- matrix(c(1, -1,  0,
 #'               0,  1, -1,
@@ -20,23 +22,45 @@
 #'             options = c(2,2,2), A, b)[1:2]
 #'
 #'
-#'
 #' # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
 #' strat <- list(pattern = c(-1, -2, -3, 4),
 #'               c = .5, ordered = TRUE, prior = c(1,1))
 #' ml_binom(c(7,3,1, 19), 20, strategy = strat)[1:2]
+#'
+#'
+#' # vertex representation (one prediction per row)
+#' V <- matrix(c(
+#'   # strict weak orders
+#'   0, 1, 0, 1, 0, 1,  # a < b < c
+#'   1, 0, 0, 1, 0, 1,  # b < a < c
+#'   0, 1, 0, 1, 1, 0,  # a < c < b
+#'   0, 1, 1, 0, 1, 0,  # c < a < b
+#'   1, 0, 1, 0, 1, 0,  # c < b < a
+#'   1, 0, 1, 0, 0, 1,  # b < c < a
+#'
+#'   0, 0, 0, 1, 0, 1,  # a ~ b < c
+#'   0, 1, 0, 0, 1, 0,  # a ~ c < b
+#'   1, 0, 1, 0, 0, 0,  # c ~ b < a
+#'   0, 1, 0, 1, 0, 0,  # a < b ~ c
+#'   1, 0, 0, 0, 0, 1,  # b < a ~ c
+#'   0, 0, 1, 0, 1, 0,  # c < a ~ b
+#'
+#'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
+#'   ), byrow = TRUE, ncol = 6)
+#' ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1),
+#'             options = c(3,3,3), V = V)
 #' @export
 ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1, start, ...){
   if (length(n) == 1) n <- rep(n, length(k))
 
-  if (!missing(strategy)){
+  if (!missing(strategy) && !is.null(strategy)){
     pt <- strategy_to_Ab(strategy)
     A <- pt$A
     b <- pt$b
     map <- strategy$pattern
   } else {
     check_Abknprior(A, b, k, n)
-    if (missing(map))
+    if (missing(map) || is.null(map))
       map <- 1:ncol(A)
   }
   aggr <- map_k_to_A(k, n, A, map)
@@ -48,31 +72,76 @@ ml_binom <- function(k, n, A, b, map, strategy, n.fit = 1, start, ...){
 #' @inheritParams count_multinom
 #' @rdname ml_binom
 #' @export
-ml_multinom <- function(k, options, A, b, n.fit = 1, start, ...){
-  check_Abokprior(A, b, options, k)
-  # est <- k / c(tapply(k, rep(1:length(options), options), sum))
-  # start <- drop_fixed(est, options)
-  tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
-  A <- tmp$A
-  b <- tmp$b
-  if (missing(start) || !all(A %*% start < b))
-    start <- find_inside(A, b, options = options)
-  check_start(start, A, b, interior = TRUE)
-  tryCatch (oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
-                              k = k, options = options,
-                              ui = - A, ci = - b, control = list(fnscale = -1, ...)),
-            error = function(e) {print(e);
-              cat("\n\n  (optimization failed with start values =", start, ")\n")})
-  cnt <- 1
-  while (cnt < n.fit){
-    start <- find_inside(A, b, random = TRUE)
-    oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
-                       k = k, options = options, ui = - A, ci = - b,
-                       control = list(fnscale = -1))
-    cnt <- cnt + 1
-    if (oo2$value > oo$value) oo <- oo2
+ml_multinom <- function(k, options, A, b, V, n.fit = 1, start, ...){
+
+  if(!missing(A) && !is.null(A)){
+    ### Ab-representation
+    check_Abokprior(A, b, options, k)
+    # est <- k / c(tapply(k, rep(1:length(options), options), sum))
+    # start <- drop_fixed(est, options)
+    tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
+    A <- tmp$A
+    b <- tmp$b
+    if (missing(start) || is.null(start) || !all(A %*% start < b))
+      start <- find_inside(A, b, options = options)
+    check_start(start, A, b, interior = TRUE)
+    tryCatch (
+      oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
+                        k = k, options = options,
+                        ui = - A, ci = - b, control = list(fnscale = -1, ...)),
+      error = function(e) {
+        print(e)
+        cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
+      })
+    cnt <- 1
+    while (cnt < n.fit){
+      start <- find_inside(A, b, random = TRUE)
+      oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
+                         k = k, options = options, ui = - A, ci = - b,
+                         control = list(fnscale = -1))
+      cnt <- cnt + 1
+      if (oo2$value > oo$value) oo <- oo2
+    }
+    names(oo$par) <- colnames(A)
+    oo$A <- A ; oo$b <- b
+
+
+  } else {
+    #### V-representation
+    options <- check_V(V, options = options)
+    S <- nrow(V)
+    alpha_Ab <- Ab_multinom(options = S, nonneg = TRUE)
+    if(!missing(start) && !is.null(start) && (length(start) != (S - 1) || any(start < 0) || sum(start) >= 1))
+      stop("'start' must be a vector of nonnegative mixture weights,\n",
+           "   and defines the weights for the first ", S-1, " row vectors of 'V'.")
+    else
+      start <- rdirichlet(1, rep(1, S))[,-S]
+    tryCatch (
+      oo <- constrOptim(start, f = loglik_mixture, grad = NULL, #grad_multinom,
+                        k = k, options = options, V = V,
+                        ui = - alpha_Ab$A, ci = - alpha_Ab$b,
+                        control = list(fnscale = -1, ...)),
+      error = function(e) {
+        print(e)
+        cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
+      })
+    cnt <- 1
+    while (cnt < n.fit){
+      start <- rdirichlet(1, rep(1, S))[,-S]
+      oo2 <- constrOptim(start, loglik_mixture, grad = NULL, #grad_multinom,
+                         k = k, options = options, V =V,
+                         ui = - alpha_Ab$A, ci = - alpha_Ab$b,
+                         control = list(fnscale = -1))
+      cnt <- cnt + 1
+      if (oo2$value > oo$value) oo <- oo2
+    }
+    names(oo$par) <- paste0("alpha[",1:(S-1), "]")
+    alpha <- add_fixed(oo$par, options = S, sum = 1)
+    oo$p <- c(t(V) %*% alpha)
+    names(oo$p) <- index_mult(options, fixed = FALSE)
+    oo$V <- V
   }
-  names(oo$par) <- colnames(A)
+  oo$options <- options
   oo
 }
 
@@ -156,6 +225,16 @@ loglik_binom <- function (p, k, n){
   ll
 }
 
+loglik_mixture <- function (alpha, k, V, options){
+  alpha <- add_fixed(alpha, options = length(alpha) + 1, sum = 1)
+  p <- t(V) %*% alpha
+  p_all <- add_fixed(c(p), options = options, sum = 1)
+  ll <- sum(k * log(p_all))
+  if (!is.na(ll) && ll == - Inf)
+    ll <- MIN_LL
+  ll
+}
+
 loglik_multinom <- function (p, k, options){
   p_all <- add_fixed(p, options = options, sum = 1)
   ll <- sum(k * log(p_all))
@@ -173,7 +252,7 @@ grad_multinom <- function (p, k, options){
   K <- k[idx_K]
   pK <- p_all[idx_K]
   g <- k[-idx_K] / p - rep(K / pK, options - 1)
-  # check: print(rbind(g = g, numderiv = numDeriv::grad(stratsel:::loglik_multinom, p, k=k, options=options)))
+  # check: print(rbind(g = g, numderiv = numDeriv::grad(loglik_multinom, p, k=k, options=options)))
   # ll <- sum(dmultinom(x = k, size = n, prob = p, log = TRUE))
   # if (!is.na(g) && ll == - Inf)
   # g[!is.na(g) & g == ] <- MIN_LL

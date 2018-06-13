@@ -6,10 +6,10 @@
 \title{Posterior Sampling for Inequality-Constrained Multinomial Models}
 \usage{
 sampling_multinom(k, options, A, b, V, prior = rep(1, sum(options)),
-  M = 5000, start, burnin = 10, progress = TRUE)
+  M = 5000, start, burnin = 10, progress = TRUE, cpu = 1)
 
 sampling_binom(k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1), M = 5000,
-  start, burnin = 10, progress = TRUE)
+  start, burnin = 10, progress = TRUE, cpu = 1)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -46,7 +46,12 @@ If missing, an approximate maximum-likelihood estimate is used.}
 \item{burnin}{number of burnin samples that are discarded. Can be chosen to be
 small if the maxmimum-likelihood estimate is used as a starting value.}
 
-\item{progress}{whether a progress bar should be shown.}
+\item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
+
+\item{cpu}{either the number of CPUs using separate MCMC chains in parallel,
+or a parallel cluster (e.g., \code{cl <- parallel::makeCluster(3)}).
+All arguments of the function call are passed directly to each core,
+and thus the total number of samples is \code{M*number_cpu}.}
 
 \item{n}{the number of choices per item type.}
 
@@ -58,11 +63,13 @@ Guessing probabilities of .50 are encoded by zeros. The default assumes
 different parameters for each item type: \code{map=1:ncol(A)}}
 }
 \value{
-a matrix with posterior samples for the multinomial probability parameters.
+an \code{mcmc} matrix (or an \code{mcmc.list} if \code{cpu>1}) with
+    posterior samples of the binomial/multinomial probability parameters.
+    See \code{\link[coda]{mcmc}}) .
 }
 \description{
-Uses Gibbs sampling to draw posterior samples for
-binomial and multinomial models with linear inequality-constraints.
+Uses Gibbs sampling to draw posterior samples for binomial and multinomial
+models with linear inequality-constraints.
 }
 \details{
 Draws posterior samples for binomial/multinomial random utility models that

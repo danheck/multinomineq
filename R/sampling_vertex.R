@@ -2,12 +2,16 @@
 #
 # TODO: C++ implementation
 #
+#' @importFrom utils txtProgressBar setTxtProgressBar
 sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
                        start, burnin = 10, progress = TRUE){
   options <- check_V(V, options)
-  # 1) Find inside point as starting value
-  if (missing(start))
-    start <- find_inside(V = V, options = options, random = TRUE)
+  # 1) Approximate ML estimate as starting value
+  if (missing(start) || is.null(start))
+    start <- ml_multinom(k = k, V = V, options = options, n.fit = 1,
+                         maxit = 50, reltol = 1e-3)$p
+  else
+    stopifnot(inside(x = start, V = V))
 
   I <- sum(options) - length(options)
   oo <- rep(1:length(options), options - 1)
@@ -17,6 +21,7 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
   prior_free <- drop_fixed(prior, options)
 
   X <- matrix(NA, M, I)
+  if (progress) pb <- txtProgressBar(0, M, style = 3)
   X[1,] <- start
   for (m in 2:M){
     x <- X[m - 1,]
@@ -32,7 +37,10 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
                           shape2[oo[i]], bnd[2], min(bnd[1], 1)) * xi_max
     }
     X[m,] <- x
+    if (progress) setTxtProgressBar(pb, m)
   }
+  if (progress) close(pb)
+  colnames(X) <- colnames(V)
   X
 }
 

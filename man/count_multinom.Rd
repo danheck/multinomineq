@@ -6,7 +6,7 @@
 \usage{
 count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
   M = 5000, steps, start, cmin = 0, maxiter = 500, burnin = 5,
-  progress = TRUE)
+  progress = TRUE, cpu = 1)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.
@@ -38,26 +38,32 @@ Must have the same length as \code{k}.}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 
-\item{steps}{an integer vector that indicates at which rows the matrix \code{A}
+\item{steps}{an integer vector that indicates the row numbers at which the matrix \code{A}
 is split for a stepwise computation of the Bayes factor (see details).
-In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+\code{M} can be a vector with the number of samples drawn
 in each step from the (partially) order-constrained models  using Gibbs sampling.
-If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.}
+If \code{cmin>0}, samples are drawn for each step until \code{count[i]>=cmin}.}
 
 \item{start}{only relevant if \code{steps} is defined or \code{cmin>0}:
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.}
+\item{cmin}{if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
+If \code{steps} is not defined, \code{steps=c(1,2,3,4,...)} by default.}
 
 \item{maxiter}{if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.}
 
 \item{burnin}{number of burnin samples per step that are discarded. Since the
-maximum-likelihood estimate is used as a start value (which is updated
-during the stepwise procedure in \code{count_multinom}), the \code{burnin}
-number can be much smaller than in standard MCMC applications.}
+maximum-likelihood estimate is used as a start value (which is updated for each step in
+the stepwise procedure in \code{count_multinom}), the \code{burnin}
+number can be smaller than in other MCMC applications.}
 
-\item{progress}{whether a progress bar should be shown.}
+\item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
+
+\item{cpu}{either the number of CPUs used for parallel sampling, or a parallel
+cluster  (e.g., \code{cl <- parallel::makeCluster(3)}).
+All arguments of the function call are passed directly to each core,
+and thus the total number of samples is \code{M*number_cpu}.}
 }
 \value{
 a list with the elements
@@ -109,4 +115,7 @@ bf_multinom(k, options, A, b, cmin = 5000, M = 1000)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
+}
+\seealso{
+\code{\link{bf_multinom}}, \code{\link{count_binom}}
 }

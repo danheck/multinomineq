@@ -16,26 +16,33 @@
 #'     Guessing probabilities of .50 are encoded by zeros. The default assumes
 #'     different parameters for each item type: \code{map=1:ncol(A)}
 #' @param M number of posterior samples drawn from the encompassing model
-#' @param steps an integer vector that indicates at which rows the matrix \code{A}
+#' @param steps an integer vector that indicates the row numbers at which the matrix \code{A}
 #'     is split for a stepwise computation of the Bayes factor (see details).
-#'     In this case, \code{M} can be chosen to be a vector with the number of samples drawn
+#'     \code{M} can be a vector with the number of samples drawn
 #'     in each step from the (partially) order-constrained models  using Gibbs sampling.
-#'     If \code{cmin>0}, steps are chosen by default as: \code{steps=1:nrow(A)}.
+#'     If \code{cmin>0}, samples are drawn for each step until \code{count[i]>=cmin}.
 #' @param prior a vector with two positive numbers defining the shape parameters
 #'     of the beta prior distributions for each binomial rate parameter.
 #' @param start only relevant if \code{steps} is defined or \code{cmin>0}:
 #'     a vector with starting values in the interior of the polytope.
 #'     If missing, an approximate maximum-likelihood estimate is used.
 #' @param cmin if \code{cmin>0}: minimum number of counts per step in the automatic stepwise procedure.
+#'     If \code{steps} is not defined, \code{steps=c(1,2,3,4,...)} by default.
 #' @param maxiter if \code{cmin>0}: maximum number of sampling runs in the automatic stepwise procedure.
 #' @param burnin number of burnin samples per step that are discarded. Since the
-#'     maximum-likelihood estimate is used as a start value (which is updated
-#'     during the stepwise procedure in \code{count_multinom}), the \code{burnin}
-#'     number can be much smaller than in standard MCMC applications.
-#' @param progress whether a progress bar should be shown.
+#'     maximum-likelihood estimate is used as a start value (which is updated for each step in
+#'     the stepwise procedure in \code{count_multinom}), the \code{burnin}
+#'     number can be smaller than in other MCMC applications.
+#' @param progress whether a progress bar should be shown (if \code{cpu=1}).
+#' @param cpu either the number of CPUs used for parallel sampling, or a parallel
+#'     cluster  (e.g., \code{cl <- parallel::makeCluster(3)}).
+#'     All arguments of the function call are passed directly to each core,
+#'     and thus the total number of samples is \code{M*number_cpu}.
 #'
 #' @details
-#' Useful to compute the encompassing Bayes factor for testing order constraints
+#' Counts the number of random samples drawn from beta distributions that satisfy
+#' the convex, linear-inequalitiy constraints. The function is useful to compute
+#' the encompassing Bayes factor for testing inequality-constrained models
 #' (see \code{\link{bf_binom}}; Hojtink, 2011).
 #'
 #' The stepwise computation of the Bayes factor proceeds as follows:
@@ -58,9 +65,11 @@
 #'    \item\code{const_map}: logarithm of the binomial constants that
 #'           have to be considered due to equality constraints
 #' }
+#' @seealso \code{\link{bf_binom}}, \code{\link{count_multinom}}
+#'
 #' @examples
-#' # linear order constraint:
-#' # x1 < x2 < .... < x6 < .50
+#' ### a set of linear order constraints:
+#' ### x1 < x2 < .... < x6 < .50
 #' A <- matrix(c(1, -1, 0, 0, 0, 0,
 #'               0, 1, -1, 0, 0, 0,
 #'               0, 0, 1, -1, 0, 0,
@@ -70,55 +79,63 @@
 #'             ncol = 6, byrow = TRUE)
 #' b <- c(0, 0, 0, 0, 0, .50)
 #'
+#' ### check whether a specific vector is inside the polytope:
+#' A %*% c(.05, .1, .12, .16, .19, .23) <= b
+#'
+#'
+#' ### observed frequencies and number of observations:
 #' k <- c(0, 3, 2, 5, 3, 7)
 #' n <- rep(10, 6)
 #'
-#' # check whether specific vector is in polytope:
-#' A %*% c(.05, .1, .12, .16, .19, .23) <= b
-#'
-#' # count prior samples and compare to analytical result
+#' ### count prior samples and compare to analytical result
 #' prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
-#' prior  # volume = attribute "proportion"
+#' prior    # to get the proportion: attr(prior, "proportion")
 #' (.50)^6 / factorial(6)
 #'
-#' # count posterior samples stepwise
-#' posterior <- count_binom(k, n, A, b, M=1e4, steps=1:4)
+#' ### count posterior samples + get Bayes factor
+#' posterior <- count_binom(k, n, A, b, M=5000, steps=1:4)
 #' count_to_bf(posterior, prior)
 #'
-#' # automatic stepwise algorithm
+#' ### automatic stepwise algorithm
 #' prior <- count_binom(0, 0, A, b, M = 1000, cmin = 500)
 #' posterior <- count_binom(k, n, A, b, M = 1000, cmin = 500)
 #' count_to_bf(posterior, prior)
-
+#'
 #' @template ref_hoijtink2011
 #' @template ref_fukuda2004
 #' @importFrom Rglpk Rglpk_solve_LP
 #' @export
 count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
                          steps, start, cmin = 0, maxiter = 500,
-                         burnin = 5, progress = TRUE){
+                         burnin = 5, progress = TRUE, cpu = 1){
 
+  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
+    arg <- lapply(as.list(match.call())[-1],
+                  function(i) tryCatch(eval(i), error = function(e) NULL))
+    count <- run_parallel(arg, fun = "count_binom", cpu = cpu, simplify = "count")
+    return(count)
+  }
   if (length(prior) == 1) prior <- rep(prior, length(k))
   check_Mminmax(M, cmin, maxiter)
-  if (missing(A)) A <- V
+  if (missing(A) || is.null(A)) A <- V
   aggr <- map_k_to_A(k, n, A, map, prior)
   k <- aggr$k
   n <- aggr$n
 
-  if (!missing(b)){
+  if (!missing(b) && !is.null(b)){
     check_Abknprior(A, b, k, n, prior)
-    if (cmin == 0 && missing(steps)){
+    if (cmin == 0 && (missing(steps) || is.null(steps))){
       count <- count_bin(k, n, A, b, prior, M, batch = BATCH, progress)
 
     } else {
       steps <- check_stepsA(steps, A)
-      if (missing(start) || any(start < 0))
+      if (missing(start) || is.null(start) || any(start < 0))
         start <-  ml_binom(k, n, A, b, map, n.fit = 1, start, maxit = 20)$par
       check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){
         zeros <- rep(0, length(steps))
-        count <- count_auto_bin(k, n, A, b, prior, zeros, zeros, steps,
+        count <- count_auto_bin(k, n, A, b, prior, count = zeros, M = zeros, steps = steps,
                                 M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
                                 start, burnin, progress)
       } else {
@@ -126,21 +143,24 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
                                     start, burnin, progress)
       }
     }
-  } else if (!missing(V)){
+  } else if (!missing(V) && !is.null(V)){
     count <- 0
     m <- M
     a <- c(rbind(k + prior[1], n - k + prior[2]))
+    if (progress) pb <- txtProgressBar(0, M, style = 3)
     while (m > 0 ){
-      X <- rpdirichlet(m, a, rep(2, ncol(V)), p_drop = TRUE)
+      X <- rpdirichlet(round(BATCH/1000), a, rep(2, ncol(V)), p_drop = TRUE)
       count <- count + sum(inside_V(X, V))
-      m <- m - BATCH
+      m <- m - round(BATCH/1000)
+      if (progress) setTxtProgressBar(pb, M - m)
     }
+    if (progress) close(pb)
     count <- cbind("count" = count, "M" = M, "steps" = NA)
   } else {
     stop("A/b or V must be provided.")
   }
-  count <- as_ineq_count(count)
+
   attr(count, "const_map_0u") <- aggr$const_map_0u
-  count
+  as_ineq_count(count)
 }
 

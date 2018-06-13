@@ -18,7 +18,7 @@ model_weights <- function(x, prior){
     w <- apply(x, 1, model_weights, prior = prior)
     return (t(w))
   } else {
-    if (missing(prior))
+    if (missing(prior) || is.null(prior))
       prior <- rep(1, length(x))
     w <- exp(x)*prior/sum(exp(x) * prior)
     return (w)

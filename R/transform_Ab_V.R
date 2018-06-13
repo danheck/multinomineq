@@ -89,7 +89,9 @@ V_to_Ab <- function (V){
     return (ieq)
   }
   Ab <- ieq@inequalities@num / ieq@inequalities@den
-  list("A" = Ab[,1:(ncol(Ab)-1 )], "b" = Ab[,ncol(Ab)])
+  A <- Ab[,1:(ncol(Ab)-1 )]
+  colnames(A) <- colnames(V)
+  list("A" = A, "b" = Ab[,ncol(Ab)])
 }
 
 
@@ -117,6 +119,7 @@ Ab_to_V <- function (A, b, options = 2){
   poi <- rPorta::traf(ieq)
   unlink("porta.log")
   V <- poi@convex_hull@num / poi@convex_hull@den
+  colnames(V) <- colnames(A)
   V
 }
 
