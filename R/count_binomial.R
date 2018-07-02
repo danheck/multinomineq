@@ -110,8 +110,8 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
                          burnin = 5, progress = TRUE, cpu = 1){
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
-    arg <- lapply(as.list(match.call())[-1],
-                  function(i) tryCatch(eval(i), error = function(e) NULL))
+    arg <- lapply(as.list(match.call())[-1], eval, envir = environment())
+                  # function(i) tryCatch(eval(i), error = function(e) NULL))
     count <- run_parallel(arg, fun = "count_binom", cpu = cpu, simplify = "count")
     return(count)
   }

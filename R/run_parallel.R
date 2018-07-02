@@ -1,12 +1,12 @@
 
-#' @importFrom parallel clusterExport parLapplyLB makeCluster clusterEvalQ
+#' @importFrom parallel clusterExport parLapplyLB makeCluster clusterEvalQ clusterSetRNGStream
 run_parallel <- function(arg, fun, cpu = 1, simplify = "count"){
 
   if (is.numeric(cpu)){
     ncpu <- cpu
     stop_cl <- TRUE
     cpu <- makeCluster(cpu)
-    clusterSetRNGStream(cl, sample.int(1e9))
+    clusterSetRNGStream(cpu, sample.int(1e9, 1))
   } else {
     ncpu <- length(cpu)
     stop_cl <- FALSE
@@ -14,7 +14,7 @@ run_parallel <- function(arg, fun, cpu = 1, simplify = "count"){
   }
   arg <- arg[!sapply(arg, is.null)]  # omit missing arguments
   arg$cpu <- 1
-  clusterExport(cl, names(arg), envir = as.environment(arg))
+  clusterExport(cpu, names(arg), envir = as.environment(arg))
   out <- parLapplyLB(cpu, seq(ncpu),
                      function(i, arg) do.call(fun, arg), arg)
   if (stop_cl) stopCluster(cpu)

@@ -67,8 +67,8 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
                             burnin = 5, progress = TRUE, cpu = 1){
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
-    arg <- lapply(as.list(match.call())[-1],
-                  function(i) tryCatch(eval(i), error = function(e) NULL))
+    arg <- lapply(as.list(match.call())[-1], eval, envir = environment())
+                  # function(EVAL_EXPR) tryCatch(eval(EVAL_EXPR), error = function(e) NULL))
     count <- run_parallel(arg, fun = "count_multinom", cpu = cpu, simplify = "count")
     return(count)
   }
