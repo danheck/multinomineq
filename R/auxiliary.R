@@ -104,6 +104,8 @@ add_fixed <- function(x, options = 2, sum = 1){
 }
 
 # ' @rdname drop_fixed
+#' @importFrom stats start end
+#' @import coda
 #' @export
 add_fixed.mcmc <- function(x, options = 2, sum = 1){
   as.mcmc(add_fixed.matrix(x, options = options, sum = sum),

@@ -57,7 +57,7 @@
 #' samp <- sampling_multinom(k, options, A, b)
 #' head(samp)
 #' apply(samp, 2, plot, type = "l", ylim = c(0, 1))
-#' @importFrom coda as.mcmc as.mcmc.list
+#' @importFrom coda as.mcmc as.mcmc.list mcmc mcmc.list
 #' @export
 sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options)),
                                M = 5000, start, burnin = 10,
@@ -85,7 +85,7 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
     if (is.null(colnames(A)))
       colnames(mcmc) <- drop_fixed(index_mult(options), options)
   }
-  as.mcmc(mcmc, start = burnin + 1, end = M)
+  mcmc(mcmc, start = burnin + 1, end = M)
 }
 
 
@@ -121,5 +121,5 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
     mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
     colnames(mcmc) <- colnames(A)
   }
-  as.mcmc(mcmc, start = burnin + 1, end = M)
+  mcmc(mcmc, start = burnin + 1, end = M)
 }
