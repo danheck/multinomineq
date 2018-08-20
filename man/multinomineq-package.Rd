@@ -6,26 +6,45 @@
 \alias{multinomineq-package}
 \title{multinomineq: Bayesian Inference for Inequality-Constrained Multinomial Models}
 \description{
-Strategy classification is used to select the decision strategy that
-provides the best account for a vector of observed choice frequencies.
-By expressing choice strategies as statistical models for binary choices,
-model-selection methods such as the Bayes factors and minimum description length
-can be used.
+Implements Gibbs sampling and Bayes factors for multinomial models with
+convex, linear-inequality constraints on the probability parameters. This
+includes models that predict a linear order of binomial probabilities
+(e.g., p1 < p2 < p3 < .50) and mixture models, which assume that the
+parameter vector p must be inside the convex hull of a finite number of
+vertices.
 }
 \details{
+Inequality-constrained multinomial models have applications in the
+area of judgment and decision making to fit and test random utility models
+(Regenwetter, M., Dana, J., & Davis-Stober, C. P. (2011).
+  Transitivity of preferences. Psychological Review, 118, 42–56,
+  <doi:10.1037/a0021150>) or to perform outcome-based strategy classification
+(i.e., to select the strategy that provides the best account for a vector of
+  observed choice frequencies; Heck, D. W., Hilbig, B. E., & Moshagen, M.
+  (2017). From information processing to decisions: Formalizing and comparing
+  probabilistic choice models. Cognitive Psychology, 96, 26–40.
+  <doi:10.1016/j.cogpsych.2017.05.003>).
+
 The method is implemented for multiple purposes:
 \itemize{
-\item Multiattribute decisions for probabilistic inferences involving strategies such as
-      Take-the-best (TTB) vs. weighted additive (WADD; Bröder, 2003; Heck et al., 2017)
-\item Risky decisions between different gambles to test choice axioms
-      such as transitivity (Regenwetter et al., 2012, 2014).
+ \item Risky decisions between different gambles to test choice axioms
+       such as transitivity (Regenwetter et al., 2012, 2014).
+       See \code{\link{regenwetter2012}}
  \item Testing deterministic axioms of measurement and choice (Karabatsos, 2005; Myung et al., 2005).
- \item Fitting and testing nonparametric item response theory models (Karabatsos, 2002).
+       See \code{\link{bf_nonlinear}}
+ \item Multiattribute decisions for probabilistic inferences involving strategies such as
+       Take-the-best (TTB) vs. weighted additive (WADD; Bröder & Schiffer, 2003; Heck et al., 2017)
+       See \code{\link{heck2017}} and \code{\link{hilbig2014}}
+ \item Fitting and testing nonparametric item response theory models (Karabatsos & Sheu, 2004).
+       See \code{\link{karabatsos2004}}
  \item Statistical inference for order-constrained contingency tables (Klugkist et al., 2007, 2010).
+       See \code{\link{bf_nonlinear}}
+ \item Testing stochastic dominance of response time distributions (Heathcote et al., 2010).
+       See \code{\link{stochdom_bf}}
 }
 
-Detailed explanations and examples can be found in the package vignette, accessible via \code{vignette("multinomineq")}.
-For convex polytopes, the transformation of vertex to inequality representation requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
+For convex polytopes, the transformation of vertex to inequality representation
+requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 }
 \references{
 Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. \url{https://doi.org/10.1002/bdm.442}
@@ -51,6 +70,8 @@ Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral 
 Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}
 
 Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \url{https://doi.org/10.1037/a0020137}
+
+Heathcote, A., Brown, S., Wagenmakers, E. J., & Eidels, A. (2010). Distribution-free tests of stochastic dominance for small samples. Journal of Mathematical Psychology, 54(5), 454-463. \url{https://doi.org/10.1016/j.jmp.2010.06.005}
 }
 \seealso{
 Useful links:

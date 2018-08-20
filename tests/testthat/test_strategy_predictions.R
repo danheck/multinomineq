@@ -1,4 +1,6 @@
 library("testthat")
+set.seed(123)
+
 # models of Hilbig & Moshagen (2014)
 v <- c(.9, .8, .7, .6)
 cuesA <- matrix(c(1, 1, 1, -1,
@@ -120,33 +122,32 @@ test_that("predictions/frequency table matches for Heck et al. (2017)", {
 
 test_that("strategy_to_Ab returns the correct A/b representation",{
   # compare results to encompassing BF method:
-  b <- list(pattern = 1:4, c = 1,
-            ordered = FALSE, prior = c(1,1))
+  encompassing <- list(pattern = 1:4, c = 1, ordered = FALSE, prior = c(1,1))
   k <- c(5, 4, 2, 0)
   n <- rep(10, 4)
 
-
-  strat <- list(pattern =-c(1:4),  # A,A,A,A  e4<e3<e2<e1<.5
+  strat <- list(pattern = -c(1:4),  # A,A,A,A  e4<e3<e2<e1<.5  | .5>t1>t2>t3>t4
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
-  m1 <- strategy_postprob(k, n, list(strat, b))
+  m1 <- strategy_postprob(k, n, list(strat, encompassing))
+
   bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
+  expect_equal(log(m1[1] / m1[2]), bf["bf_0u",1], tol = 3*bf["bf_0u",2])
 
   strat <- list(pattern =-c(4:1),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
-  m1 <- strategy_postprob(k, n, list(strat, b))
+  m1 <- strategy_postprob(k, n, list(strat, encompassing))
   bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
+  expect_equal(log(m1[1] / m1[2]), bf["bf_0u",1], tol = 3*bf["bf_0u",2])
 
   strat <- list(pattern =c(1,-5,2,-3),  # A,A,A,A  e1<e2<e3<e4<.5
                 c = .5, ordered = TRUE,
                 prior = c(1,1))
   pt <- strategy_to_Ab(strat)
-  m1 <- strategy_postprob(k, n, list(strat, b))
+  m1 <- strategy_postprob(k, n, list(strat, encompassing))
   bf <- bf_binom(k, n, pt$A, pt$b, M = 1e6, log = TRUE)
-  expect_equal(log(m1[1] / m1[2]), bf["log_bf_0u",1], tol = 3*bf["log_bf_0u",2])
+  expect_equal(log(m1[1] / m1[2]), bf["bf_0u",1], tol = 3*bf["bf_0u",2])
 })

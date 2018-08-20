@@ -31,12 +31,13 @@ stochdom_bf <- function (x1, x2, breaks = "Sturges", order = "<", ...){
   h2 <- hist(x2, breaks = b, plot = FALSE)
   k1 <- h1$counts
   k2 <- h2$counts
+  k <- c(k1, k2)
   B <- length(k1)
   bmat <- rbind("x1" = k1, "x2" = k2)
   colnames(bmat) <- paste0("b", 1:B)
 
   Ab <- stochdom_Ab(bins = B, conditions = 2, order = order)
-  bf <- bf_multinom(c(k1, k2), options = rep(B, 2),  A = Ab$A, b = Ab$b,
+  bf <- bf_multinom(k, options = rep(B, 2),  A = Ab$A, b = Ab$b,
                     prior = rep(1/B, B * 2), ...)
   list("breaks" = b, "k" = bmat,
        "A" = Ab$A, "b" = Ab$b,

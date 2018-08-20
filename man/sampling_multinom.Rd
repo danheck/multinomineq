@@ -88,7 +88,7 @@ A <- matrix(c(1, 0, 0,   # x1 < .50
 b <- c(.5, 1, 1, -.2, .1)
 samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
 head(samp)
-apply(samp, 2, plot, type = "l", ylim = c(0,.6))
+plot(samp)
 
 
 ############### multinomial ##########################
@@ -106,7 +106,7 @@ A <- matrix(c(1, 0, 0,   # a1 < .20
 b <- c(.2, 1, -.2, .4)
 samp <- sampling_multinom(k, options, A, b)
 head(samp)
-apply(samp, 2, plot, type = "l", ylim = c(0, 1))
+plot(samp)
 }
 \references{
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}

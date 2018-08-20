@@ -38,7 +38,7 @@
 #' b <- c(.5, 1, 1, -.2, .1)
 #' samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
 #' head(samp)
-#' apply(samp, 2, plot, type = "l", ylim = c(0,.6))
+#' plot(samp)
 #'
 #'
 #' ############### multinomial ##########################
@@ -56,7 +56,7 @@
 #' b <- c(.2, 1, -.2, .4)
 #' samp <- sampling_multinom(k, options, A, b)
 #' head(samp)
-#' apply(samp, 2, plot, type = "l", ylim = c(0, 1))
+#' plot(samp)
 #' @importFrom coda as.mcmc as.mcmc.list mcmc mcmc.list
 #' @export
 sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options)),
@@ -66,7 +66,9 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
     k <- rep(0, sum(options))
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
-    arg <- lapply(as.list(match.call())[-1], eval, envir = environment())
+    arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
+    if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0))
+      arg$k <- rep(0, sum(arg$options))
     mcmc_list <- run_parallel(arg, fun = "sampling_multinom", cpu = cpu, simplify = "as.mcmc.list")
     return(mcmc_list)
   }

@@ -44,10 +44,10 @@
 #' @export
 bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...){
 
-  arg <- lapply(as.list(match.call())[-1], eval, envir = environment())
+  arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
   arg$log <- NULL
   po <- do.call("count_binom", arg)
-  arg$k <- 0
+  arg$k <- arg$n <- 0
   pr <- do.call("count_binom", arg)
   count_to_bf(po, pr, log = log)
 }
@@ -58,7 +58,7 @@ bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...){
 bf_multinom <- function(k, options, A, b, V, prior = rep(1, sum(options)),
                         log = FALSE, ...){
 
-  arg <- lapply(as.list(match.call())[-1], eval, envir = environment())
+  arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
   arg$log <- NULL
   po <- do.call("count_multinom", arg)
   arg$k <- 0

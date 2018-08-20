@@ -1,4 +1,7 @@
-M <- 5e5
+
+set.seed(123)
+
+M <- 2e5
 p <- seq(0,1,.05)
 quantile_ss <- function(x, y, p = seq(0,1,.05)){
   sum((quantile(x, p) - quantile(y, p))^2)
@@ -68,7 +71,7 @@ test_that("Gibbs sampling gives same results as accept-reject for binomial", {
     qqplot(X1[,i], X[sel,i])
   }
   expect_equal(colMeans(X1), colMeans(X[sel,]), tol = .01)
-  expect_equal(apply(X1, 2, sd), apply(X[sel,], 2, sd), tol = .01)
+  expect_equal(unname(apply(X1, 2, sd)), apply(X[sel,], 2, sd), tol = .01)
   for (i in 1:ncol(A))
     expect_equal(quantile(X1[,i], p), quantile(X[sel,i], p), tol = .04)
 })
@@ -183,7 +186,7 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   X1 <- rpdirichlet(M*2, k + 1, options, p_drop = TRUE)
   sel <- sel_Ab(X1, A, b)
   cnt <- count_multinom(k, options, A, b, M = 5e5)
-  expect_equal(mean(sel), attr(cnt, "proportion"), tol = attr(cnt, "se")) ## integral
+  expect_equal(mean(sel), attr(cnt, "proportion"), tol = 5 * attr(cnt, "se")) ## integral
   par(mfrow=c(2,2))
   for (i in 1:ncol(A)){
     plot(density(X[,i]), xlim = 0:1, main = i)
