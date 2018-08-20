@@ -1,7 +1,8 @@
 #' Posterior Predictive p-Values
 #'
 #' Uses posterior samples to get posterior-predicted frequencies and compare
-#' the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the posterior-predicted frequencies.
+#' the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the
+#' posterior-predicted frequencies.
 #'
 #' @inheritParams rpmultinom
 #' @inheritParams count_binom
@@ -9,7 +10,9 @@
 #' @param by optional: a vector of the same length as \code{k} indicating factor levels
 #'     by which the posterior-predictive checks should be split (e.g., by item sets).
 # ' @param M number of subsamples from \code{prob}
-#' @seealso \code{\link{sampling_binom}}/\code{\link{sampling_multinom}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
+#' @seealso \code{\link{sampling_binom}}/\code{\link{sampling_multinom}} to get
+#'     posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to
+#'     get posterior-predictive samples.
 #' @template ref_myung2005
 #'
 #' @examples

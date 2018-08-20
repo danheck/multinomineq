@@ -4,8 +4,9 @@
 \alias{count_binom}
 \title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
 \usage{
-count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps, start,
-  cmin = 0, maxiter = 500, burnin = 5, progress = TRUE, cpu = 1)
+count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
+  start, cmin = 0, maxiter = 500, burnin = 5, progress = TRUE,
+  cpu = 1)
 }
 \arguments{
 \item{k}{the number of Option B choices.

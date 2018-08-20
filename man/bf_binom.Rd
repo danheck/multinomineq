@@ -7,8 +7,8 @@
 \usage{
 bf_binom(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...)
 
-bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)), log = FALSE,
-  ...)
+bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)),
+  log = FALSE, ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.

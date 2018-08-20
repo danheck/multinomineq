@@ -4,7 +4,8 @@
 \alias{bf_nonlinear}
 \title{Bayes Factor for Nonlinear Order Constraints}
 \usage{
-bf_nonlinear(k, options, inside, prior = rep(1, sum(options)), M = 10000)
+bf_nonlinear(k, options, inside, prior = rep(1, sum(options)),
+  M = 10000)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type, e.g.

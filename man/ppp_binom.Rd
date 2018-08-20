@@ -32,7 +32,8 @@ by which the posterior-predictive checks should be split (e.g., by item sets).}
 }
 \description{
 Uses posterior samples to get posterior-predicted frequencies and compare
-the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the posterior-predicted frequencies.
+the Pearson's X^2 statistic for (1) the observed frequencies vs. (2) the
+posterior-predicted frequencies.
 }
 \examples{
 # uniform samples:  p<.10
@@ -49,5 +50,7 @@ ppp_multinom(prob, c(1,0,9), 3)  # ok
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
 }
 \seealso{
-\code{\link{sampling_binom}}/\code{\link{sampling_multinom}} to get posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to get posterior-predictive samples.
+\code{\link{sampling_binom}}/\code{\link{sampling_multinom}} to get
+    posterior samples and \code{\link{rpbinom}}/\code{\link{rpmultinom}} to
+    get posterior-predictive samples.
 }
