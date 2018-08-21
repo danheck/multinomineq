@@ -43,4 +43,3 @@
 #'             M = 1000, cmin = 1, steps = seq(2000,75000,2000))
 #' }
 "regenwetter2012"
-

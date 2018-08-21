@@ -5,7 +5,6 @@
 using namespace Rcpp;
 
 
-
 // count number of samples that adhere to constraint A*x <= b
 // X: samples (rows: replications; cols: D dimensions)
 // [[Rcpp::export]]

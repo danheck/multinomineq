@@ -36,8 +36,8 @@ installed from GitHub via:
 devtools::install_github("danheck/multinomineq")
 ```
 
-Note that the pacakge `rPorta` is required to transform between the vertex ($V$) and 
-the inequality ($A x<b$) representation of a poyltope. The package is available on
+Note that the pacakge `rPorta` is required to transform between the vertex (V) and 
+the inequality (A*x<b) representation of a poyltope. The package is available on
 GitHub here:  (https://github.com/TasCL/rPorta)[ https://github.com/TasCL/rPorta]
 
 To compile C++ code, Windows and Mac require 

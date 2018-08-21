@@ -4,6 +4,7 @@
 
 using namespace Rcpp;
 
+
 // sample from truncated beta distribution using the inverse cdf method
 // [[Rcpp::export]]
 double rbeta_trunc(const double shape1, const double shape2,

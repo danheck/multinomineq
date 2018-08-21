@@ -7,6 +7,7 @@
 // [[Rcpp::depends(RcppProgress)]]
 using namespace Rcpp;
 
+
 // [[Rcpp::export]]
 arma::mat rdirichlet(const unsigned int n, const arma::vec alpha){
   unsigned int I = alpha.n_elem;
@@ -306,3 +307,4 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
   if (progress) Rcout << "\n";
   return results(count, M, steps + 1); // C++ --> R indexing
 }
+
