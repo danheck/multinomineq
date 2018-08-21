@@ -10,3 +10,4 @@
 #' \item{\code{prior}: }{a numeric vector with two positive values specifying the shape parameters of the beta prior distribution (truncated to the interval \code{[0,c]}}
 #' \item{\code{label}: }{strategy label (optional)}
 #' }
+#'

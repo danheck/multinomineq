@@ -4,9 +4,7 @@ using namespace arma;
 #ifndef FUNCTIONS_H_INCLUDED
 #define FUNCTIONS_H_INCLUDED
 
-
 // functions that are used in multiple scripts:
-
 
 NumericMatrix results(const vec& count, const vec& M, const vec& steps);
 NumericMatrix results(const unsigned int count, const unsigned int M, const unsigned int steps);
