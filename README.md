@@ -26,6 +26,21 @@ observed choice frequencies; Heck, D. W., Hilbig, B. E., & Moshagen, M.
 probabilistic choice models. Cognitive Psychology, 96, 26–40.
 <doi:10.1016/j.cogpsych.2017.05.003>).
 
+## Details and Citation
+
+The following paper provides a detailed description of the implemented methods:
+
+* Heck, D. W., & Davis-Stober, C. P. (2018). 
+  Multinomial models with linear inequality constraints: 
+  Overview and improvements of computational methods for Bayesian inference. 
+  *Manuscript submitted for publication.* Retrieved from https://arxiv.org/abs/1808.07140
+
+If you use `multinomineq` in publications, please cite the paper above or the R package:
+
+* Heck, D. W. (2018). multinomineq: Bayesian Inference for Inequality-Constrained
+  Multinomial Models. *R package version 0.1.0.* https://github.com/danheck/multinomineq
+
+
 ### Installation
 
 To get the most recent version of `multinomineq`, the package can  directly be
@@ -38,7 +53,7 @@ devtools::install_github("danheck/multinomineq")
 
 Note that the pacakge `rPorta` is required to transform between the vertex (V) and 
 the inequality (A*x<b) representation of a poyltope. The package is available on
-GitHub here:  (https://github.com/TasCL/rPorta)[ https://github.com/TasCL/rPorta]
+GitHub here: https://github.com/TasCL/rPorta
 
 To compile C++ code, Windows and Mac require 
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and 
@@ -54,10 +69,4 @@ sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 <!--The manual is available within R by typing `vignette('multinomineq')`.-->
 
 
-### Citation
-
-If you use `multinomineq` in publications, please cite the package as follows:
-
-Heck, D. W. (2018). multinomineq: Bayesian Inference for Inequality-Constrained
-Multinomial Models. R package version 0.1.0. https://github.com/danheck/multinomineq
 

@@ -130,7 +130,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start, maxit = 20)$par
+        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start, control = list(maxit = 50))$par
       check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){

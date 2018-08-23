@@ -5,9 +5,9 @@
 \alias{ml_multinom}
 \title{Maximum-likelihood Estimate}
 \usage{
-ml_binom(k, n, A, b, map, strategy, n.fit = 1, start, ...)
+ml_binom(k, n, A, b, map, strategy, n.fit = 3, start, ...)
 
-ml_multinom(k, options, A, b, V, n.fit = 1, start, ...)
+ml_multinom(k, options, A, b, V, n.fit = 3, start, ...)
 }
 \arguments{
 \item{k}{the number of Option B choices.
@@ -36,8 +36,10 @@ different parameters for each item type: \code{map=1:ncol(A)}}
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
-\item{...}{further arguments passed to the list of \code{control} arguments in
-\code{\link[stats]{constrOptim}} (e.g., \code{maxit = 5000}.}
+\item{...}{further arguments passed to the function
+\code{\link[stats]{constrOptim}}. To ensure high accuracy, the number of
+maximum iterations should be sufficiently large (e.g., by setting
+\code{control = list(maxit = 1e6, reltol=.Machine$double.eps^.6), outer.iterations = 1000}.}
 
 \item{options}{the number of choice options per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
@@ -52,7 +54,12 @@ Note that this method is comparatively slow since it solves linear-programming p
 to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs sampler.}
 }
 \value{
-the list returned by the optimizer \code{\link[stats]{constrOptim}}.
+the list returned by the optimizer \code{\link[stats]{constrOptim}},
+  including the input arguments (e.g., \code{k}, \code{A}, etc.).
+  If the Ab-representation was used, \code{par} provides the ML estimate for the probability vector.
+  If the V-representation was used, \code{par} provides the estimates for the mixture weights defining
+  the convex hull (these weight parameters are usually not identifiable),
+  while \code{p} provides the ML estimates for the probability parameters.
 }
 \description{
 Get ML estimate for product-binomial/multinomial model with linear inequality constraints.

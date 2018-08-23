@@ -8,8 +8,8 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
   options <- check_V(V, options)
   # 1) Approximate ML estimate as starting value
   if (missing(start) || is.null(start))
-    start <- ml_multinom(k = k, V = V, options = options, n.fit = 1,
-                         maxit = 50, reltol = 1e-3)$p
+    start <- ml_multinom(k = k, V = V, options = options, n.fit = 2,
+                         control = list(maxit = 1000, reltol = 1e-6))$p
   else
     stopifnot(inside(x = start, V = V))
 
@@ -33,6 +33,8 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
     for (i in idx){
       xi_max <- 1 - sum(x[oo == oo[i]]) + x[i]
       bnd <- line_clipping(x, V, dim = i)[,i] / xi_max
+      if (abs(diff(bnd)) < 1e-15)
+        warning("Check whether parameter space/convex hull has full dimensionality (e.g., using the function: V_to_Ab)!")
       x[i] <- rbeta_trunc(k_free[i] + prior_free[i],
                           shape2[oo[i]], bnd[2], min(bnd[1], 1)) * xi_max
     }

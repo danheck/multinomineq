@@ -43,7 +43,7 @@ test_that("dimensionality of V works", {
 
   # undebug(multinomineq:::sampling_V)
   expect_silent(pp <- sampling_multinom(k = c(4,2,3,  19,4,2,  2,15,10),
-                                        options = rep(3,3), V = V_free,
+                                        options = c(3,3,3), V = V_free,
                                         M = 100, progress = FALSE))
   expect_true(all(inside(pp, V = V_free)))
   expect_true(all(inside(add_fixed(pp, options), V = V)))
