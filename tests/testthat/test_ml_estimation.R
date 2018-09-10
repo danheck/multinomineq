@@ -71,7 +71,7 @@ test_that("if unconstrained MLE == constrained MLE", {
                          n.fit = 5, control = list(maxit = 1e7, reltol=.Machine$double.eps^.5),
                          outer.iterations = 1000, progress = FALSE))["elapsed"]
   expect_lt(t, 1)  # should be fast!
-  expect_equal(est_V$p, mle_unconstr)
+  expect_equal(est_V$p, mle_unconstr, tolerance = .0001)
   expect_equal(est_V$value, multinomineq:::loglik_multinom(mle_unconstr, k, options))
 
 })
