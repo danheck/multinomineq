@@ -1,0 +1,1 @@
+#' @references Hoijtink, H., Béland, S., & Vermeulen, J. A. (2014). Cognitive diagnostic assessment via Bayesian evaluation of informative diagnostic hypotheses. Psychological Methods, 19(1), 21–38. doi:10.1037/a0034176

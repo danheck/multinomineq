@@ -60,6 +60,7 @@
 #' @template ref_myung2005
 #' @template ref_karabatsos2004
 #' @template ref_hoijtink2011
+#' @template ref_hoijtink2014
 #' @template ref_klugkist2007
 #' @template ref_klugkist2010
 #' @template ref_heathcote2010
