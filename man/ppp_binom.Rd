@@ -16,8 +16,7 @@ For \code{rpmultinom}: probabilities of all categories excluding
 the last category for each option (cf. \code{p_drop}).
 See also \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
-\item{k}{the number of Option B choices.
-The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
 \item{n}{integer vector, specifying the number of trials for each binomial/multinomial distribution
 Note that this is the \code{size} argument in \code{rmultinom}, cf. \code{\link[stats]{Multinom}}.}

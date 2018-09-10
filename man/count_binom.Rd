@@ -9,10 +9,10 @@ count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
   cpu = 1)
 }
 \arguments{
-\item{k}{the number of Option B choices.
-The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{the number of choices per item type.
+If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
 column for each of the free parameters. The parameter space is defined
@@ -86,8 +86,8 @@ with the attributes:
 \description{
 Draws prior/posterior samples for product-binomial data and counts how many samples are
 inside the convex polytope defined by
-(1) the inequalities A*x <= b or
-(2) the convex hull over the vertices V.
+(1) the inequalities \code{A*x <= b} or
+(2) the convex hull over the vertices \code{V}.
 }
 \details{
 Counts the number of random samples drawn from beta distributions that satisfy

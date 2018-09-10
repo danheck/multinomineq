@@ -12,11 +12,11 @@ sampling_binom(k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
   M = 5000, start, burnin = 10, progress = TRUE, cpu = 1)
 }
 \arguments{
-\item{k}{the number of choices for each alternative ordered by item type, e.g.
-\code{c(a1,a2,a3, b1,b2)}.
+\item{k}{the number of choices for each alternative ordered by item type (e.g.
+\code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
 The default \code{k=0} is equivalent to sampling from the prior.}
 
-\item{options}{the number of choice options per item type,
+\item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 
@@ -53,7 +53,8 @@ or a parallel cluster (e.g., \code{cl <- parallel::makeCluster(3)}).
 All arguments of the function call are passed directly to each core,
 and thus the total number of samples is \code{M*number_cpu}.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{the number of choices per item type.
+If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.}
 
 \item{map}{optional: numeric vector of the same length as \code{k} with integers
 mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},

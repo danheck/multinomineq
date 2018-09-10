@@ -11,10 +11,10 @@ bf_multinom(k, options, A, b, V, prior = rep(1, sum(options)),
   log = FALSE, ...)
 }
 \arguments{
-\item{k}{the number of Option B choices.
-The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{the number of choices per item type.
+If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
 column for each of the free parameters. The parameter space is defined
@@ -45,7 +45,7 @@ of the beta prior distributions for each binomial rate parameter.}
 \item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}}
 (e.g., \code{M}, \code{steps}).}
 
-\item{options}{the number of choice options per item type,
+\item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 }

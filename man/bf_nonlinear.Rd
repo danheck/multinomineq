@@ -8,11 +8,11 @@ bf_nonlinear(k, options, inside, prior = rep(1, sum(options)),
   M = 10000)
 }
 \arguments{
-\item{k}{the number of choices for each alternative ordered by item type, e.g.
-\code{c(a1,a2,a3, b1,b2)}.
+\item{k}{the number of choices for each alternative ordered by item type (e.g.
+\code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
 The default \code{k=0} is equivalent to sampling from the prior.}
 
-\item{options}{the number of choice options per item type,
+\item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 

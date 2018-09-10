@@ -14,7 +14,7 @@ add_fixed(x, options = 2, sum = 1)
 a matrix (typically \code{A} or \code{V}), in which case the fixed dimensions
 are dropped/added column-wise.}
 
-\item{options}{the number of choice options per item type,
+\item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 

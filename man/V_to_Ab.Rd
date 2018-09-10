@@ -16,8 +16,8 @@ Since the values have to sum up to one within each multinomial condition,
 the last value of each multinomial is omitted
 (e.g., the prediction 1-0-0/0-1 for a tri and binomial becomes 1-0/0).}
 
-\item{A}{a matrix defining the convex polytope via A*x <= b.
-The columns of A do not include the last choice option per item type and
+\item{A}{a matrix defining the convex polytope via \code{A*x <= b}.
+The columns of \code{A} do not include the last choice option per item type and
 thus the number of columns must be equal to \code{sum(options-1)}
 (e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
 is \code{c(a1,a2, b1)}).}

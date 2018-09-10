@@ -7,10 +7,10 @@
 binom_to_multinom(k, n)
 }
 \arguments{
-\item{k}{the number of Option B choices.
-The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{the number of choices per item type.
+If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.}
 }
 \description{
 Converts the number of "hits" in the binary choice format to the observed
