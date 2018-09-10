@@ -78,7 +78,8 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
                        start = start, burnin = burnin, progress = progress)
   } else {
     if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_multinom(k, options, A, b, n.fit = 1, control = list(maxit = 50))$par
+      start <-  ml_multinom(k, options, A, b, n.fit = 1,
+                            control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
     check_start(start, A, b, interior = TRUE)
     if (length(prior) == 1) prior <- rep(prior, sum(options))
     check_Abokprior(A, b, options, k, prior)
@@ -118,7 +119,8 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
     n <- aggr$n
     check_Abknprior(A, b, k, n, prior)
     if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_binom(k, n, A, b, map, n.fit = 1, control = list(maxit = 50))$par
+      start <-  ml_binom(k, n, A, b, map, n.fit = 1,
+                         control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
     check_start(start, A, b, interior = TRUE)
     mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
     colnames(mcmc) <- colnames(A)

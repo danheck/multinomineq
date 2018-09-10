@@ -146,6 +146,12 @@ check_Abx <- function (A, b, x){
 check_V <- function(V, options = 2){
   if(is.null(dim(V)) ||  any(V < 0, V > 1))
     stop("The vertex representation 'V' must be provided as a numeric matrix with values in [0,1].")
+
+  if (nrow(unique(V)) != nrow(V))
+    warning("The matrix 'V' contains identical vertices (rows).\n",
+            "  This makes estimation and testing functions unstable and less efficient.\n",
+            "  Please remove redundant vertices, e.g., by using:  unique(V)")
+
   # if (length(options) == 1)
   #   options <- rep(options, ncol(V) / (options - 1))
   # else if (sum(options - 1) != ncol(V))

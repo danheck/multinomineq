@@ -43,6 +43,7 @@
 #' @export
 inside <- function(x, A, b, V){
   if (!missing(V) && !is.null(V)){
+    check_Vx(V, x)
     i <- inside_V(x, V)
   } else {
     check_Abx(A, b, x)
@@ -109,10 +110,9 @@ inside_multinom <- function(k, options, A, b, V){
   }
 }
 
-inside_V <- function (x, V){
-  check_Vx(V, x)
+inside_V <- function (x, V, return_glpk = FALSE){
   if (!is.null(dim(x))){
-    return (apply(x, 1, inside_V, V = V))
+    return (apply(x, 1, inside_V, V = V, return_glpk = return_glpk))
   } else {
     npar <- length(x) + 1
     obj <- c(-1, x)  # z0, z
@@ -122,6 +122,12 @@ inside_V <- function (x, V){
     bnd <- list(lower = list(ind = 1:npar, val = rep(-Inf, npar)),
                 upper = list(ind = 1:npar, val = rep(Inf, npar)))
     glpk <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE, bounds = bnd)
-    return (!glpk$optimum > 0)  # >0  --> outside (= separating hyperplane exists)
+    if (return_glpk){
+      glpk$inside <- !glpk$optimum > 0
+      glpk
+    } else {
+      return (!glpk$optimum > 0)  # >0  --> outside (= separating hyperplane exists)
+
+    }
   }
 }

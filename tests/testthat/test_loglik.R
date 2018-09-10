@@ -1,3 +1,23 @@
+
+
+
+test_that('multinomineq:::loglik_binom/_multinom gives correct results', {
+
+  n <- rep(10,3)
+  k <- c(3,2,5)
+  expect_equal(multinomineq:::loglik_binom(c(.5,.5,.5), k ,n), - sum(n * log(.5)))
+  p <- runif(3)
+  expect_equal(multinomineq:::loglik_binom(p, k ,n), - sum(k * log(p), (n-k)*log(1-p)))
+  expect_equal(suppressWarnings(multinomineq:::loglik_binom(c(0,0,0), k ,n)), Inf)
+
+  p <- rpdirichlet(1, rep(1,7), c(3,4))
+  p_all <- add_fixed(p, c(3,4))
+  k <- rpmultinom(p, 1, c(3,4))
+  expect_equal(multinomineq:::loglik_multinom(p, k, c(3,4)), - sum(k * log(p_all)))
+  expect_equal(suppressWarnings(multinomineq:::loglik_multinom(c(0,0,0,0,0), k, c(3,4))), Inf)
+})
+
+
 # vectors of predictions for 3 item types (Hilbig & Moshagen, 2014)
 TTB <- c(-1, -1, -1)
 WADD <- c(-1, 1, -1)
@@ -28,44 +48,32 @@ test_that('predictions work as expected', {
                1-c(.1, .25, .3))
 })
 
-test_that('multinomineq:::loglik works', {
+test_that("multinomineq::loglik_strategy works", {
 
-  expect_lte(multinomineq:::loglik(runif(1,0.1,.5), k ,n, multinomineq:::as_strategy(TTB)), 0)
-  expect_gte(multinomineq:::loglik(sum(k)/sum(n), k ,n, multinomineq:::as_strategy(TTB)),
-             multinomineq:::loglik(runif(1,0,.5), k ,n, multinomineq:::as_strategy(TTB)))
+  # loglik_strategy is now DEPRECATED [ was used for NML]
+  expect_gte(multinomineq:::loglik_strategy(runif(1,0.1,.5), k ,n, multinomineq:::as_strategy(TTB)), 0)
+  expect_lte(multinomineq:::loglik_strategy(sum(k)/sum(n), k ,n, multinomineq:::as_strategy(TTB)),
+             multinomineq:::loglik_strategy(runif(1,0,.5), k ,n, multinomineq:::as_strategy(TTB)))
 
-  expect_lte(multinomineq:::loglik(runif(1,0,.5), k ,n, multinomineq:::as_strategy(WADD)), 0)
-  expect_lte(multinomineq:::loglik(runif(3,0,1), k ,n, multinomineq:::as_strategy(baseline, c=1, ordered = FALSE)), 0)
-  expect_lte(multinomineq:::loglik(c(), k ,n, multinomineq:::as_strategy(GUESS)), 0)
+  expect_gte(multinomineq:::loglik_strategy(runif(1,0,.5), k ,n, multinomineq:::as_strategy(WADD)), 0)
+  expect_gte(multinomineq:::loglik_strategy(runif(3,0,1), k ,n,
+                                   multinomineq:::as_strategy(baseline, c=1, ordered = FALSE)), 0)
+  expect_gte(multinomineq:::loglik_strategy(c(), k ,n, multinomineq:::as_strategy(GUESS)), 0)
+  expect_equal(multinomineq:::loglik_strategy(c(), k ,n, multinomineq:::as_strategy(GUESS)),
+               - sum(n * log(.5)))
 
   # expected errors
-  expect_identical(multinomineq:::loglik(runif(1,0,.5), k_false , n, multinomineq:::as_strategy(TTB)), -Inf)
+  expect_identical(suppressWarnings(
+    multinomineq:::loglik_strategy(0, k_false , n, multinomineq:::as_strategy(TTB))), Inf)
   # inadmissible parameters
-  expect_identical(multinomineq:::loglik(1.5, k , n, multinomineq:::as_strategy(TTB)), NA_real_)
-  expect_identical(multinomineq:::loglik(-.1, k , n, multinomineq:::as_strategy(TTB)), NA_real_)
-  expect_identical(multinomineq:::loglik(-.1, k , n, multinomineq:::as_strategy(WADDprob)), NA_real_)
-  expect_identical(multinomineq:::loglik(c(.5,.4,.3), k , n, multinomineq:::as_strategy(WADDprob)), NA_real_)
+  expect_identical(suppressWarnings(
+    multinomineq:::loglik_strategy(1.5, k , n, multinomineq:::as_strategy(TTB))), NA_real_)
+  expect_identical(suppressWarnings(
+    multinomineq:::loglik_strategy(-.1, k , n, multinomineq:::as_strategy(TTB))), NA_real_)
+  expect_identical(suppressWarnings(
+    multinomineq:::loglik_strategy(-.1, k , n, multinomineq:::as_strategy(WADDprob))), NA_real_)
+  expect_identical(suppressWarnings(
+    multinomineq:::loglik_strategy(c(.5,.4,.3), k , n, multinomineq:::as_strategy(WADDprob))), NA_real_)
 
-  # standard ML estimation
-  # expect_silent(ml <- ml_binomial(k, n, strategy = multinomineq:::as_strategy(rep(-1, length(k)))))
-  # est <- sum(k)/sum(n)
-  # expect_equal(ml$error, est)
-  # expect_equal(ml$loglik, sum(dbinom(k, n, est, log = TRUE)))
-  #
-  # # luckiness ML estimation
-  # expect_silent(ml <- maximize_ll(k, n, multinomineq:::as_strategy(rep(-1, length(k)),
-  #                                                              prior = c(1.5, 1.5)))) # Beta(1.5, 1.5)
-  # est <- (sum(k) + .5)/(sum(n) + 1)
-  # expect_equal(ml$error, est)
-  # expect_equal(ml$loglik, dbeta(est,1.5, 1.5, log = TRUE) +
-  #                sum(dbinom(k, n, est, log = TRUE)))
-
-  # baseline luckiness
-  # expect_silent(ml <- maximize_ll(k, n, list(pattern = - seq_along(k), c = 1,
-  #                                            ordered = FALSE, prior = c(1.5, 1.5))))
-  # est <- (k + .5)/(n + 1)
-  # expect_equal(ml$error, est)
-  # expect_equal(ml$loglik, sum(dbeta(est,1.5, 1.5, log = TRUE) +
-  #                               dbinom(k, n, est, log = TRUE)))
 })
 

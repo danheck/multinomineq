@@ -1,7 +1,7 @@
 ############ CONSTANTS
 # to avoid numerical issues: lower value for probability parameters
 BOUND <- 1e-10
-MIN_LL <- - 1e300
+MIN_LL <- - 1e100
 
 # reduce memory load by counting in batches:
 BATCH <- 50000

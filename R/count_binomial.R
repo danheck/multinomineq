@@ -2,13 +2,13 @@
 #'
 #' Draws prior/posterior samples for product-binomial data and counts how many samples are
 #' inside the convex polytope defined by
-#' (1) the inequalities A*x <= b or
-#' (2) the convex hull over the vertices V.
+#' (1) the inequalities \code{A*x <= b} or
+#' (2) the convex hull over the vertices \code{V}.
 #'
 #' @inheritParams inside
-#' @param k the number of Option B choices.
-#'     The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.
+#' @param k vector of observed response frequencies.
 #' @param n the number of choices per item type.
+#'     If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.
 #' @param map optional: numeric vector of the same length as \code{k} with integers
 #'     mapping the frequencies \code{k} to the free parameters/columns of \code{A}/\code{V},
 #'     thereby allowing for equality constraints (e.g., \code{map=c(1,1,2,2)}).
@@ -50,6 +50,7 @@
 #' (1) Unconstrained model vs. inequalities in \code{A[1:5,]};
 #' (2) use posterior based on inequalities in \code{A[1:5,]} and check inequalities \code{A[6:10,]};
 #' (3) sample from A[1:10,] and check inequalities in \code{A[11:nrow(A),]} (i.e., all inequalities).
+#'
 #'
 #' @return a matrix with the columns
 #' \itemize{
@@ -130,7 +131,8 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start, control = list(maxit = 50))$par
+        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start,
+                           control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
       check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){

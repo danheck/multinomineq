@@ -5,16 +5,16 @@
 #' (1) the inequalities A*x <= b or
 #' (2) the convex hull over the vertices V.
 #'
-#' @param A a matrix defining the convex polytope via A*x <= b.
-#'    The columns of A do not include the last choice option per item type and
+#' @param A a matrix defining the convex polytope via \code{A*x <= b}.
+#'    The columns of \code{A} do not include the last choice option per item type and
 #'    thus the number of columns must be equal to \code{sum(options-1)}
 #'    (e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
 #'    is \code{c(a1,a2, b1)}).
-#' @param options the number of choice options per item type,
+#' @param options the number of observable categories per item type,
 #'    e.g., \code{c(3,2)} for a ternary and binary item.
 #'     The sum of \code{options} must be equal to the length of \code{k}.
-#' @param k the number of choices for each alternative ordered by item type, e.g.
-#'     \code{c(a1,a2,a3, b1,b2)}.
+#' @param k the number of choices for each alternative ordered by item type (e.g.
+#'     \code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
 #'     The default \code{k=0} is equivalent to sampling from the prior.
 #' @param prior the prior parameters of the Dirichlet-shape parameters.
 #'    Must have the same length as \code{k}.
@@ -86,7 +86,8 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_multinom(k, options, A, b, n.fit = 1, start, control = list(maxit = 50))$par
+        start <-  ml_multinom(k, options, A, b, n.fit = 1, start,
+                              control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
       check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){

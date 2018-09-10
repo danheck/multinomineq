@@ -5,15 +5,17 @@
 \alias{ml_multinom}
 \title{Maximum-likelihood Estimate}
 \usage{
-ml_binom(k, n, A, b, map, strategy, n.fit = 3, start, ...)
+ml_binom(k, n, A, b, map, strategy, n.fit = 3, start, progress = FALSE,
+  ...)
 
-ml_multinom(k, options, A, b, V, n.fit = 3, start, ...)
+ml_multinom(k, options, A, b, V, n.fit = 3, start, progress = FALSE,
+  ...)
 }
 \arguments{
-\item{k}{the number of Option B choices.
-The default \code{k=n=rep(0,ncol(A))} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
-\item{n}{the number of choices per item type.}
+\item{n}{the number of choices per item type.
+If \code{k=n=0}, Bayesian inference is relies on the prior distribution only.}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
 column for each of the free parameters. The parameter space is defined
@@ -36,12 +38,14 @@ different parameters for each item type: \code{map=1:ncol(A)}}
 a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
+\item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
+
 \item{...}{further arguments passed to the function
 \code{\link[stats]{constrOptim}}. To ensure high accuracy, the number of
 maximum iterations should be sufficiently large (e.g., by setting
 \code{control = list(maxit = 1e6, reltol=.Machine$double.eps^.6), outer.iterations = 1000}.}
 
-\item{options}{the number of choice options per item type,
+\item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 
@@ -55,14 +59,28 @@ to test whether a point is inside  a polytope (Fukuda, 2004) or to run the Gibbs
 }
 \value{
 the list returned by the optimizer \code{\link[stats]{constrOptim}},
-  including the input arguments (e.g., \code{k}, \code{A}, etc.).
-  If the Ab-representation was used, \code{par} provides the ML estimate for the probability vector.
-  If the V-representation was used, \code{par} provides the estimates for the mixture weights defining
-  the convex hull (these weight parameters are usually not identifiable),
-  while \code{p} provides the ML estimates for the probability parameters.
+  including the input arguments (e.g., \code{k}, \code{options}, \code{A}, \code{V}, etc.).
+  \itemize{
+  \item If the Ab-representation was used, \code{par} provides the ML estimate for
+  the probability vector \eqn{\theta}.
+  \item If the V-representation was used, \code{par} provides the estimates for the
+  (usually not identifiable) mixture weights \eqn{\alpha} that define the convex
+  hull of the vertices in \eqn{V}, while \code{p} provides the ML estimates for
+  the probability parameters. Because the weights must sum to one, the
+  \eqn{\alpha}-parameter for the last row of the matrix \eqn{V} is dropped.
+  If the unconstrained ML estimate is inside the convex hull, the mixture weights
+  \eqn{\alpha} are not estimated and replaced by missings (\code{NA}).
+  }
 }
 \description{
 Get ML estimate for product-binomial/multinomial model with linear inequality constraints.
+}
+\details{
+First, it is checked whether the unconstrained maximum-likelihood estimator
+(e.g., for the binomial: \code{k/n}) is inside the constrained parameter space.
+Only if this is not the case, nonlinear optimization with convex linear-inequality
+constrained is used to estimate (A) the probability parameters \eqn{\theta}
+for the Ab-representation or (B) the mixture weights \eqn{\alpha} for the V-representation.
 }
 \examples{
 # predicted linear order: p1 < p2 < p3 < .50

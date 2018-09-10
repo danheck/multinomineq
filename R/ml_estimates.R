@@ -10,12 +10,26 @@
 #'     maximum iterations should be sufficiently large (e.g., by setting
 #'     \code{control = list(maxit = 1e6, reltol=.Machine$double.eps^.6), outer.iterations = 1000}.
 #'
+#' @details
+#' First, it is checked whether the unconstrained maximum-likelihood estimator
+#' (e.g., for the binomial: \code{k/n}) is inside the constrained parameter space.
+#' Only if this is not the case, nonlinear optimization with convex linear-inequality
+#' constrained is used to estimate (A) the probability parameters \eqn{\theta}
+#' for the Ab-representation or (B) the mixture weights \eqn{\alpha} for the V-representation.
+#'
 #' @return the list returned by the optimizer \code{\link[stats]{constrOptim}},
-#'   including the input arguments (e.g., \code{k}, \code{A}, etc.).
-#'   If the Ab-representation was used, \code{par} provides the ML estimate for the probability vector.
-#'   If the V-representation was used, \code{par} provides the estimates for the mixture weights defining
-#'   the convex hull (these weight parameters are usually not identifiable),
-#'   while \code{p} provides the ML estimates for the probability parameters.
+#'   including the input arguments (e.g., \code{k}, \code{options}, \code{A}, \code{V}, etc.).
+#'   \itemize{
+#'   \item If the Ab-representation was used, \code{par} provides the ML estimate for
+#'   the probability vector \eqn{\theta}.
+#'   \item If the V-representation was used, \code{par} provides the estimates for the
+#'   (usually not identifiable) mixture weights \eqn{\alpha} that define the convex
+#'   hull of the vertices in \eqn{V}, while \code{p} provides the ML estimates for
+#'   the probability parameters. Because the weights must sum to one, the
+#'   \eqn{\alpha}-parameter for the last row of the matrix \eqn{V} is dropped.
+#'   If the unconstrained ML estimate is inside the convex hull, the mixture weights
+#'   \eqn{\alpha} are not estimated and replaced by missings (\code{NA}).
+#'   }
 #'
 #' @examples
 #' # predicted linear order: p1 < p2 < p3 < .50
@@ -58,7 +72,8 @@
 #' ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1),
 #'             options = c(3,3,3), V = V)
 #' @export
-ml_binom <- function(k, n, A, b, map, strategy, n.fit = 3, start, ...){
+ml_binom <- function(k, n, A, b, map, strategy, n.fit = 3, start,
+                     progress =FALSE, ...){
   if (length(n) == 1) n <- rep(n, length(k))
 
   if (!missing(strategy) && !is.null(strategy)){
@@ -80,33 +95,61 @@ ml_binom <- function(k, n, A, b, map, strategy, n.fit = 3, start, ...){
 #' @inheritParams count_multinom
 #' @rdname ml_binom
 #' @export
-ml_multinom <- function(k, options, A, b, V, n.fit = 3, start, ...){
+ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
+                        progress = FALSE, ...){
+
+  t0 <- Sys.time()
+  if (progress) cat("ML estimation starts at", format(t0), "using", n.fit, "starting values.\n",
+                    "Current ML value: ")
+
+  check_ko(k, options)
+  n <- c(tapply(k, rep(1:length(options), options), sum))
+  est_unconstr <- drop_fixed(k / rep(n, options), options)
+  if (anyNA(est_unconstr)){
+    inside_unconstr <- FALSE  # (n=0) required for prior sampling
+  } else {
+    ll_unconstr <- loglik_multinom(est_unconstr, k, options)
+  }
 
   if(!missing(A) && !is.null(A)){
     ### Ab-representation
     check_Abokprior(A, b, options, k)
-    # est <- k / c(tapply(k, rep(1:length(options), options), sum))
-    # start <- drop_fixed(est, options)
     tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
     A <- tmp$A
     b <- tmp$b
-    if (missing(start) || is.null(start) || !all(A %*% start < b))
-      start <- find_inside(A, b, options = options)
-    check_start(start, A, b, interior = TRUE)
-    tryCatch (
-      oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
-                        k = k, options = options, ui = - A, ci = - b, ...),
-      error = function(e) {
-        print(e)
-        cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
-      })
-    cnt <- 1
-    while (cnt < n.fit){
-      start <- find_inside(A, b, random = TRUE)
-      oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
-                         k = k, options = options, ui = - A, ci = - b, ...)
-      cnt <- cnt + 1
-      if (oo2$value < oo$value) oo <- oo2
+
+    if (!anyNA(est_unconstr))
+      inside_unconstr <- inside(est_unconstr, A = A, b = b)
+    if (inside_unconstr){
+      if (progress) cat("Unconstrained MLE within: A*x <= b;  -loglik:", ll_unconstr)
+      oo <- list(par = est_unconstr,
+                 value = ll_unconstr,
+                 counts = NA,
+                 convergence = 0,
+                 message = "Unconstrained MLE satisfies constraint:  A*x <= b.",
+                 outer.iterations = NA,
+                 barrier.value = NA)
+    } else {
+      if (missing(start) || is.null(start) || !all(A %*% start < b))
+        start <- find_inside(A, b, options = options)
+      check_start(start, A, b, interior = TRUE)
+      tryCatch (
+        oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
+                          k = k, options = options, ui = - A, ci = - b, ...),
+        error = function(e) {
+          print(e)
+          cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
+        })
+      cnt <- 1
+      if (progress) cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
+      while (cnt < n.fit){
+        start <- find_inside(A, b, random = TRUE)
+        oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
+                           k = k, options = options, ui = - A, ci = - b, ...)
+        cnt <- cnt + 1
+        if (progress) cat("(",cnt,") ",round(oo2$value, 1), "; ", sep = "")
+        if (oo2$value < oo$value) oo <- oo2
+      }
     }
     names(oo$par) <- colnames(A)
     oo$A <- A
@@ -118,36 +161,61 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start, ...){
     options <- check_V(V, options = options)
     S <- nrow(V)
     alpha_Ab <- Ab_multinom(options = S, nonneg = TRUE)
-    if(!missing(start) && !is.null(start) && (length(start) != (S - 1) || any(start < 0) || sum(start) >= 1))
-      stop("'start' must be a vector of nonnegative mixture weights,\n",
-           "   and defines the weights for the first ", S-1, " row vectors of 'V'.")
-    else
-      start <- rdirichlet(1, rep(1, S))[,-S]
-    tryCatch (
-      oo <- constrOptim(start, f = loglik_mixture, grad = grad_multinom_mixture,
-                        k = k, options = options, V = V,
-                        ui = - alpha_Ab$A, ci = - alpha_Ab$b, ...),
-      error = function(e) {
-        print(e)
-        cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
-      })
-    cnt <- 1
-    while (cnt < n.fit){
-      start <- rdirichlet(1, rep(1, S))[,-S]
-      oo2 <- constrOptim(start, f = loglik_mixture, grad = grad_multinom_mixture,
-                         k = k, options = options, V =V,
-                         ui = - alpha_Ab$A, ci = - alpha_Ab$b, ...)
-      cnt <- cnt + 1
-      if (oo2$value < oo$value) oo <- oo2
+
+    if (!anyNA(est_unconstr))
+      inside_unconstr <- inside_V(x = est_unconstr, V = V, return_glpk = TRUE)
+    if (inside_unconstr$inside){
+      if (progress) cat("Unconstrained MLE within convex hull of V;  -loglik:", ll_unconstr)
+      oo <- list(par = rep(NA, S - 1),
+                 value = ll_unconstr,
+                 counts = NA,
+                 convergence = 0,
+                 message = "Unconstrained MLE is inside convex hull of V.",
+                 outer.iterations = NA,
+                 barrier.value = NA,
+                 p = est_unconstr)
+    } else {
+
+      if(!missing(start) && !is.null(start) && (length(start) != (S - 1) || any(start < 0) || sum(start) >= 1))
+        stop("'start' must be a vector of nonnegative mixture weights,\n",
+             "   and defines the weights for the first ", S-1, " row vectors of 'V'.")
+      else
+        start <- rdirichlet(1, rep(3, S))[,-S]  # first starting value closer to center
+
+      tryCatch (
+        oo <- constrOptim(start, f = loglik_mixture, grad = grad_multinom_mixture,
+                          k = k, options = options, V = V,
+                          ui = - alpha_Ab$A, ci = - alpha_Ab$b, ...),
+        error = function(e) {
+          print(e)
+          cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
+        })
+      cnt <- 1
+      if (progress) cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
+      while (cnt < n.fit){
+        start <- rdirichlet(1, rep(1, S))[,-S]
+        oo2 <- constrOptim(start, f = loglik_mixture, grad = grad_multinom_mixture,
+                           k = k, options = options, V =V,
+                           ui = - alpha_Ab$A, ci = - alpha_Ab$b, ...)
+        cnt <- cnt + 1
+        if (progress) cat("(",cnt,") ", round(oo2$value, 1), "; ", sep = "")
+        if (oo2$value < oo$value) oo <- oo2
+      }
     }
     names(oo$par) <- paste0("alpha[",1:(S-1), "]")
-    alpha <- add_fixed(oo$par, options = S, sum = 1)
-    oo$p <- c(t(V) %*% alpha)
+    if (!inside_unconstr$inside){
+      alpha <- add_fixed(oo$par, options = S, sum = 1)
+      oo$p <- c(t(V) %*% alpha)
+    }
     names(oo$p) <- index_mult(options, fixed = FALSE)
     oo$V <- V
   }
+  t1 <- Sys.time()
+  if (progress) cat("\nFinished at", format(t1), " (difference:", format(t1-t0), ").\n")
   oo$k <- k
   oo$options <- options
+  oo$n.fit <- n.fit
+  oo$time <- t1-t0
   oo
 }
 
@@ -213,22 +281,30 @@ get_error_number <- function(pattern){
   length(get_error_unique(pattern))
 }
 
-# product binomial loglikelihood with luckiness
+# product binomial loglikelihood with luckiness [DEPRECATED]
 #
 # luckiness: -log(a(prob))   not normalized
 # => complexity of order-constrained models can be compared
 # default:    standard NML; luck=c(1,1)
 # uniform BF: inverse of Jeffreys prior; luck=c(1.5, 1.5)
-loglik <- function (error, k, n, strategy){
+loglik_strategy <- function (error, k, n, strategy){
   pb <- error_to_prob(error, strategy)
   loglik_binom(pb, k, n)
 }
 
 loglik_binom <- function (p, k, n){
-  try(ll <- sum(dbinom(x = k, size = n, prob = p, log = TRUE)), silent = TRUE)
-  if (is.null(ll) || !is.na(ll) && ll == - Inf && all(k <= n))
-    ll <- MIN_LL
-  ll
+  lp1 <- log(p)
+  lp1[k == 0] <- 0
+  lp0 <- log(1 - p)
+  lp0[k == n] <- 0
+  ll <- sum(k * lp1, (n-k) * lp0)
+  # try(ll <- sum(dbinom(x = k, size = n, prob = p, log = TRUE)), silent = TRUE)
+  # if (is.null(ll) || !is.na(ll) && ll == - Inf && all(k <= n))
+  #   ll <- MIN_LL
+  if (is.na(ll) || ll == -Inf)
+    warning("log-likelihood: NaN or -Inf: \n",
+            "  Check whether model implies strictly positive probability for each k>0!")
+  - ll
 }
 
 # log(k1)*p1 + log(k2)*p2 + ...
@@ -237,9 +313,12 @@ loglik_mixture <- function (alpha, k, V, options){
   alpha <- c(alpha, 1 - sum(alpha))
   p <- t(V) %*% alpha
   p_all <- add_fixed(c(p), options = options, sum = 1)
-  ll <- sum(k * log(p_all))
-  if (!is.na(ll) && ll == - Inf)
-    ll <- MIN_LL
+  lp <- log(p_all)
+  lp[k == 0] <- 0
+  ll <- sum(k * lp)
+  if (is.na(ll) || ll == -Inf)
+    warning("log-likelihood: NaN or -Inf: \n",
+            "  Check whether model implies strictly positive probability for each k>0!")
   - ll
 }
 
@@ -280,11 +359,16 @@ grad_multinom_mixture <- function(alpha, k, V, options){
 
 loglik_multinom <- function (p, k, options){
   p_all <- add_fixed(p, options = options, sum = 1)
-  ll <- sum(k * log(p_all))
+  lp <- log(p_all)
+  lp[k == 0] <- 0
+  ll <- sum(k * lp)
   # tapply(p, oo, function(pp) dmultinom())
   # ll <- sum(dmultinom(x = k, size = n, prob = p, log = TRUE))
-  if (!is.na(ll) && ll == - Inf)
-    ll <- MIN_LL
+  # if (!is.na(ll) && ll == - Inf)
+  #   ll <- MIN_LL
+  if (is.na(ll) || ll == -Inf)
+    warning("log-likelihood: NaN or -Inf: \n",
+            "  Check whether model implies strictly positive probability for each k>0!")
   - ll
 }
 

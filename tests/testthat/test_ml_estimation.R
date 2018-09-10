@@ -52,3 +52,26 @@ test_that("ML estimation matches for Ab- and V-representation", {
 
   expect_equal(unname(est_V$p), est_Ab$par, tolerance = .0001)
 })
+
+test_that("if unconstrained MLE == constrained MLE", {
+
+  set.seed(123)
+  n <- 100
+  m <- 5
+  options = rep(3,m)
+  V <- round(rpdirichlet(n, rep(1,3*5), options = options))
+  alpha <- c(rpdirichlet(1, rep(1, n), n, p_drop = FALSE))
+  p <- add_fixed( c(alpha %*% V), options)
+  k <- c(round(p*10000))
+  n <- c(tapply(k, rep(1:length(options), options), sum))
+  mle_unconstr <- drop_fixed(k / n, options)
+
+  t <- system.time(
+    est_V <- ml_multinom(k = k, options = options, V = unique(V),
+                         n.fit = 5, control = list(maxit = 1e7, reltol=.Machine$double.eps^.5),
+                         outer.iterations = 1000, progress = FALSE))["elapsed"]
+  expect_lt(t, 1)  # should be fast!
+  expect_equal(est_V$p, mle_unconstr)
+  expect_equal(est_V$value, multinomineq:::loglik_multinom(mle_unconstr, k, options))
+
+})
