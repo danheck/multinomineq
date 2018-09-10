@@ -68,20 +68,29 @@ count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
     prior <- t(c(exact_prior, 1))
   }
 
-  l_post <- log(posterior[,1] / posterior[,2])
-  l_prior <- log(prior[,1] / prior[,2])
-  est <- sum(l_post) - sum(l_prior) + const
-  est_0n0 <- sum(l_post) - log(1 - exp(sum(l_post)))
-
+  l_post <- sum(log(posterior[,1] / posterior[,2]))
+  l_prior <- sum(log(prior[,1] / prior[,2]))
+  est <- l_post - l_prior + const
   lbf_0u <- s_post - s_prior + const
   lbf_u0 <- s_prior - s_post + const
-  lbf_0n0 <- s_post - log(1 - exp(s_post))
+
+  # lbf_0n0 = log(f) - log(c) + log(1-c) - log(1-f)
+  est_0n0 <- l_post - log1mexp(l_post) - l_prior + log1mexp(l_prior)
+  lbf_0n0 <- s_post - s_prior + log1mexp(s_prior) - log1mexp(s_post)
 
   bf <- cbind("bf" = c("bf_0u" = est, "bf_u0" = -est, "bf_00'" = est_0n0),
               t(sapply(list(lbf_0u, lbf_u0, lbf_0n0),
                        summary_samples, exp = !log)))
   if(!log) bf[,"bf"] <- exp(bf[,"bf"])
   bf
+}
+
+# log(1 - exp(x))
+# cf. https://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+log1mexp <- function(x, a0 = log(2)){
+  ifelse(x <= a0,
+         log(- expm1(x)),
+         log1p(- exp(x)))
 }
 
 #' @importFrom stats quantile
