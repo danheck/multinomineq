@@ -267,7 +267,7 @@ bf2
 
 
 
-### Formal definition of multinomial models with inequality constraints
+## Formal definition of multinomial models with inequality constraints
 
 In the following, we define inequality-constrained multinomial models for discrete data.
 We use the term "item type" to refer to a category system $i$ that is modeled by a multinomial distribution with a fixed total number of observations $n_i$.
