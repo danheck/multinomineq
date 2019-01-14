@@ -1,0 +1,312 @@
+---
+title: "multinomineq: Multinomial Models with Inequality Constraints"
+author: "Daniel W. Heck"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{multinomineq: Multinomial Models with Inequality Constraints}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+The R package `multinomineq` facilitates the Bayesian analysis of multinomial models with inequality constraints.
+Essentially, these models allow to analyze discrete choice frequencies while assuming that the choice probabilities are constrained by linear inequality constraints (e.g., by the order $\theta_{1} \leq \theta_{2}\leq \theta_{3}\leq \theta_{4}$).
+Whereas the first section shows how to define and test such models, the second section below provides a formal definition of the model class.
+
+
+
+## Example: Testing the Description-Experience Gap
+
+The following example shows how inequality constraints can be used to test the description-experience (DE) gap in risky decisions (Hertwig et al., 2004).
+Essentially, participants had to choice one of two options in 6 different risky gambles.
+The description-experience gap states that people underweigh small probabilities of winning a payoff when making decisions based on experience.
+This is a reanalysis of the models in Regenwetter & Robinson (2017).
+
+First, it is necessary to install the R package `multinomineq` from Github:
+
+```{r}
+# install.packages("devtools", "coda", "RcppArmadillo", "RcppProgress", "Rglpk", "quadprog")
+# devtools::install_github("danheck/multinomineq")
+
+library("multinomineq")
+library("coda")
+set.seed(1234)
+```
+
+
+### Data structure
+
+We reanalyze the data by Hertwig et al. (2004) who collected choice frequencies of $n=25$ participants for 6 binary risky gambles.
+The observed choice frequencies can simply be summarized by the frequencies of choosing "Option H" for each of the 6 binary gambles: 
+
+```{r}
+n <- 25  
+# Choices of "Option H" in Description condition:
+HER_desc <- c(9, 16, 16, 7, 12, 16)
+# Choices of "Option H" in Experience condition:
+HER_exp  <- c(22, 11, 7, 14, 5, 3)
+```
+
+
+### The vertex (V-)representation
+
+First, we will analyze the data using the vertex (V-)representation for inequality constraints.
+Essentially, the matrix $V$ lists all of the patterns that are predicted by the substantive theory of interest.
+In this case, Regenwetter & Robinson (2017) used a specific decision making model (i.e., Cumulative Prospect Theory) to generate all possible predictions by means of a Monte Carlo simulation.
+Essentially, inequality-constrained models assume a mixture distribution over all these possible predictions (e.g., due to heterogeneity across participants or trials).
+Geometrically, the corresponding parameter space thus represents the convex hull of the vertices (i.e., all possible linear combinations with nonnegative weights).
+
+In the present example, the matrix $V$ lists all of the predictions of Cumulative Prospect Theory (CPT) when assuming underweighting of small probabilities.
+Each row refers to a specific predicted pattern for the 6 risky gambles (1 = choose "Option H"; 0 = do not choose "Option H"):
+
+```{r}
+# Underweighting of small probabilities CPT:
+V_under <- matrix(c(0, 0, 0, 0, 0, 0,  # first predicted pattern
+                    0, 0, 0, 1, 0, 0,  # second predicted pattern
+                    0, 0, 1, 1, 0, 0,  # ...
+                    1, 0, 0, 0, 0, 0,
+                    1, 0, 0, 1, 0, 0,
+                    1, 0, 1, 1, 0, 0,
+                    1, 1, 0, 0, 0, 0,
+                    1, 1, 0, 0, 1, 0,
+                    1, 1, 0, 1, 1, 0,
+                    1, 1, 0, 0, 1, 1,
+                    1, 1, 0, 1, 0, 0,
+                    1, 1, 0, 1, 1, 1,
+                    1, 1, 1, 1, 0, 0,
+                    1, 1, 1, 1, 1, 0,
+                    1, 1, 1, 1, 1, 1), 
+                  ncol = 6, byrow = TRUE)
+```
+
+Note that it is not easy to check whether a given vector of choice probabilities for the 6 gambles is inside the convex hull of the predicted patterns.
+As a remedy, one can use the function `inside()`:
+
+```{r}
+# define a specific vector of choice probabilities:
+p <- c(.25, .48, .93, .10, .32, .50)
+
+# check whether p is inside the convex hull defined by V:
+inside(p, V = V_under)
+
+# to find a (random) probability that is inside the convex hull:
+find_inside(V = V_under, random = TRUE)
+```
+
+
+### The inequality (Ab-)representation
+
+Instead of listing the vertices (or edges) of the inequality-constrained parameter space, we may instead provide a list of linear inequalities for the parameters.
+For this purpose, we use a matrix $A$ and a vector $b$ and only allow parameter vectors $\theta$ that satisfy the inequalities defined by the matrix equation: $A \cdot \theta \leq b$.
+
+For the description-experience gap, one can show that instead of listing the predictions by the matrix  `V_under`, one may equivalently describe the linear inequalities as follows:
+
+```{r}
+A <- matrix(c( 0,   0,   -1,    0,    0,    0,  # first inequality
+               0,   0,    0,    0,    0,   -1,  # second inequality
+              -1,   1,    0,    0,    0,    0,  # ...
+               0,  -1,    0,    0,    1,    0,
+               0,   0,    0,    0,   -1,    1,
+               0,   0,    1,   -1,    0,    0,
+               0,   0,    0,    1,    0,    0,
+               1,   0,    0,    0,    0,    0), 
+            ncol = 6, byrow = TRUE)
+
+b <- c(0, 0, 0, 0, 0, 0, 1, 1)
+```
+
+For example, the third row of $A$ and the third value of $b$ specify that 
+$-1 \cdot \theta_1 + 1 \cdot \theta_2 + 0 \cdot \theta_3+ 0 \cdot \theta_4+ 0 \cdot \theta_5+ 0 \cdot \theta_6 \leq 0$ (which is equivalent to $\theta_2 \leq \theta_1$).
+
+Using the matrix $A$ and the vector $b$, it is easy to check whether a given vector of probabilities satisfies all of the inequality constraints:
+
+```{r}
+p <- c(.25, .48, .93, .10, .32, .50)
+all(A %*% p <= b)
+
+# corresponding function in multinomineq:
+inside(p, A, b)
+
+# find a point that satisfies the constraints:
+find_inside(A, b, random = TRUE)
+```
+
+Note that it is sometimes possible to convert the vertex $V$-representation (convex hull) to the inequality $Ab$-representation using software.
+For this purpose, it is necessary to install the R package `rPorta` from Github:
+
+```{r, eval = FALSE}
+### not run:
+devtools::install_github("TasCL/rPorta")
+Ab_under <- V_to_Ab(V_under)
+Ab_under 
+```
+
+
+### Posterior sampling
+
+In a Bayesian framework, inequality-constrained multinomial models can be fitted by drawing posterior samples for the parameter vector $\theta$.
+If the model is defined in terms of a $V$ matrix with predictions, we obtain $M=5,000$ posterior samples as follows:
+
+```{r, eval = FALSE}
+# fit data from Description and Experience condition:
+p_D_under <- sampling_binom(k = HER_desc, n = n, 
+                            V = V_under, M = 2000, progress = FALSE)
+p_E_under <- sampling_binom(k = HER_exp, n = n, 
+                            V = V_under, M = 2000, progress = FALSE)
+```
+
+If the model is defined in terms of the inequality $Ab$-representation, we obtained posterior samples in a similar way by replacing the argument `V=V` by the arguments `A=B,b=b`:
+
+```{r}
+# fit data from Description and Experience condition:
+p_D_under <- sampling_binom(k = HER_desc, n = n, 
+                            A = A, b = b, M = 2000, progress = FALSE)
+p_E_under <- sampling_binom(k = HER_exp, n = n, 
+                            A = A, b = b, M = 2000, progress = FALSE)
+```
+
+Irrespective of how the posterior samples have been obtained, we can use standard Bayesian methods to check convergence of the MCMC sampler and obtain summary statistics of the posterior distribution:
+
+```{r, fig.width=7, fig.height=5.5}
+# check convergence of MCMC sampler:
+plot(p_D_under)
+# summarize posterior samples:
+summary(p_D_under)
+```
+
+Similarly, we can use posterior-predictive checks to assess whether the model fits the data adequately.
+Essentially, this method uses Pearson's $X^2$-statistic to measure the discrepancy between the observed and the posterior-predicted frequencies.
+If the models fits the data well, the posterior-predicted p-value `ppp` should be close to 0.50:
+
+```{r}
+# posterior-predictive p-value for Description condition:
+ppp_binom(prob = p_D_under, k = HER_desc, n = n)
+ppp_binom(prob = p_D_under, k = HER_exp, n = n)
+```
+
+
+
+### Bayes factor
+
+To test the inequality constraints, we can use Bayesian model selection to compare the constrained model against the unconstrained model (the so-called encompassing model which does not restrict the choice probabilities $\theta$).
+The Bayes factor `bf_0u` quantifies the evidence in favor of the inequality-constrained model $H_0$ versus the unconstrained model $H_u$.
+Similarly, the Bayes factor `bf_00'` compares the inequality-constrained model $H_0$ against the model $H_{0'}$ which has a parameter space that is defined as the exact complement of the parameter space of $H_0$.
+Note that the results also provide an approximation of the approximation uncertainty due to random sampling (i.e., the standard error `se` and a 90% credibility interval `ci.5%` and `ci.95%`):
+
+```{r,eval = FALSE}
+# compute Bayes factor using the V-representation
+bf_D_under <- bf_binom(k = HER_desc, n = n, V = V_under, 
+                       M = 10000, progress = FALSE)
+bf_E_under <- bf_binom(k = HER_exp,  n = n, V = V_under, 
+                       M = 10000, progress = FALSE)
+```
+```{r}
+# compute Bayes factor using the Ab-representation
+bf_D_under <- bf_binom(HER_desc, n = n, A = A, b = b, 
+                       M = 10000, progress = FALSE)
+bf_E_under <- bf_binom(HER_exp,  n = n, A = A, b = b, 
+                       M = 10000, progress = FALSE)
+
+bf_D_under
+bf_E_under
+```
+
+<!-- # automatic stepwise: -->
+<!-- bf_binom(HER_desc, n = n, A = A, b = b, M=50000,  -->
+<!--          cmin = 1000, cpu = 8) -->
+
+
+
+#### Data format for multinomial frequencies
+
+In the present example, we only observed binary data which can be described by the number of choices for one of two options.
+If more than two choice options are provided in a comparison, a different data format for multinomial data has to be used.
+Essentially, one needs to specify *all* choice frequencies $k_{ij}$ (for the binomial case, we ommitted the frequency of *not* choosing one option because we knew the total number $n$).
+Moreover, one needs to specify a vector `options` that defines how many choice options are available for each item type.
+
+Using this notation, the 6 binomial choice frequencies above can equivalently be specified as follows:
+
+```{r}
+# binomial data format:
+n <- 25  
+HER_desc <- c(9, 16, 16, 7, 12, 16)
+
+# multinomial data format:
+k_multinom <- c(9,16,   # first binary gamble
+                16,9,   # second binary gamble
+                16,9,   # ...
+                7,17,   
+                12,13,   
+                16,9)
+options <- c(2, 2, 2, 2, 2, 2)  # 2 options for each type
+```
+
+The binomial format can be also translated to the multinomial format automatically:
+
+```{r}
+mn <- binom_to_multinom(HER_desc, n)
+mn
+```
+
+The multinomial data format can be used as input for the analysis as follows:
+
+```{r}
+p_under2 <- sampling_multinom(k = mn$k, options = mn$options, A = A, b = b)
+bf2 <- bf_multinom(k = k_multinom, options = options, A = A, b = b)
+bf2
+```
+
+
+
+
+### Formal definition of multinomial models with inequality constraints
+
+In the following, we define inequality-constrained multinomial models for discrete data.
+We use the term "item type" to refer to a category system $i$ that is modeled by a multinomial distribution with a fixed total number of observations $n_i$.
+For an item type $i$, we label the observed frequencies as $k_{ij}$.
+
+The parameter vector of interest refers to the choice probabilities:
+$$\theta = (\theta_{11},\dots,\theta_{1 (J_1-1)},\theta_{21},\dots, \theta_{I (J_I-1)})$$
+Note that the last probability within each item type is ommited because probabilities have to sum to one. Hence, for $n_i=3$ choice options there are only 2 free parameters.
+
+Using this notation, we can define a product-multinomial likelihood function:
+$$p(k \mid \theta) = \prod_{i=1}^I  
+{n_i \choose k_{i1} ,\dots ,k_{i J_i} }
+\prod_{j=1}^{J_i - 1}  \theta_{ij}^{k_{ij}} 
+\left(1- \sum_{r=1}^{J_i-1} \theta_{ir}\right)^{k_{J_i}}$$
+
+Inequality constraints can be defined in two different, equivalent ways. 
+First, one may define a list of inequality constraints that have to hold for the choice probabilities, for instance:
+\begin{align*}
+\theta_{11}>\theta_{21},\\
+\theta_{21}>\theta_{31},\\
+\theta_{31}>\theta_{41}
+\end{align*}
+To formalize this notation, we define the constrained parameter space $\Omega_0$ via a matrix $A$ and a vector $b$ that specify a list of inequalities that have to hold:
+$$\Omega_0 = \left\{\theta \in \Omega \, \middle | \, A \, \theta \leq  b \right\}$$
+
+Alternatively, one may list all the vertices $v^{(s)}$ defining the constrained parameter space in the rows of a matrix $V$.
+
+
+$$\Omega_0 = \left\{ \theta = \sum_{s=1}^S \alpha_s  v^{(s)} \,\middle |\, \alpha_s \geq 0 \text{ for all } s=1,\dots, S \text{ and }\sum_{s=1}^S \alpha_s=1 \right\}$$
+
+As a prior distribution for the parameters $\theta$, we assume independent Dirichlet distributions for the different item types $i$ with shape parameters $\alpha_{ij}$.
+Note that we only allow parameters that are inside the constrained parameter space $\Omega_0$:
+
+$$p(\theta) = \frac {1}{c} \, \mathbb I_{\Omega_0}(\theta) \, 
+ \prod_{i=1}^I \prod_{j=1}^{J_i} \theta_{ij}^{\alpha_{ij}-1}$$
+
+Finally, the analytical solution of the posterior distribution is also a product-Dirichlet distribution, truncated to the constrained parameter space:
+
+$$p(\theta \mid  k) = \frac {1}{f} \, \mathbb I_{\Omega_0}(\theta) \, 
+ \prod_{i=1}^I \prod_{j=1}^{J_i} \theta_{ij}^{k_{ij} + \alpha_{ij}-1}$$
+ 
+ 
