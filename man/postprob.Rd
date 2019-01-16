@@ -4,30 +4,45 @@
 \alias{postprob}
 \title{Transform Bayes Factors to Posterior Model Probabilities}
 \usage{
-postprob(..., prior, beta = c(0.5, 0.5), samples = 3000)
+postprob(..., prior, include_unconstr = TRUE)
 }
 \arguments{
-\item{...}{an arbitrary number of Bayes-factor objects with the elements \code{count} and \code{M} indicating how often posterior samples where within the admissible parameter space relative to the same encompassing model. Such lists are returned by \code{\link{count_binom}} or \code{\link{count_multinom}}.}
+\item{...}{one or more Bayes-factor objects for different models as returned
+by the functions \code{\link{bf_binom}}, \code{\link{bf_multinom}} and
+\code{\link{count_to_bf}} (i.e., a 3x4 matrix containing a row
+\code{"bf0u"} and a column \code{"bf"}). Note that the Bayes factors must
+have been computed for the same data and using the same prior (this is not
+checked internally).}
 
-\item{prior}{prior model probabilities. Uniform by default.}
+\item{prior}{a vector of prior model probabilities (default: uniform). The
+order must be identical to that of the Bayes factors supplied via
+\code{...}. If \code{include_unconstr=TRUE}, the unconstrained model is
+automatically added to the list of models (at the last position).}
 
-\item{beta}{prior shape parameters of the beta distributions used for approximating the
-standard errors of the Bayes-factor estimates. The default is Jeffreys' prior.}
-
-\item{samples}{number of samples from beta distributions used to compute
-   standard errors.
-
-
-The unconstrained (encompassing) model is the saturated baseline model that assumes a separate,
-independent probability for each observable frequency. The Bayes factor is obtained
-as the ratio of posterior/prior samples within an order-constrained subset of the
-parameter space.
-
-The standard error of the (stepwise) encompassing Bayes factor is estimated by sampling
-ratios from beta distributions, with parameters defined by the posterior/prior counts
-(see Hoijtink, 2011; p. 211).}
+\item{include_unconstr}{whether to include the unconstrained, encompassing
+model without inequality constraints (i.e., the saturated model).}
 }
 \description{
-Computes posterior model probabilities based on objects returned by
-\code{\link{bf_binom}}, \code{\link{bf_multinom}} and \code{\link{count_to_bf}}.
+Computes posterior model probabilities based on Bayes factors.
+}
+\examples{
+# data: binomial frequencies in 4 conditions
+n <- 100
+k <- c(59, 54, 74)
+
+# Hypothesis 1: p1 < p2 < p3
+A1 <- matrix(c(1, -1,  0,
+               0,  1, -1), 2, 3, TRUE)
+b1 <- c(0, 0)
+
+# Hypothesis 2: p1 < p2 and p1 < p3
+A2 <- matrix(c(1, -1,  0,
+               1,  0, -1), 2, 3, TRUE)
+b2 <- c(0, 0)
+
+# get posterior probability for hypothesis
+bf1 <- bf_binom(k, n, A = A1, b = b1)
+bf2 <- bf_binom(k, n, A = A2, b = b2)
+postprob(bf1, bf2,
+         prior = c(bf1=1/3, bf2=1/3, unconstr=1/3))
 }
