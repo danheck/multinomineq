@@ -52,44 +52,47 @@ test_that("NIRT axioms match with Rasch predictions", {
   matrix(apply(spost, 2, mean), N)
 })
 
-test_that("ISOP matches the results of sirt package",{
-  if(FALSE){
-    library(sirt)
-    data(data.read)
-    dat <- as.matrix( data.read)
-    dat.resp <- 1 - is.na(dat) # response indicator matrix
-    I <- ncol(dat)
+test_that("ISOP matches the results of sirt package (only development)",{
+  skip_on_cran()
+  skip_if_not_installed("sirt")
 
-    # different scores of students
-    stud.p <- rowMeans( dat , na.rm=TRUE )
-    # different item p values
-    item.p <- colMeans( dat , na.rm=TRUE )
-    item.ps <- sort( item.p, index.return=TRUE)
-    dat <- dat[ ,  item.ps$ix ]
-    # define score groups students
-    scores <- sort( unique( stud.p ) )
-    SC <- length(scores)
-    # create table
-    freq.correct <- matrix( NA , SC , I )
-    wgt <- freq.correct
-    # percent correct
-    a1 <- stats::aggregate( dat == 1 , list( stud.p ) , mean , na.rm=TRUE )
-    freq.correct <- a1[,-1]
-    # weights
-    a1 <- stats::aggregate( dat.resp , list( stud.p ) , sum , na.rm=TRUE )
-    wgt <- a1[,-1]
-    isop.sirt <- fit.isop(freq.correct, wgt, conv = 1e-04, maxit = 100,
-                          progress = TRUE, calc.ll=TRUE)
-    k <- round(unlist(wgt * freq.correct))
-    n <- unlist(wgt)
-    isop <- nirt_to_Ab(nrow(wgt), ncol(wgt))
-    dim(isop$A)
-    pp <- sampling_binom(k, n, isop$A, isop$b, M = 1000, prior = rep(12^-2, 2))
-    theta <- matrix(apply(pp, 2, mean), nrow(wgt))
-    plot(pp[,53], ty="l")
-    round(isop.sirt$fX, 2)
-    round(theta, 2)
-  }
+  library("sirt")
+  data(data.read)
+  dat <- as.matrix( data.read)
+  dat.resp <- 1 - is.na(dat) # response indicator matrix
+  I <- ncol(dat)
+
+  # different scores of students
+  stud.p <- rowMeans( dat , na.rm=TRUE )
+  # different item p values
+  item.p <- colMeans( dat , na.rm=TRUE )
+  item.ps <- sort( item.p, index.return=TRUE)
+  dat <- dat[ ,  item.ps$ix ]
+  # define score groups students
+  scores <- sort( unique( stud.p ) )
+  SC <- length(scores)
+  # create table
+  freq.correct <- matrix( NA , SC , I )
+  wgt <- freq.correct
+  # percent correct
+  a1 <- stats::aggregate( dat == 1 , list( stud.p ) , mean , na.rm=TRUE )
+  freq.correct <- a1[,-1]
+  # weights
+  a1 <- stats::aggregate( dat.resp , list( stud.p ) , sum , na.rm=TRUE )
+  wgt <- a1[,-1]
+  isop.sirt <- fit.isop(freq.correct, wgt, conv = 1e-04, maxit = 100,
+                        progress = TRUE, calc.ll=TRUE)
+  k <- round(unlist(wgt * freq.correct))
+  n <- unlist(wgt)
+  isop <- nirt_to_Ab(nrow(wgt), ncol(wgt))
+  dim(isop$A)
+  pp <- sampling_binom(k, n, isop$A, isop$b, M = 1000, prior = rep(12^-2, 2))
+  theta <- matrix(apply(pp, 2, mean), nrow(wgt))
+  plot(pp[,53], ty="l")
+  round(isop.sirt$fX, 2)
+  round(theta, 2)
+  round(isop.sirt$fX - theta, 2)
+
 })
 
 #############################################################

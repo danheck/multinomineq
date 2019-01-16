@@ -15,3 +15,4 @@ test_that("stochastic dominance is teste correctly", {
   #' count_to_bf(post,prior)
 
 })
+
