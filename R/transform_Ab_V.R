@@ -76,22 +76,25 @@
 V_to_Ab <- function (V){
   # options <- check_V(V, options)
   check_V(V)
-  if (!requireNamespace("rPorta", quietly = TRUE))
+
+  if (requireNamespace("rPorta", quietly = TRUE)){
+    poi <- rPorta::as.poiFile(V)
+    ieq <- rPorta::traf(poi)
+    unlink("porta.log")
+    if (!all(ieq@inequalities@sign == -1)){
+      warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1).",
+               "\n  Complete Porta object is returned.")
+      return (ieq)
+    }
+    Ab <- ieq@inequalities@num / ieq@inequalities@den
+    A <- Ab[,1:(ncol(Ab)-1 )]
+    colnames(A) <- colnames(V)
+    return(list("A" = A, "b" = Ab[,ncol(Ab)]))
+
+  } else {
     stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
           call. = FALSE)
-  # use rPorta
-  poi <- rPorta::as.poiFile(V)
-  ieq <- rPorta::traf(poi)
-  unlink("porta.log")
-  if (!all(ieq@inequalities@sign == -1)){
-    warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1).",
-             "\n  Complete Porta object is returned.")
-    return (ieq)
   }
-  Ab <- ieq@inequalities@num / ieq@inequalities@den
-  A <- Ab[,1:(ncol(Ab)-1 )]
-  colnames(A) <- colnames(V)
-  list("A" = A, "b" = Ab[,ncol(Ab)])
 }
 
 
@@ -107,20 +110,24 @@ V_to_Ab <- function (V){
 #'
 #' @export
 Ab_to_V <- function (A, b, options = 2){
-  if (!requireNamespace("rPorta", quietly = TRUE))
-    stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
-          call. = FALSE)
 
   options <- check_Ab(A, b, options)
   tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   A <- tmp$A
   b <- tmp$b
-  ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
-  poi <- rPorta::traf(ieq)
-  unlink("porta.log")
-  V <- poi@convex_hull@num / poi@convex_hull@den
-  colnames(V) <- colnames(A)
-  V
+
+  if (requireNamespace("rPorta", quietly = TRUE)){
+    ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
+    poi <- rPorta::traf(ieq)
+    unlink("porta.log")
+    V <- poi@convex_hull@num / poi@convex_hull@den
+    colnames(V) <- colnames(A)
+    return(V)
+
+  } else {
+    stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
+          call. = FALSE)
+  }
 }
 
 

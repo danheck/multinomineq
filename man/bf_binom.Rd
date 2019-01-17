@@ -87,9 +87,9 @@ A <- matrix(c(1, -1, 0, 0, 0, 0,
 b <- c(0, 0, 0, 0, 0, .50)
 
 # Bayes factor: unconstrained vs. constrained
-bf_binom(k, n, A, b, prior=c(1, 1), M=5e4)
-bf_binom(k, n, A, b, prior=c(1, 1), M=5000, steps=c(2,4,5))
-bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 500)
+bf_binom(k, n, A, b, prior=c(1, 1), M=10000)
+bf_binom(k, n, A, b, prior=c(1, 1), M=2000, steps=c(2,4,5))
+bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 200)
 }
 \references{
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \url{https://doi.org/10.1016/j.jmp.2004.11.001}

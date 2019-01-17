@@ -69,11 +69,11 @@
 #'
 #'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
 #'   ), byrow = TRUE, ncol = 6)
-#' ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1),
+#' ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1), n.fit = 1,
 #'             options = c(3,3,3), V = V)
 #' @export
 ml_binom <- function(k, n, A, b, map, strategy, n.fit = 3, start,
-                     progress =FALSE, ...){
+                     progress = FALSE, ...){
   if (length(n) == 1) n <- rep(n, length(k))
 
   if (!missing(strategy) && !is.null(strategy)){

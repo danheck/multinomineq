@@ -31,7 +31,6 @@ The method is implemented for multiple purposes:
        such as transitivity (Regenwetter et al., 2012, 2014).
        See \code{\link{regenwetter2012}}
  \item Testing deterministic axioms of measurement and choice (Karabatsos, 2005; Myung et al., 2005).
-       See \code{\link{bf_nonlinear}}
  \item Multiattribute decisions for probabilistic inferences involving strategies such as
        Take-the-best (TTB) vs. weighted additive (WADD; Bröder & Schiffer, 2003; Heck et al., 2017)
        See \code{\link{heck2017}} and \code{\link{hilbig2014}}

@@ -38,9 +38,9 @@
 #' b <- c(0, 0, 0, 0, 0, .50)
 #'
 #' # Bayes factor: unconstrained vs. constrained
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=5e4)
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=5000, steps=c(2,4,5))
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 500)
+#' bf_binom(k, n, A, b, prior=c(1, 1), M=10000)
+#' bf_binom(k, n, A, b, prior=c(1, 1), M=2000, steps=c(2,4,5))
+#' bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 200)
 #' @export
 bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...){
 

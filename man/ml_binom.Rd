@@ -120,6 +120,6 @@ V <- matrix(c(
 
   0, 0, 0, 0, 0, 0   # a ~ b ~ c
   ), byrow = TRUE, ncol = 6)
-ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1),
+ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1), n.fit = 1,
             options = c(3,3,3), V = V)
 }

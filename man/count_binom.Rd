@@ -122,17 +122,17 @@ k <- c(0, 3, 2, 5, 3, 7)
 n <- rep(10, 6)
 
 ### count prior samples and compare to analytical result
-prior <- count_binom(0, 0, A, b, M = 1e4, steps = 1:4)
+prior <- count_binom(0, 0, A, b, M = 5000, steps = 1:4)
 prior    # to get the proportion: attr(prior, "proportion")
 (.50)^6 / factorial(6)
 
 ### count posterior samples + get Bayes factor
-posterior <- count_binom(k, n, A, b, M=5000, steps=1:4)
+posterior <- count_binom(k, n, A, b, M=2000, steps=1:4)
 count_to_bf(posterior, prior)
 
 ### automatic stepwise algorithm
-prior <- count_binom(0, 0, A, b, M = 1000, cmin = 500)
-posterior <- count_binom(k, n, A, b, M = 1000, cmin = 500)
+prior <- count_binom(0, 0, A, b, M = 500, cmin = 200)
+posterior <- count_binom(k, n, A, b, M = 500, cmin = 200)
 count_to_bf(posterior, prior)
 
 }
