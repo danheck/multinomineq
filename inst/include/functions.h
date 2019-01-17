@@ -23,3 +23,5 @@ double rbeta_trunc(const double shape1, const double shape2,
 vec start_random(const mat& A, const vec& b, const unsigned int M, vec start);
 
 #endif
+
+

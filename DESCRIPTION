@@ -39,6 +39,7 @@ Imports:
     quadprog,
     coda
 Suggests:
+    rPorta,
     knitr,
     testthat
 LinkingTo: 
@@ -47,3 +48,5 @@ LinkingTo:
     RcppProgress
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
+Additional_repositories: https://danheck.github.io/drat/
+
