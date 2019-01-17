@@ -6,15 +6,9 @@ V <- matrix(c( 0, 0, 0,
                0, 0,.5,
                0,.5,.5,
                .5,.5,.5), ncol = 3, byrow = TRUE)
-# V <- matrix(c( 0, 0, 0,
-#                0, 0,1,
-#                0,1,0,
-#                1,0,0,
-#                1,0,1,
-#                0,1,1), ncol = 3, byrow = TRUE)
-# add_fixed(V, options)
 k <- c(3,4,2,  1,5)
-Ab <- V_to_Ab(V)
+Ab <- list(A = structure(c(-1, 0, 1, 0, 0, 1, -1, 0, 0, -1, 0, 2), .Dim = 4:3),
+           b = c(0, 0, 0, 1))
 
 test_that("posterior sampling for vertex representation works", {
 
