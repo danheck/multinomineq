@@ -79,9 +79,9 @@ install.packages("rPorta")
 
 ## Compilation of Source Packages
 
-On Linux, the `glpk` package has to be installed outside of R:
+On Linux, GLPK libraries have to be installed via the console:
 ```
-sudo apt-get install glpk
+sudo apt-get install libglpk-dev
 ```
 
 To compile C++ code, Windows and Mac require 

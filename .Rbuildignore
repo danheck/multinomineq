@@ -6,3 +6,4 @@ README.md
 ^.*\.o$
 porta.log
 porta.ieq
+.travis.yml
