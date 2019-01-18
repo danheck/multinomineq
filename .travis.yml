@@ -20,4 +20,7 @@ r_packages:
 addons:
   apt:
     packages:
-    - glpk
+    - glpk-utils
+
+notifications:
+  email: false
