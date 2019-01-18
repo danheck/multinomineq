@@ -9,10 +9,8 @@ repos:
 
 cache: packages
 
-# Be strict when checking our package
 warnings_are_errors: true
 
-# Suggested packages needed to run tests
 r_packages:
   - knitr
   - rmarkdown
@@ -24,3 +22,7 @@ addons:
 
 notifications:
   email: false
+
+before_install:
+  - sudo apt-get install -y glpk
+  - sudo apt-get update
