@@ -1,0 +1,11 @@
+bibentry("Article",
+		title="Multinomial models with linear inequality constraints: Overview and improvements of computational methods for Bayesian inference",
+		author="Daniel W. Heck, and Clintin P. Davis-Stober",
+		journal = "Manuscript under revision",
+		year="2019",
+		volume = "",
+		pages = "",
+    doi = "",
+		url="https://arxiv.org/abs/1808.07140",
+		mheader = "To cite 'multinomineq' in publications, please use:")
+
