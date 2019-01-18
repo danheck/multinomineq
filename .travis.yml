@@ -18,14 +18,10 @@ r_packages:
   - knitr
   - rmarkdown
 
-addons:
-  apt:
-    packages:
-    - glpk-utils
 
 notifications:
   email: false
 
+
 before_install:
-  - sudo apt-get install -y glpk
   - sudo apt-get update
