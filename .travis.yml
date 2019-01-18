@@ -1,8 +1,11 @@
 language: r
-sudo: false
+
+sudo: true
+
 r:
   - release
   - devel
+
 repos:
   CRAN: https://cloud.r-project.org
   danheck: https://danheck.github.com/drat/
