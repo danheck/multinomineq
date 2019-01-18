@@ -27,9 +27,9 @@ The second section below provides a concise formal definition of the model class
 ## Example: Testing the Description-Experience Gap
   
 The following example shows how inequality constraints can be used to test the description-experience (DE) gap in risky decision making (Hertwig et al., 2004).
-In the experiment, participants had to choose one of two risky gambles in each of 6 different paired comparisons (e.g., a lottery in which you win 10€ with $p=.20$ versus a lottery in which you can 20€ with $p=.45$).
+In the experiment, participants had to choose one of two risky gambles in each of 6 different paired comparisons (e.g., a lottery in which you win 10€ with $p=.20$ versus a lottery in which you can win 20€ with $p=.45$).
 The description-experience gap states that people underweigh small probabilities $p$ when making decisions based on experience.
-The following is a reanalysis of the models in Regenwetter & Robinson (2017).
+We will conduct a reanalysis of Hertwig's data set using the inequality-constrained multinomial model in Regenwetter & Robinson (2017).
 
 First, it is necessary to install the R package `multinomineq` from Github.
 Note that it is necessary to install the developer R tools first (see https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
@@ -61,23 +61,24 @@ HER_exp  <- c(22, 11, 7, 14, 5, 3)
 ```
 
 
-### The vertex (V-)representation
+### Vertex ($V$-)representation
 
-First, it is shown how to use the vertex (V-)representation for inequality-constrained models.
+First, it is shown how to use the vertex ($V$-)representation for inequality-constrained models.
 Essentially, the rows of the matrix $V$ list all patterns that are predicted by a substantive theory of interest.
 Each prediction either states that "Option H" is chosen (value `1`) or not (value `0`).
-For example, if the theory makes the prediction that "Option H" is chosen only in the 4th paired comparison  but otherwise not, the matrix `V` needs to include the following pattern in one row: `c(0,0,0,1,0,0)`.
+For example, if the theory makes the prediction that "Option H" is chosen only in the 4th paired comparison  but otherwise not, the matrix $V$ needs to include the following pattern in one row: `c(0,0,0,1,0,0)`.
 Similarly, all possible predictions need to be combined to form the matrix $V$.
 Inequality-constrained models assume a mixture distribution over all these possible predicted patterns
 (e.g., due to heterogeneity across participants or trials).
 Geometrically, the corresponding parameter space thus represents the convex hull of the predicted patterns/vertices (i.e., all possible linear combinations of the rows of $V$ when using nonnegative weights).
 
-For the description-experience gap, Regenwetter & Robinson (2017) used a specific decision making model (i.e., Cumulative Prospect Theory) to generate all possible predictions.
+For the description-experience gap, Regenwetter & Robinson (2017) used a specific decision making model (Cumulative Prospect Theory) to generate all possible predictions.
 The matrix $V$ lists all of these predictions when assuming that participants underweigh small probabilities $p$ of winning money.
-The following matrix contains all predicted patterns for the 6 risky gambles (`1` = choose "Option H"; `0` = do not choose "Option H"):
+The following matrix contains all predicted patterns for the 6 risky gambles:
 
 ```{r}
 # Underweighting of small probabilities CPT:
+# (1 = choose "Option H"; 0 = do not choose "Option H")
 V <- matrix(c(0, 0, 0, 0, 0, 0,  # first predicted pattern
               0, 0, 0, 1, 0, 0,  # second predicted pattern
               0, 0, 1, 1, 0, 0,  # ...
@@ -111,13 +112,13 @@ find_inside(V = V, random = TRUE)
 ```
 
 
-### The inequality (Ab-)representation
+### Inequality ($Ab$-)representation
 
 Instead of listing the vertices (or edges) of the inequality-constrained parameter space, we may instead define a set of linear inequality constraints on the parameters explicitly.
 For this purpose, we specify a matrix $A$ and a vector $b$.
 The model only allows parameter vectors $\theta$ that satisfy the inequalities defined by the matrix equation: $A \cdot \theta \leq b$.
 
-For the description-experience gap, one can show that instead of listing the predictions by the matrix `V` as shown above, one can equivalently describe the linear inequalities as follows:
+For the description-experience gap, one can show that instead of listing the predictions by the matrix $V$ as shown above, one can equivalently describe the linear inequalities as follows:
 
 ```{r}
 A <- matrix(c( 0,   0,   -1,    0,    0,    0,  # first inequality
@@ -149,7 +150,7 @@ inside(p_observed, A, b)
 find_inside(A, b, random = TRUE)
 ```
 
-Note that it is sometimes possible to convert the vertex $V$-representation (convex hull) to the inequality $Ab$-representation using specific software.
+Note that it is sometimes possible to convert the vertex ($V$-)representation (convex hull) to the inequality ($Ab$-)representation using specific software.
 To do this in R, it is necessary to install the package `rPorta` from Github:
 
 ```{r, eval = FALSE}
@@ -163,7 +164,7 @@ Ab
 ### Posterior sampling
 
 In a Bayesian framework, inequality-constrained multinomial models can be fitted by drawing posterior samples for the parameter vector of choice probabilities $\theta$.
-If the model is defined in terms of a $V$ matrix with predicted patterns, we obtain $M=2,000$ posterior samples as follows:
+If the model is defined in terms of a matrix $V$ with predicted patterns, we obtain $M=2,000$ posterior samples as follows:
 
 ```{r, eval = FALSE}
 # fit data from Description and Experience condition:
@@ -171,7 +172,7 @@ p_D <- sampling_binom(k = HER_desc, n = n, V = V, M = 2000, progress = FALSE)
 p_E <- sampling_binom(k = HER_exp, n = n, V = V, M = 2000, progress = FALSE)
 ```
 
-If the model is defined in terms of the inequality $Ab$-representation, we obtain posterior samples in a similar way by replacing the argument `V=V` by the two arguments `A=B,b=b`:
+If the model is defined in terms of the inequality $Ab$-representation, we obtain posterior samples in a similar way by replacing the argument `V=V` by the two arguments `A=A, b=b`:
 
 ```{r}
 # fit data from Description and Experience condition:
@@ -193,7 +194,8 @@ summary(p_D)
 
 Similarly, we can use posterior-predictive checks to test whether an inequality-constrained model fits the data adequately (i.e., whether the constraints hold empirically).
 Essentially, this method computes Pearson's $X^2$-statistic to measure the discrepancy both for the observed and the posterior-predicted frequencies.
-If the model fits the data, the posterior-predicted p-value `ppp` should be around to 0.50 (often,  `ppp <.05` is used as a criterion):
+If the model does *not* fit the data, the posterior-predicted $p$-value `ppp` will become very small (and it will be close to 0.50 if the model fits).
+Hence, we usually apply a criterion such as `ppp < .05` to reject models that do not fit the data, as in the following example:
 
 ```{r}
 # posterior-predictive p-value for Description condition:
@@ -208,7 +210,7 @@ ppp_binom(prob = p_D, k = HER_exp, n = n)
 Often, one is interested in quantifying the evidence in favor of the inequality constraints.
 We can use Bayesian model selection to compare the inequality-constrained model $M_0$ against the unconstrained model $M_u$ that does not restrict the choice probabilities $\theta$ (also called encompassing model).
 The Bayes factor `bf_0u` quantifies the evidence in favor of the inequality-constrained model $M_0$ versus the unconstrained model $M_u$.
-Similarly, `bf_u0` is the inverse of `bf_0u` and provide the evidence for the unconstrained model.
+Similarly, `bf_u0` is the inverse of `bf_0u` and provides the evidence for the unconstrained model.
 Moreover, the Bayes factor `bf_00'` compares the inequality-constrained model $M_0$ against the model $M_{0'}$ which has a parameter space defined as the *complement* of the parameter space of $M_0$.
 
 Bayes factors are computed as follows:
@@ -231,12 +233,12 @@ The matrix that is provided as output shows the standard error `se` for the Baye
 
 ##### Increased efficiency for Bayes factor computations
 
-Internally, the encompassing Bayes factor is computed in two steps using the *unconstrained* multinomial model $M_u$:
+Within the function `bf_binom`, the encompassing Bayes factor is computed in two steps based on the *unconstrained* multinomial model $M_u$:
 
-1. Draw parameter samples from the *prior* and count the proportion of samples $c$ inside the inequality-constrained parameter space.
-2. Draw parameter samples from the *posterior* and count the proportion of samples $f$ inside the inequality-constrained parameter space.
+1. Draw *prior* parameter samples from $M_u$ and count the proportion of samples $c$ inside the inequality-constrained parameter space.
+2. Draw *posterior* parameter samples from $M_u$ and count the proportion of samples $f$ inside the inequality-constrained parameter space.
 
-Based on these proportions, the Bayes factor in favor of the inequality constraints can be approximated as $B_{0u}=f/c$. 
+Based on these two proportions, the Bayes factor in favor of the inequality constraints is approximated as $B_{0u}=f/c$. 
 It might be convenient to perform these computations in separate steps in R for some models and datasets.
 For example, the prior constant $c$ is sometimes known analytically.
 Moreover, when analyzing multiple datasets or participants, it is more efficient to estimate the prior constant $c$ only once because $c$ is identical for all analyses:
@@ -256,7 +258,7 @@ count_to_bf(posterior = cnt_E, prior = cnt)
 ```
 
 Since Bayes factors can be hard to compute for some models and data sets, `multinomineq` provides a stepwise procedure that aims at increasing the efficiency.
-The user can specify a minimum number of sambles `cmin` that must satisy a subset of the inequality constraints.
+The user can specify a minimum number of samples `cmin` that must satisy a subset of the inequality constraints.
 The algorithm keeps sampling until this threshold is reached.
 The argument `steps` determines at which rows of the matrix $A$ the inequalities are split into subsets of increasing size.
 For example, `steps = c(3, 5, 7)` means that the first subset contains only the first 3 inequalities, the second subset the first 5 inequalities etc.:
