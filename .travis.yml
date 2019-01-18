@@ -1,0 +1,23 @@
+language: r
+sudo: false
+r:
+  - release
+  - devel
+repos:
+  CRAN: https://cloud.r-project.org
+  danheck: https://danheck.github.com/drat/
+
+cache: packages
+
+# Be strict when checking our package
+warnings_are_errors: true
+
+# Suggested packages needed to run tests
+r_packages:
+  - knitr
+  - rmarkdown
+
+addons:
+  apt:
+    packages:
+    - glpk
