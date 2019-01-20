@@ -2,7 +2,7 @@
 #'
 #' Draws prior/posterior samples for product-multinomial data and counts how many samples are
 #' inside the convex polytope defined by
-#' (1) the inequalities A*x <= b or
+#' (1) the inequalities \code{A*x <= b} or
 #' (2) the convex hull over the vertices V.
 #'
 #' @param A a matrix defining the convex polytope via \code{A*x <= b}.

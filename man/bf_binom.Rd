@@ -59,7 +59,7 @@ a matrix with two columns (Bayes factor and SE of approximation) and three rows:
     }
 }
 \description{
-Computes the Bayes factor for linear order-constraints (specified via: A*x <= b)
+Computes the Bayes factor for linear order-constraints (specified via: \code{A*x <= b})
 for product-binomial/-multinomial models.
 }
 \details{

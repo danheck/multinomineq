@@ -18,7 +18,7 @@
 #' @details
 #' Draws posterior samples for binomial/multinomial random utility models that
 #' assume a mixture over predefined preference orders/vertices that jointly define
-#' a convex polytope via the set of inequalities \code{A * x <= b} or as the
+#' a convex polytope via the set of inequalities \code{A * x < b} or as the
 #' convex hull of a set of vertices \code{V}.
 #'
 #' @seealso \code{\link{count_multinom}}, \code{\link{ml_multinom}}
