@@ -179,3 +179,54 @@ Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
 # V_multinom <- function (options, V){
 #   see: add_fixed
 # }
+
+
+
+#' Drop fixed columns in the Ab-Representation
+#'
+#' Often inequalities refer to all probability parameters of a multinomial distribution.
+#' This function allows to transform the inequalities into the appropriate format
+#' \code{A * x <b} with respect to the free parameters only.
+#'
+#' @inheritParams count_multinom
+#'
+#' @examples
+#' # p1 < p2 < p3 < p4
+#' A4 <- matrix(c(1, -1,  0,  0,
+#'                0,  1, -1,  0,
+#'                0,  0,  1, -1),
+#'              nrow = 3, byrow = TRUE)
+#' b4 <- c(0, 0, 0)
+#'
+#' # drop the fixed column for: p4 = (1-p1-p2-p3)
+#' Ab_drop_fixed(A4, b4, options = c(4))
+#'
+#'
+#' # p1 < p2 < p3 < p4  TODO: check multiple options BG BUG BUG BUG
+#' A4 <- matrix(c(1, -1,  0,  0, 1, -1,
+#'                0,  1, -1,  0, 0, 0,
+#'                0,  0,  1, -1, 0, 0,
+#'                1, -1,  0,  0, 1, -1),
+#'              nrow = 4, byrow = TRUE)
+#' b4 <- c(0, 0, 0, 0)
+#'
+#' # drop the fixed column for: p4 = (1-p1-p2-p3)
+#' Ab_drop_fixed(A4, b4, options = c(4, 2))
+#'
+#' @export
+Ab_drop_fixed <- function(A, b, options){
+  check_Ab(A, b, options + 1)
+
+  cnt <- 0
+  for (i in 1:length(options)){
+    idx <- seq.int(1, options[i] - 1) + cnt
+    A[,idx] <- A[,idx] - A[,max(idx) + 1]
+    b <- b - A[,max(idx) + 1]
+    A <- A[,- (max(idx) + 1)]
+    cnt <- cnt + options[i] - 1
+  }
+
+  if (is.null(colnames(A)))
+    colnames(A) <- index_mult(options, fixed = FALSE)
+  list(A = A, b = b, options = options)
+}
