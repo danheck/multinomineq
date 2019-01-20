@@ -201,18 +201,6 @@ Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
 #' # drop the fixed column for: p4 = (1-p1-p2-p3)
 #' Ab_drop_fixed(A4, b4, options = c(4))
 #'
-#'
-#' # p1 < p2 < p3 < p4  TODO: check multiple options BG BUG BUG BUG
-#' A4 <- matrix(c(1, -1,  0,  0, 1, -1,
-#'                0,  1, -1,  0, 0, 0,
-#'                0,  0,  1, -1, 0, 0,
-#'                1, -1,  0,  0, 1, -1),
-#'              nrow = 4, byrow = TRUE)
-#' b4 <- c(0, 0, 0, 0)
-#'
-#' # drop the fixed column for: p4 = (1-p1-p2-p3)
-#' Ab_drop_fixed(A4, b4, options = c(4, 2))
-#'
 #' @export
 Ab_drop_fixed <- function(A, b, options){
   check_Ab(A, b, options + 1)

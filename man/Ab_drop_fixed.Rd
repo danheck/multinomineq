@@ -34,4 +34,5 @@ b4 <- c(0, 0, 0)
 
 # drop the fixed column for: p4 = (1-p1-p2-p3)
 Ab_drop_fixed(A4, b4, options = c(4))
+
 }
