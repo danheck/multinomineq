@@ -92,6 +92,7 @@ ml_binom <- function(k, n, A, b, map, strategy, n.fit = 3, start,
   ml_multinom(k_all, options, A, b, n.fit = n.fit, start = start,...)
 }
 
+
 #' @inheritParams count_multinom
 #' @rdname ml_binom
 #' @export
@@ -104,7 +105,9 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
 
   check_ko(k, options)
   n <- c(tapply(k, rep(1:length(options), options), sum))
-  est_unconstr <- drop_fixed(k / rep(n, options), options)
+  est_unconstr <- c(drop_fixed(k / rep(n, options), options))
+  if (length(est_unconstr) != sum(options - 1))
+    stop("ML estimation only implemented for a vetor k (not for data sets/matrices).")
   if (anyNA(est_unconstr)){
     inside_unconstr <- FALSE  # (n=0) required for prior sampling
   } else {
@@ -309,9 +312,10 @@ loglik_binom <- function (p, k, n){
 
 # log(k1)*p1 + log(k2)*p2 + ...
 # log(k1)*(V[,1] %*% alpha') + ...   where: alpha' = c(alpha, 1-sum(alpha))
+# NOT vectorized
 loglik_mixture <- function (alpha, k, V, options){
   alpha <- c(alpha, 1 - sum(alpha))
-  p <- t(V) %*% alpha
+  p <- c(t(V) %*% alpha)
   p_all <- add_fixed(c(p), options = options, sum = 1)
   lp <- log(p_all)
   lp[k == 0] <- 0
@@ -335,16 +339,18 @@ loglik_mixture <- function (alpha, k, V, options){
 # -dpK_dalpha[3,]
 # numDeriv::grad(p1, alpha[1:(S-1)])
 
+# NOT vectorized
 grad_multinom_mixture <- function(alpha, k, V, options){
   S <- nrow(V)
   alpha <- c(alpha, 1 - sum(alpha))
-  p <- t(V) %*% alpha   # = V[S,] + dp_dalpha %*% alpha[1:(S-1)]
+  p <- c(t(V) %*% alpha)   # = V[S,] + dp_dalpha %*% alpha[1:(S-1)]
   p_all <- add_fixed(c(p), options = options, sum = 1)
   idx_K <- cumsum(options)
   K <- k[idx_K]
   pK <- p_all[idx_K]
 
-  dp_dalpha <- t(V[1:(S-1),]) - V[S,]  # = d p_j(alpha) / d alpha (numderiv: ok)
+  # unlist: stability if V data.frame
+  dp_dalpha <- t(V[1:(S-1),,drop=FALSE]) - unlist(V[S,])  # = d p_j(alpha) / d alpha (numderiv: ok)
   dpK_dalpha <- do.call("rbind", by(dp_dalpha, rep(1:length(options), options - 1),
                                     colSums))  # = d p_K(alpha) / d alpha (numderiv: ok)
   g <- c(k[-idx_K] / p) %*% dp_dalpha - (K /pK) %*% dpK_dalpha
