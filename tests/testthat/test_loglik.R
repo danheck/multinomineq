@@ -11,9 +11,9 @@ test_that('multinomineq:::loglik_binom/_multinom gives correct results', {
   expect_equal(suppressWarnings(multinomineq:::loglik_binom(c(0,0,0), k ,n)), Inf)
 
   p <- rpdirichlet(1, rep(1,7), c(3,4))
-  p_all <- add_fixed(p, c(3,4))
+  p_all <- c(add_fixed(p, c(3,4)))
   k <- rpmultinom(p, 1, c(3,4))
-  expect_equal(multinomineq:::loglik_multinom(p, k, c(3,4)), - sum(k * log(p_all)))
+  expect_equal(multinomineq:::loglik_multinom(p, c(k), c(3,4)), - sum(k * log(p_all)))
   expect_equal(suppressWarnings(multinomineq:::loglik_multinom(c(0,0,0,0,0), k, c(3,4))), Inf)
 })
 
