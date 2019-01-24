@@ -1,4 +1,4 @@
-#' Number of Product-Binomial Prior/Posterior Samples in Polytope
+#' Count How Many Samples Satisfy Linear Inequalities (Binomial)
 #'
 #' Draws prior/posterior samples for product-binomial data and counts how many samples are
 #' inside the convex polytope defined by
@@ -116,7 +116,6 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     count <- run_parallel(arg, fun = "count_binom", cpu = cpu, simplify = "count")
     return(count)
   }
-  if (length(prior) == 1) prior <- rep(prior, length(k))
   check_Mminmax(M, cmin, maxiter)
   if (missing(A) || is.null(A)) A <- V
   aggr <- map_k_to_A(k, n, A, map, prior)
@@ -131,9 +130,9 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_binom(k, n, A, b, map, n.fit = 1, start,
+        start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1, start,
                            control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-      check_start(start, A, b, interior = TRUE)
+      check_start(start, A, b, interior = FALSE)
 
       if (cmin > 0){
         zeros <- rep(0, length(steps))

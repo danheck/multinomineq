@@ -135,7 +135,7 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
     } else {
       if (missing(start) || is.null(start) || !all(A %*% start < b))
         start <- find_inside(A, b, options = options)
-      check_start(start, A, b, interior = TRUE)
+      check_start(start, A, b, interior = FALSE)
       tryCatch (
         oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
                           k = k, options = options, ui = - A, ci = - b, ...),
@@ -363,16 +363,28 @@ grad_multinom_mixture <- function(alpha, k, V, options){
   - g
 }
 
-loglik_multinom <- function (p, k, options){
-  p_all <- add_fixed(p, options = options, sum = 1)
+loglik_multinom <- function (p, k, options, p_drop = FALSE){
+  if (!p_drop){
+    p_all <- add_fixed(p, options = options, sum = 1)
+  } else {
+    p_all <- p
+  }
   lp <- log(p_all)
-  lp[k == 0] <- 0
-  ll <- sum(k * lp)
+
+  if (is.null(dim(lp))){
+    lp[k == 0] <- 0
+    ll <- sum(k * lp)
+  } else {
+    lpt <- t(lp)
+    lpt[k == 0] <- 0
+    ll <- colSums(k * lpt)
+  }
+  # ll <- sum(k * lp)
   # tapply(p, oo, function(pp) dmultinom())
   # ll <- sum(dmultinom(x = k, size = n, prob = p, log = TRUE))
   # if (!is.na(ll) && ll == - Inf)
   #   ll <- MIN_LL
-  if (is.na(ll) || ll == -Inf)
+  if (anyNA(ll) || any(ll == -Inf))
     warning("log-likelihood: NaN or -Inf: \n",
             "  Check whether model implies strictly positive probability for each k>0!")
   - ll

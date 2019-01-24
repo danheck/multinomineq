@@ -44,7 +44,7 @@ a vector with starting values in the interior of the polytope.
 If missing, an approximate maximum-likelihood estimate is used.}
 
 \item{burnin}{number of burnin samples that are discarded. Can be chosen to be
-small if the maxmimum-likelihood estimate is used as a starting value.}
+small if the maxmimum-a-posteriori estimate is used as the (default) starting value.}
 
 \item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
 

@@ -1,4 +1,4 @@
-#' Number of Product-Multinomial Prior/Posterior Samples in Polytope
+#' Count How Many Samples Satisfy Linear Inequalities (Multinomial)
 #'
 #' Draws prior/posterior samples for product-multinomial data and counts how many samples are
 #' inside the convex polytope defined by
@@ -68,7 +68,6 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
-                  # function(EVAL_EXPR) tryCatch(eval(EVAL_EXPR), error = function(e) NULL))
     count <- run_parallel(arg, fun = "count_multinom", cpu = cpu, simplify = "count")
     return(count)
   }
@@ -86,9 +85,9 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     } else {
       steps <- check_stepsA(steps, A)
       if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_multinom(k, options, A, b, n.fit = 1, start,
+        start <-  ml_multinom(k + prior, options, A, b, n.fit = 1, start,
                               control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-      check_start(start, A, b, interior = TRUE)
+      check_start(start, A, b, interior = FALSE)
 
       if (cmin > 0){
         zeros <- rep(0, length(steps))

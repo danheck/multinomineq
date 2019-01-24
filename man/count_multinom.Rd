@@ -2,7 +2,7 @@
 % Please edit documentation in R/count_multinomial.R
 \name{count_multinom}
 \alias{count_multinom}
-\title{Number of Product-Multinomial Prior/Posterior Samples in Polytope}
+\title{Count How Many Samples Satisfy Linear Inequalities (Multinomial)}
 \usage{
 count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
   M = 5000, steps, start, cmin = 0, maxiter = 500, burnin = 5,

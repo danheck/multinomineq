@@ -3,7 +3,7 @@
 \name{bf_binom}
 \alias{bf_binom}
 \alias{bf_multinom}
-\title{Bayes Factor for Linear Order Constraints}
+\title{Bayes Factor for Linear Order Constraints (Binomial)}
 \usage{
 bf_binom(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...)
 

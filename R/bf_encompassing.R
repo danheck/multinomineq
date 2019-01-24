@@ -1,4 +1,4 @@
-#' Bayes Factor for Linear Order Constraints
+#' Bayes Factor for Linear Order Constraints (Binomial)
 #'
 #' Computes the Bayes factor for linear order-constraints (specified via: \code{A*x <= b})
 #' for product-binomial/-multinomial models.

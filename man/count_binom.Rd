@@ -2,7 +2,7 @@
 % Please edit documentation in R/count_binomial.R
 \name{count_binom}
 \alias{count_binom}
-\title{Number of Product-Binomial Prior/Posterior Samples in Polytope}
+\title{Count How Many Samples Satisfy Linear Inequalities (Binomial)}
 \usage{
 count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
   start, cmin = 0, maxiter = 500, burnin = 5, progress = TRUE,
