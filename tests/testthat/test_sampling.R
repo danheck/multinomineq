@@ -1,4 +1,4 @@
-
+library(testthat)
 set.seed(123)
 
 M <- 2e5
@@ -30,7 +30,7 @@ test_that("truncated beta is correct", {
   y <- rbeta(10000, a, b)
   x2 <- y[y > bmin & y < bmax]
   expect_equal(quantile(x, p), quantile(x2, p), tol = .02)
-  qqplot(x, x2)
+  # qqplot(x, x2)
 })
 
 test_that("Gibbs sampling gives same results as accept-reject for binomial", {
@@ -64,12 +64,12 @@ test_that("Gibbs sampling gives same results as accept-reject for binomial", {
   X <- matrix(rbeta(10*M*length(k), k+1,n-k+1), ncol = length(k), byrow=TRUE)
   sel <- apply(X, 1, function(x) all(A %*% x <= b))
 
-  par(mfrow=c(1,2))
-  for (i in 1:ncol(A)){
-    plot(density(X1[,i]))
-    lines(density(X[sel,i]), col = 2)
-    qqplot(X1[,i], X[sel,i])
-  }
+  # par(mfrow=c(1,2))
+  # for (i in 1:ncol(A)){
+  #   plot(density(X1[,i]))
+  #   lines(density(X[sel,i]), col = 2)
+  #   qqplot(X1[,i], X[sel,i])
+  # }
   expect_equal(colMeans(X1), colMeans(X[sel,]), tol = .01)
   expect_equal(unname(apply(X1, 2, sd)), apply(X[sel,], 2, sd), tol = .01)
   for (i in 1:ncol(A))
@@ -120,8 +120,8 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X2 <- rpdirichlet(M*5, k+1, options, p_drop = TRUE)
   sel <- sel_Ab(X2, A, b)
   for (i in 1:ncol(X1)){
-    qqplot(X1[,i],X2[sel,i])
-    abline(0,1,col=2)
+    # qqplot(X1[,i],X2[sel,i])
+    # abline(0,1,col=2)
     expect_equal(quantile_ss(X1[,i],X2[sel,i],p), 0, tol = .05)
   }
 })
@@ -147,13 +147,13 @@ test_that("Gibbs sampling for multinomial [posterior]", {
   # accept-reject
   X1 <- rpdirichlet(M*5, k + 1, options, p_drop = TRUE)
   sel <- sel_Ab(X1, A, b)
-  par(mfrow=c(2,2))
-  for (i in 1:ncol(A)){
-    plot(density(X[,i]), xlim = 0:1, main = i)
-    lines(density(X1[sel,i]), col = 2)
-    qqplot(X[,i], X1[sel,i])
-    abline(0,1,col=2)
-  }
+  # par(mfrow=c(2,2))
+  # for (i in 1:ncol(A)){
+  #   plot(density(X[,i]), xlim = 0:1, main = i)
+  #   lines(density(X1[sel,i]), col = 2)
+  #   qqplot(X[,i], X1[sel,i])
+  #   abline(0,1,col=2)
+  # }
   expect_equal(unname(colMeans(X)), colMeans(X1[sel,]), tol = .01)
   expect_equal(unname(apply(X, 2, sd)), apply(X1[sel,], 2, sd), tol = .005)
   for (i in 1:ncol(A))
@@ -187,12 +187,12 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   sel <- sel_Ab(X1, A, b)
   cnt <- count_multinom(k, options, A, b, M = 5e5)
   expect_equal(mean(sel), attr(cnt, "proportion"), tol = 5 * attr(cnt, "se")) ## integral
-  par(mfrow=c(2,2))
-  for (i in 1:ncol(A)){
-    plot(density(X[,i]), xlim = 0:1, main = i)
-    lines(density(X1[sel,i]), col = 2)
-    qqplot(X[,i], X1[sel,i])
-  }
+  # par(mfrow=c(2,2))
+  # for (i in 1:ncol(A)){
+  #   plot(density(X[,i]), xlim = 0:1, main = i)
+  #   lines(density(X1[sel,i]), col = 2)
+  #   qqplot(X[,i], X1[sel,i])
+  # }
   expect_equal(unname(colMeans(X)), colMeans(X1[sel,]), tol = .005)
   expect_equal(unname(apply(X, 2, sd)), apply(X1[sel,], 2, sd), tol = .005)
   for (i in 1:ncol(A))

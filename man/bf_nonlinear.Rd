@@ -2,47 +2,96 @@
 % Please edit documentation in R/bf_nonlinear.R
 \name{bf_nonlinear}
 \alias{bf_nonlinear}
-\title{Bayes Factor for Nonlinear Order Constraints}
+\alias{count_nonlinear}
+\title{Bayes Factor for Nonlinear Inequality Constraints}
 \usage{
 bf_nonlinear(k, options, inside, prior = rep(1, sum(options)),
-  M = 10000)
+  log = FALSE, ...)
+
+count_nonlinear(k = 0, options, inside, prior = rep(1, sum(options)),
+  M = 5000, progress = TRUE, cpu = 1)
 }
 \arguments{
-\item{k}{the number of choices for each alternative ordered by item type (e.g.
-\code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
-The default \code{k=0} is equivalent to sampling from the prior.}
+\item{k}{vector of observed response frequencies.}
 
 \item{options}{the number of observable categories per item type,
 e.g., \code{c(3,2)} for a ternary and binary item.
  The sum of \code{options} must be equal to the length of \code{k}.}
 
-\item{inside}{a function that takes a vector with probabilities
-\code{p=c(p11,p12,p13,  p21,p22,...)} as input and returns \code{1} or \code{TRUE}
-if the order constraints are satisfied and \code{0} or \code{FALSE} if not.}
+\item{inside}{an indicator function that takes a vector with probabilities
+\code{p=c(p11,p12,  p21,p22,...)} (where the last probability for each
+multinomial is dropped) as input and returns \code{1} or \code{TRUE}
+if the order constraints are satisfied and \code{0} or \code{FALSE} otherwise
+(see details).}
 
-\item{prior}{the prior parameters of the Dirichlet-shape parameters.
-Must have the same length as \code{k}.}
+\item{prior}{a vector with two positive numbers defining the shape parameters
+of the beta prior distributions for each binomial rate parameter.}
+
+\item{log}{whether to return the log-Bayes factor instead of the Bayes factor}
+
+\item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}}
+(e.g., \code{M}, \code{steps}).}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
+
+\item{progress}{whether a progress bar should be shown (if \code{cpu=1}).}
+
+\item{cpu}{either the number of CPUs used for parallel sampling, or a parallel
+cluster  (e.g., \code{cl <- parallel::makeCluster(3)}).
+All arguments of the function call are passed directly to each core,
+and thus the total number of samples is \code{M*number_cpu}.}
 }
 \description{
-Draws prior and posterior samples from product-multinomial model and computes the
-Bayes factor for a user-specified nonlinear order constraint defined via an
-indicator function of the parameters: (p11,p12,p13,  p21,p22,...)
+Computes the encompassing Bayes factor for a user-specified, nonlinear inequality
+constraint. Restrictions are defined via an indicator function of the free parameters
+\code{c(p11,p12,p13,  p21,p22,...)} (i.e., the multinomial probabilities).
+}
+\details{
+Inequality constraints are defined via an indicator function \code{inside}
+which returns \code{inside(x)=1} (or \code{0}) if the vector of free parameters
+\code{x} is inside (or outside) the model space. Since the vector \code{x}
+must include only free (!) parameters, the last probability for each
+multinomial must not be used in the function \code{inside(x)}!
+
+Efficiency can be improved greatly if the indicator function is defined as C++
+code via the function \link[RcppXPtrUtils]{cppXPtr} in the package RcppXPtrUtils
+(see below for examples). In this case, please keep in mind that indexing in C++
+starts with 0,1,2... (not with 1,2,3,... as in R)!
 }
 \examples{
-### 2x2x2 continceny table (Klugkist & Hojtink, 2007)
+##### 2x2x2 continceny table (Klugkist & Hojtink, 2007)
+#
 # (defendant's race) x (victim's race) x (death penalty)
-# index: 0 = white/white/yes  ; 1 = black/black/no
+# indexing: 0 = white/white/yes  ; 1 = black/black/no
+# probabilities: (p000,p001,  p010,p011,  p100,p101,  p110,p111)
+# Model2:
+# p000*p101 < p100*p001  &   p010*p111 < p110*p011
 
-# p = (p000,p001,  p010,p011,  p100,p101,  p110,p111)
-k <- c(19,132,     0, 9,       11, 52,     6,97)
+# observed frequencies:
+k <- c(19,132,   0,9,   11,52,   6,97)
 
-# Model2: p000*p101 < p100*p001 & p010*p111 < p110*p011
-model2 <- function(x)
-   x[1]*x[6] < x[5]*x[2] & x[3]*x[8] < x[7]*x[4]
-bf_nonlinear(k, 8, model2, M=1e5)  # K&H07: bf_0u=1.62
+model <- function(x)
+  x[1]*x[6] < x[5]*x[2]  &  x[3]*(1-sum(x)) < x[7]*x[4]
+# NOTE: "1-sum(x)"  must be used instead of "x[8]"!
+
+# compute Bayes factor (Klugkist 2007: bf_0u=1.62)
+bf_nonlinear(k, 8, model, M=50000)
+
+
+
+##### Using a C++ indicator function (much faster)
+cpp_code <- "SEXP model(NumericVector x){
+  return wrap(x[0]*x[5] < x[4]*x[1] & x[2]*(1-sum(x)) < x[6]*x[3]);}"
+# NOTE: C++ indexing starts at 0!
+
+# define C++ pointer to indicator function:
+model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
+
+bf_nonlinear(k=c(19,132, 0,9, 11,52, 6,97), M = 100000,
+             options = 8, inside = model_cpp)
 }
 \references{
 Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}
+
+Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \url{https://doi.org/10.1037/a0020137}
 }

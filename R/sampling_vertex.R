@@ -5,10 +5,11 @@
 #' @importFrom utils txtProgressBar setTxtProgressBar
 sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
                        start, burnin = 10, progress = TRUE){
+  stopifnot(M > burnin, burnin > 0)
   options <- check_V(V, options)
-  # 1) Approximate ML estimate as starting value
+  # 1) Approximate MAP estimate as starting value
   if (missing(start) || is.null(start))
-    start <- ml_multinom(k = k, V = V, options = options, n.fit = 2,
+    start <- ml_multinom(k = k + prior, V = V, options = options, n.fit = 2,
                          control = list(maxit = 1000, reltol = 1e-6))$p
   else
     stopifnot(inside(x = start, V = V))

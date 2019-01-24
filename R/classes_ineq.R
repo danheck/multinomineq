@@ -20,7 +20,7 @@ as_ineq_count <- function(count){
 
 #' @export
 print.ineq_count <- function(x, ...){
-  cat("Number of samples in line with inequality constraints:\n")
+  cat("Number of samples satisfying the inequality constraints:\n")
   print.table(x)
   p <- attr(x, "proportion")
   se <- attr(x, "se")

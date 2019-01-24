@@ -59,6 +59,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rgamma_trunc
+double rgamma_trunc(const double shape, const double rate, const double min, const double max);
+RcppExport SEXP _multinomineq_rgamma_trunc(SEXP shapeSEXP, SEXP rateSEXP, SEXP minSEXP, SEXP maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type shape(shapeSEXP);
+    Rcpp::traits::input_parameter< const double >::type rate(rateSEXP);
+    Rcpp::traits::input_parameter< const double >::type min(minSEXP);
+    Rcpp::traits::input_parameter< const double >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(rgamma_trunc(shape, rate, min, max));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rbeta_trunc
 double rbeta_trunc(const double shape1, const double shape2, const double min, const double max);
 RcppExport SEXP _multinomineq_rbeta_trunc(SEXP shape1SEXP, SEXP shape2SEXP, SEXP minSEXP, SEXP maxSEXP) {
@@ -339,6 +353,105 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const unsigned int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< const bool >::type progress(progressSEXP);
     rcpp_result_gen = Rcpp::wrap(count_auto_mult(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bisection_r
+double bisection_r(Function f, NumericVector x, int i, double min, double max, const double eps);
+RcppExport SEXP _multinomineq_bisection_r(SEXP fSEXP, SEXP xSEXP, SEXP iSEXP, SEXP minSEXP, SEXP maxSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Function >::type f(fSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< double >::type min(minSEXP);
+    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bisection_r(f, x, i, min, max, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bisection_cpp
+double bisection_cpp(SEXP f_, NumericVector x, int i, double min, double max, const double eps);
+RcppExport SEXP _multinomineq_bisection_cpp(SEXP f_SEXP, SEXP xSEXP, SEXP iSEXP, SEXP minSEXP, SEXP maxSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type f_(f_SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< double >::type min(minSEXP);
+    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bisection_cpp(f_, x, i, min, max, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// call_xptr
+NumericVector call_xptr(SEXP f_, NumericVector x);
+RcppExport SEXP _multinomineq_call_xptr(SEXP f_SEXP, SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type f_(f_SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(call_xptr(f_, x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sampling_nonlin_r
+arma::mat sampling_nonlin_r(const arma::vec& k, const arma::vec& options, Function inside, const arma::vec& prior, const unsigned int M, arma::vec start, const unsigned int burnin, const bool progress, const double eps);
+RcppExport SEXP _multinomineq_sampling_nonlin_r(SEXP kSEXP, SEXP optionsSEXP, SEXP insideSEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< Function >::type inside(insideSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< const bool >::type progress(progressSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampling_nonlin_r(k, options, inside, prior, M, start, burnin, progress, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sampling_nonlin_cpp
+arma::mat sampling_nonlin_cpp(const arma::vec& k, const arma::vec& options, SEXP inside_, const arma::vec& prior, const unsigned int M, arma::vec start, const unsigned int burnin, const bool progress, const double eps);
+RcppExport SEXP _multinomineq_sampling_nonlin_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP inside_SEXP, SEXP priorSEXP, SEXP MSEXP, SEXP startSEXP, SEXP burninSEXP, SEXP progressSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type inside_(inside_SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type start(startSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< const bool >::type progress(progressSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampling_nonlin_cpp(k, options, inside_, prior, M, start, burnin, progress, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// count_nonlin_cpp
+NumericMatrix count_nonlin_cpp(const arma::vec& k, const arma::vec& options, SEXP inside_, const arma::vec& prior, const unsigned int M, const unsigned int batch, const bool progress);
+RcppExport SEXP _multinomineq_count_nonlin_cpp(SEXP kSEXP, SEXP optionsSEXP, SEXP inside_SEXP, SEXP priorSEXP, SEXP MSEXP, SEXP batchSEXP, SEXP progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type options(optionsSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type inside_(inside_SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type batch(batchSEXP);
+    Rcpp::traits::input_parameter< const bool >::type progress(progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(count_nonlin_cpp(k, options, inside_, prior, M, batch, progress));
     return rcpp_result_gen;
 END_RCPP
 }

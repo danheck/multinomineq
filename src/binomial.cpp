@@ -4,6 +4,15 @@
 
 using namespace Rcpp;
 
+// sample from truncated gamma distribution using the inverse cdf method
+// [[Rcpp::export]]
+double rgamma_trunc(const double shape, const double rate,
+                    const double min, const double max){
+  double pmin = R::pgamma(min, shape, 1/rate, 0, false);  // scale = 1/rate
+  double pmax = R::pgamma(max, shape, 1/rate, 0, false);
+  double u = R::runif(0, 1);
+  return R::qgamma(pmin + u * (pmax - pmin), shape, 1/rate, 0, false);
+}
 
 // sample from truncated beta distribution using the inverse cdf method
 // [[Rcpp::export]]

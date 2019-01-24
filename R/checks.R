@@ -1,23 +1,19 @@
 
 check_kn <- function(k = NULL, n = NULL){
-  if(length(k) != length(n))
-    stop("Length of 'k' and 'n' does not match.")
-  if(any(n < 0) || any(n != round(n)))
-    stop("'n' must contain positive integers.")
-  if(any(k < 0) || any(k > n) || any(k != round(k)))
-    stop("'k' must contain positive integers smaller or equal to 'n'.")
+  stopifnot(all(n >= 0))
+  stopifnot(length(k) == length(n), all(k >= 0), all(k <= n))
 }
 
 
-check_start <- function(start, A, b, interior = TRUE){
-  if (length(start) != ncol(A)) {
+check_start <- function(start, A, b, interior = FALSE){
+  if (length(start) != ncol(A))
     stop ("'start' must have the same length as the number of columns of 'A'.")
-  }
-  if (!interior && !all(A %*% start <= b)){
+
+  if (!interior && !all(A %*% start <= b))
     stop ("'start' must be in the convex polytope:  A*start <= b")
-  } else if (interior && !all(A %*% start < b)){
+
+  if (interior && !all(A %*% start < b))
     stop ("'start' must be in the interior (not at the boundaries) of convex polytope:  A*start < b")
-  }
 }
 
 check_prior <- function (prior){
@@ -222,12 +218,23 @@ check_count <- function(count){
 }
 
 check_io <- function(inside, options){
-  if (!is.function(inside))
-    stop("'inside' must be a function.")
-  tryCatch (inside(runif(sum(options))),
-            error = function(e)
-              stop("The function 'inside' should work for vector of length ", sum(options)))
-  if (!inside(runif(sum(options))) %in% c(0,1))
-    stop ("The function 'inside' should return 0/1  or TRUE/FALSE.")
+  x <- c(rpdirichlet(1, rep(1.5, sum(options)), options))
+  if(is.function(inside)){
+    tryCatch (inside_output <- inside(x),
+              error = function(e)
+                stop("The function 'inside' must be valid for vector of length ", sum(options - 1)))
+    stopifnot(inside_output %in% c(0, 1))
+  } else if(class(inside) == "XPtr"){
+    RcppXPtrUtils::checkXPtr(inside, type = "SEXP", args = "NumericVector")
+    tryCatch (inside_output <- call_xptr(inside, x),
+              error = function(e)
+                stop("The C++ function 'inside' defined via RcppXPtrUtils::call_xptr",
+                     "\n  must be valid for vector of length ", sum(options - 1)))
+  } else {
+    stop("'inside' must be an R function or a C++ pointer to a function\n",
+         "generated via RcppXPtrUtils::cppXPtr(code) .")
+  }
+  if (!inside_output %in% c(0,1))
+    stop ("The function 'inside' should return values 0/1  or TRUE/FALSE.")
 }
 

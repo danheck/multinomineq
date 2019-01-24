@@ -17,6 +17,10 @@ adj_iterative <- function(par, c = .50, DIFF_BOUND = 0.0) {
     .Call(`_multinomineq_adj_iterative`, par, c, DIFF_BOUND)
 }
 
+rgamma_trunc <- function(shape, rate, min, max) {
+    .Call(`_multinomineq_rgamma_trunc`, shape, rate, min, max)
+}
+
 rbeta_trunc <- function(shape1, shape2, min, max) {
     .Call(`_multinomineq_rbeta_trunc`, shape1, shape2, min, max)
 }
@@ -106,5 +110,29 @@ count_stepwise_multi <- function(k, options, A, b, prior, M, steps, batch, start
 
 count_auto_mult <- function(k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress = TRUE) {
     .Call(`_multinomineq_count_auto_mult`, k, options, A, b, prior, count, M, steps, M_iter, cmin, maxiter, start, burnin, progress)
+}
+
+bisection_r <- function(f, x, i, min, max, eps = 1e-10) {
+    .Call(`_multinomineq_bisection_r`, f, x, i, min, max, eps)
+}
+
+bisection_cpp <- function(f_, x, i, min, max, eps = 1e-10) {
+    .Call(`_multinomineq_bisection_cpp`, f_, x, i, min, max, eps)
+}
+
+call_xptr <- function(f_, x) {
+    .Call(`_multinomineq_call_xptr`, f_, x)
+}
+
+sampling_nonlin_r <- function(k, options, inside, prior, M, start, burnin = 5L, progress = TRUE, eps = 1e-10) {
+    .Call(`_multinomineq_sampling_nonlin_r`, k, options, inside, prior, M, start, burnin, progress, eps)
+}
+
+sampling_nonlin_cpp <- function(k, options, inside_, prior, M, start, burnin = 5L, progress = TRUE, eps = 1e-10) {
+    .Call(`_multinomineq_sampling_nonlin_cpp`, k, options, inside_, prior, M, start, burnin, progress, eps)
+}
+
+count_nonlin_cpp <- function(k, options, inside_, prior, M, batch, progress = TRUE) {
+    .Call(`_multinomineq_count_nonlin_cpp`, k, options, inside_, prior, M, batch, progress)
 }
 

@@ -53,7 +53,8 @@ If developer tools for R are available (see below), the most recent version of
 the package `multinomineq` can directly be installed from GitHub via:
 ```
 ### install dependencies:
-install.packages("devtools","RcppArmadillo","RcppProgress","Rglpk", "quadprog")
+install.packages("devtools","RcppArmadillo","RcppProgress",
+                 "Rglpk", "quadprog", "RcppXPtrUtils")
 
 ### install from Github:
 devtools::install_github("danheck/multinomineq")

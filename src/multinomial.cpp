@@ -180,23 +180,19 @@ arma::mat sampling_mult(const arma::vec& k, const arma::vec& options,
   unsigned int j = 0;
   for (unsigned int i = 1 ; i < M  + burnin; i++){
     p.increment();   // update progress bar
-    if(i % 1000 == 0) Rcpp::checkUserInterrupt();
+    if(i % 100 == 0) Rcpp::checkUserInterrupt();
     X.col(i) = X.col(i-1);
     idx = sample(idx, D, false);
     for (unsigned int m = 0; m < D; m++){
-      j = m; //idx(m);
-      // scaled truncated beta:
-      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
-      bmax = 1;
-      bmin = 0;
-      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / (A.col(j) * s);
+      j = idx(m);
+      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / A.col(j); // divide by s below
       Aneg = find(A.col(j) < 0);
       Apos = find(A.col(j) > 0);
-      if (!Aneg.is_empty())
-        bmin = rhs(Aneg).max();
-      if (!Apos.is_empty())
-        bmax = rhs(Apos).min();
-      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
+      bmin = Aneg.is_empty() ? 0. : rhs(Aneg).max();
+      bmax = Apos.is_empty() ? 1. : rhs(Apos).min(); // bmax=s (cancels out below)
+      // scaled truncated beta:
+      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
+      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), std::max(0., bmin/s), std::min(1.,bmax/s));
     }
   }
   X.shed_cols(0,burnin - 1);
@@ -308,3 +304,164 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
   return results(count, M, steps + 1); // C++ --> R indexing
 }
 
+
+
+//#######################################################################
+// BISECTION (in one dimension of a vector)
+
+template <typename T>
+double bisection(T f, NumericVector x, int i, double min, double max,
+                 const double eps = 1e-10){
+
+  // [robustness] check that lower/upper boundary are 0/1:
+  x[i] = min;
+  double f_min = as<double>(f(x)) - 0.50;
+  x[i] = max;
+  double f_max = as<double>(f(x)) - 0.50;
+  if ( (f_min <= 0 && f_max <= 0) || (f_min >= 0 && f_max >= 0))
+    stop("[Bisection algorithm]\n  Indicator function 'inside' does not have different values (0/1) for min/max.\n  Check whether inequality-constrained parameter space is convex!\n  (multiplicative constraints such as x[1]*x[2]<0.50 are in general not convex)");
+
+  while (min + eps < max) {
+    double const mid = 0.5 * min + 0.5 * max;
+    x[i] = mid;
+    double const f_mid = as<double>(f(x)) - 0.50;
+
+    if ((f_min < 0) == (f_mid < 0)) {
+      min = mid;
+      f_min = f_mid;
+    } else {
+      max = mid;
+    }
+  }
+
+  return min;
+}
+
+// [[Rcpp::export]]
+double bisection_r(Function f, NumericVector x, int i, double min, double max,
+                   const double eps = 1e-10){
+  return bisection<Function>(f, x, i, min, max, eps);
+}
+
+typedef SEXP (*funcPtr)(NumericVector);
+// [[Rcpp::export]]
+double bisection_cpp(SEXP f_, NumericVector x, int i, double min, double max,
+                     const double eps = 1e-10){
+  funcPtr f = *XPtr<funcPtr>(f_);
+  return bisection<funcPtr>(f, x, i, min, max, eps);
+}
+
+
+
+//#######################################################################
+// NONLINEAR CONSTRAINTS
+
+
+typedef SEXP (*funcPtr)(NumericVector);
+// [[Rcpp::export]]
+NumericVector call_xptr(SEXP f_, NumericVector x){
+  funcPtr f = *XPtr<funcPtr>(f_);
+  NumericVector y = f(x);
+  return y;
+}
+
+template <typename T>
+arma::mat sampling_nonlin(const arma::vec& k, const arma::vec& options, T inside,
+                          const arma::vec& prior, const unsigned int M, arma::vec start,
+                          const unsigned int burnin = 5, const bool progress = true,
+                          const double eps = 1e-10){
+  unsigned int D = sum(options - 1);  // dimensions
+  mat X(D, M + burnin);       // initialize posterior, column-major order
+  X.col(0) = start;
+
+  // last options for each multinomial (not provided by matrix A)
+  uvec idx_J = conv_to<uvec>::from(cumsum(options) - 1);
+  vec beta_J = rep_options(k(idx_J) + prior(idx_J), options - 1);
+  vec beta_j = shed_options(k + prior, options);
+  // lower/upper index within each multinomial:
+  vec j_up  = rep_options(cumsum(options - 1) - 1, options - 1);
+  vec j_low = j_up - rep_options(options - 2, options - 1);
+
+  Progress p(M, progress);
+  double bmax, bmin, s;
+  uvec Apos, Aneg;
+  IntegerVector idx = seq_len(D) - 1;
+  unsigned int j = 0;
+  for (unsigned int i = 1 ; i < M  + burnin; i++){
+    p.increment();   // update progress bar
+    if(i % 100 == 0) Rcpp::checkUserInterrupt();
+    X.col(i) = X.col(i-1);
+    idx = sample(idx, D, false);
+    for (unsigned int m = 0; m < D; m++){
+      j = idx(m);
+      // scaling parameter of scaled truncated beta:
+      s = 1 - accu(X.col(i).rows(j_low(j), j_up(j))) + X(j,i);
+      // find truncation boundaries via bisection:
+      bmin = 0.;
+      bmax = s;
+
+      X(j,i) = bmin;
+      double check0 = as<double>(inside(wrap(X.col(i))));
+      if (check0 != 1.){
+        double rmin = bisection(inside, wrap(X.col(i)), j, bmin, X(j,i-1), eps);
+        // approximation from below: add epsilon to ensure that inside(p)==TRUE
+        bmin = std::max(0., (rmin + eps) / s);
+      }
+
+      X(j,i) = bmax;
+      double check1 = as<double>(inside(wrap(X.col(i))));
+      if (check1 != 1.){
+        double rmax = bisection(inside, wrap(X.col(i)), j, X(j,i-1), bmax, eps);
+        bmax = std::min(1., rmax / s);
+      }
+      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
+      double check_new = as<double>(inside(wrap(X.col(i))));
+      Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
+    }
+  }
+  X.shed_cols(0,burnin - 1);
+  return X.t();
+}
+
+// [[Rcpp::export]]
+arma::mat sampling_nonlin_r(const arma::vec& k, const arma::vec& options, Function inside,
+                            const arma::vec& prior, const unsigned int M, arma::vec start,
+                            const unsigned int burnin = 5, const bool progress = true,
+                            const double eps = 1e-10){
+  return sampling_nonlin<Function>(k, options, inside, prior, M, start, burnin, progress, eps);
+}
+
+typedef SEXP (*funcPtr)(NumericVector);
+// [[Rcpp::export]]
+arma::mat sampling_nonlin_cpp(const arma::vec& k, const arma::vec& options, SEXP inside_,
+                              const arma::vec& prior, const unsigned int M, arma::vec start,
+                              const unsigned int burnin = 5, const bool progress = true,
+                              const double eps = 1e-10){
+  funcPtr inside = *XPtr<funcPtr>(inside_);
+  return sampling_nonlin<funcPtr>(k, options, inside, prior, M, start, burnin, progress, eps);
+}
+
+
+typedef SEXP (*funcPtr)(NumericVector);
+// [[Rcpp::export]]
+NumericMatrix count_nonlin_cpp(const arma::vec& k, const arma::vec& options, SEXP inside_,
+                               const arma::vec& prior, const unsigned int M,
+                               const unsigned int batch, const bool progress = true){
+  funcPtr inside = *XPtr<funcPtr>(inside_);
+
+  Progress p(M/batch, progress);
+  int count = 0, todo = M;
+  mat X(batch, k.n_elem);
+  while (todo > 0){
+    p.increment();   // update progress bar
+    Rcpp::checkUserInterrupt();
+    // count prior and posterior samples that match constraints:
+    unsigned int R = fmin(todo,batch);
+    X = rpdirichlet(R, k + prior, options, true);
+    for (unsigned int i = 0; i < R; i++){
+      count = count  + as<double>(inside(wrap(X.row(i))));
+    }
+    todo = todo - batch;
+  }
+  return results(count, M, 1);
+}

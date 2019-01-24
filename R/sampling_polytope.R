@@ -9,7 +9,7 @@
 #' @inheritParams sampling_binom
 #' @param M number of posterior samples
 #' @param burnin number of burnin samples that are discarded. Can be chosen to be
-#'     small if the maxmimum-likelihood estimate is used as a starting value.
+#'     small if the maxmimum-a-posteriori estimate is used as the (default) starting value.
 #' @param cpu either the number of CPUs using separate MCMC chains in parallel,
 #'     or a parallel cluster (e.g., \code{cl <- parallel::makeCluster(3)}).
 #'     All arguments of the function call are passed directly to each core,
@@ -62,8 +62,10 @@
 sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options)),
                                M = 5000, start, burnin = 10,
                                progress = TRUE, cpu = 1){
+  stopifnot(M > burnin, burnin > 0)
   if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
+  check_ko(k, options)
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
@@ -78,15 +80,15 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
                        start = start, burnin = burnin, progress = progress)
   } else {
     if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_multinom(k, options, A, b, n.fit = 1,
+      start <-  ml_multinom(k + prior, options, A, b, n.fit = 1,
                             control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-    check_start(start, A, b, interior = TRUE)
+    check_start(start, A, b, interior = FALSE)
     if (length(prior) == 1) prior <- rep(prior, sum(options))
     check_Abokprior(A, b, options, k, prior)
     mcmc <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
     colnames(mcmc) <- colnames(A)
     if (is.null(colnames(A)))
-      colnames(mcmc) <- drop_fixed(index_mult(options), options)
+      colnames(mcmc) <- index_mult(options, fixed = FALSE)
   }
   mcmc(mcmc, start = burnin + 1, end = M)
 }
@@ -97,8 +99,8 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
 sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
                             M = 5000, start, burnin = 10,
                             progress = TRUE, cpu = 1){
+  stopifnot(M > burnin, burnin > 0)
   if (length(n) == 1) n <- rep(n, length(k))
-  if (length(prior) == 1) prior <- rep(prior, length(k))
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1],
@@ -111,17 +113,17 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
     options <- rep(2, length(k))
     k2 <- add_fixed(k, options = options, sum = n)
     mcmc <- sampling_V(k2, options = options, V = V,
-                       prior = rep(prior, length(k)), M = M,
-                       start = start, burnin = burnin, progress = progress)
+                       prior = rep(prior, length(k)), # extended prior for multinomial
+                       M = M, start = start, burnin = burnin, progress = progress)
   } else {
     aggr <- map_k_to_A(k, n, A, map)
     k <- aggr$k
     n <- aggr$n
     check_Abknprior(A, b, k, n, prior)
     if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_binom(k, n, A, b, map, n.fit = 1,
+      start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1,
                          control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-    check_start(start, A, b, interior = TRUE)
+    check_start(start, A, b, interior = FALSE)
     mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
     colnames(mcmc) <- colnames(A)
   }
