@@ -78,7 +78,7 @@ model <- function(x)
 bf_nonlinear(k, 8, model, M=50000)
 
 
-
+\dontrun{
 ##### Using a C++ indicator function (much faster)
 cpp_code <- "SEXP model(NumericVector x){
   return wrap(x[0]*x[5] < x[4]*x[1] & x[2]*(1-sum(x)) < x[6]*x[3]);}"
@@ -89,6 +89,7 @@ model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
 
 bf_nonlinear(k=c(19,132, 0,9, 11,52, 6,97), M = 100000,
              options = 8, inside = model_cpp)
+}
 }
 \references{
 Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}

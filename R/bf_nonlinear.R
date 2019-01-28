@@ -37,7 +37,7 @@
 #' bf_nonlinear(k, 8, model, M=50000)
 #'
 #'
-#'
+#' \dontrun{
 #' ##### Using a C++ indicator function (much faster)
 #' cpp_code <- "SEXP model(NumericVector x){
 #'   return wrap(x[0]*x[5] < x[4]*x[1] & x[2]*(1-sum(x)) < x[6]*x[3]);}"
@@ -48,6 +48,7 @@
 #'
 #' bf_nonlinear(k=c(19,132, 0,9, 11,52, 6,97), M = 100000,
 #'              options = 8, inside = model_cpp)
+#' }
 #' @export
 bf_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)),
                          log = FALSE, ...){

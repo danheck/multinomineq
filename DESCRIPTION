@@ -3,8 +3,7 @@ Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
 Version: 0.2.0
 Date: 2019-01-24
-Author: person("Daniel W.","Heck", email="heck@uni-mannheim.de",
-               role=c("aut","cre"))
+Authors@R: person("Daniel W.", "Heck", email="heck@uni-mannheim.de", role=c("aut","cre"))
 Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Description: 
     Implements Gibbs sampling and Bayes factors for multinomial models with
