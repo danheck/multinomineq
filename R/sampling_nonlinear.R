@@ -31,6 +31,7 @@
 #'
 #'
 #'
+#' \dontrun{
 #' ##### Using a C++ indicator function (much faster)
 #' cpp_code <- "SEXP inside(NumericVector x){
 #'   return wrap( sum(pow(x-.50, 2)) <= .15);}"
@@ -42,6 +43,7 @@
 #'                            inside = model_cpp, M=1000)
 #' head(mcmc)
 #' plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
+#' }
 #' @export
 sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options)),
                                 M = 1000, start, burnin = 10, eps = 1e-6,

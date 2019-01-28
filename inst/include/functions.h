@@ -24,4 +24,3 @@ vec start_random(const mat& A, const vec& b, const unsigned int M, vec start);
 
 #endif
 
-

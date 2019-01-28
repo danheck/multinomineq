@@ -68,26 +68,28 @@ function is convex.
 \examples{
 # two binomial success probabilities: x = c(x1, x2)
 # restriction to a circle:
-inside <- function(x)
+model <- function(x)
   (x[1]-.50)^2 + (x[2]-.50)^2 <= .15
 
 # draw prior samples
 mcmc <- sampling_nonlinear(k = 0, options = c(2,2),
-                           inside, M = 1000)
+                           inside = model, M = 1000)
 head(mcmc)
 plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
 
 
 
+\dontrun{
 ##### Using a C++ indicator function (much faster)
 cpp_code <- "SEXP inside(NumericVector x){
   return wrap( sum(pow(x-.50, 2)) <= .15);}"
 # NOTE: Uses Rcpp sugar syntax (vectorized sum & pow)
 
 # define function via C++ pointer:
-inside_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
+model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
 mcmc <- sampling_nonlinear(k=0, options = c(2,2),
-                           inside = inside_cpp, M=1000)
+                           inside = model_cpp, M=1000)
 head(mcmc)
 plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
+}
 }
