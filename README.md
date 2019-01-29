@@ -14,22 +14,21 @@ R package `multinomineq`
 
 <img src="man/figures/multinomineq.png" width="200" align="right">
 
-Implements Gibbs sampling and Bayes factors for multinomial models with
-linear inequality constraints on the vector of probability parameters. As
-special cases, the model class includes models that predict a linear order 
-of binomial probabilities (e.g., p[1] < p[2] < p[3] < .50) and mixture models 
-assuming that the parameter vector p must be inside the convex hull of a 
-finite number of predicted patterns (i.e., vertices). 
+Implements Gibbs sampling and Bayes factors for multinomial models with linear
+inequality constraints on the vector of probability parameters. As special
+cases, the model class includes models that predict a linear order of binomial
+probabilities (e.g., p[1] < p[2] < p[3] < .50) and mixture models assuming that
+the parameter vector p must be inside the convex hull of a finite number of
+predicted patterns (i.e., vertices).
 
-Inequality-constrained multinomial models have applications in the area of 
-judgment and decision making to fit and test random utility models  
-(Regenwetter, M., Dana, J., & Davis-Stober, C.P. (2011). Transitivity of 
-preferences. Psychological Review, 118, 42–56) or to 
-perform outcome-based strategy classification to select the decision strategy 
-that provides the best account for a vector of observed choice frequencies 
-(Heck, D.W., Hilbig, B.E., & Moshagen, M. (2017). From information 
-processing to decisions: Formalizing and comparing probabilistic choice models. 
-Cognitive Psychology, 96, 26–40).
+Inequality-constrained multinomial models have applications in the area of
+judgment and decision making to fit and test random utility models (Regenwetter,
+M., Dana, J., & Davis-Stober, C.P. (2011). Transitivity of preferences.
+Psychological Review, 118, 42–56) or to perform outcome-based strategy
+classification to select the decision strategy that provides the best account
+for a vector of observed choice frequencies (Heck, D.W., Hilbig, B.E., &
+Moshagen, M. (2017). From information processing to decisions: Formalizing and
+comparing probabilistic choice models. Cognitive Psychology, 96, 26–40).
 
 
 ## References and Vignette
