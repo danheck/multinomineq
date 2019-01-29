@@ -8,11 +8,11 @@
 [![Build Status](https://travis-ci.org/danheck/multinomineq.svg?branch=master)](https://travis-ci.org/danheck/multinomineq)
 [![Coverage status](https://codecov.io/gh/danheck/multinomineq/branch/master/graph/badge.svg)](https://codecov.io/github/danheck/multinomineq?branch=master)
 
-<img src="man/figures/multinomineq.png" width="150">
 
 R package `multinomineq`
 =====
 
+<img src="man/figures/multinomineq.png" width="200" align="right">
 
 Implements Gibbs sampling and Bayes factors for multinomial models with
 linear inequality constraints on the vector of probability parameters. As
