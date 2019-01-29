@@ -4,6 +4,7 @@
 man-roxygen/*
 \.github/*
 README.md
+README.Rmd
 ^.*\.o$
 porta.log
 porta.ieq
