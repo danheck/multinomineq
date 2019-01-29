@@ -41,7 +41,8 @@ Imports:
 Suggests:
     rPorta,
     knitr,
-    testthat
+    testthat,
+    covr
 LinkingTo: 
     Rcpp,
     RcppArmadillo,
