@@ -1,12 +1,18 @@
 #' multinomineq: Bayesian Inference for Inequality-Constrained Multinomial Models
 #'
+#' @description{
+#' \if{html}{\figure{multinomineq.png}{options: width=100 alt ="multinomineq"}}
+#' \if{latex}{\figure{multinomineq.png}{options: width=0.5in}}
+#'
 #' Implements Gibbs sampling and Bayes factors for multinomial models with
 #' convex, linear-inequality constraints on the probability parameters. This
 #' includes models that predict a linear order of binomial probabilities
 #' (e.g., p1 < p2 < p3 < .50) and mixture models, which assume that the
 #' parameter vector p must be inside the convex hull of a finite number of
 #' vertices.
+#' }
 #'
+#' @details
 #' Inequality-constrained multinomial models have applications in the
 #' area of judgment and decision making to fit and test random utility models
 #' (Regenwetter, M., Dana, J., & Davis-Stober, C. P. (2011).

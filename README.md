@@ -1,14 +1,18 @@
 <!--
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/multinomineq)](http://cran.r-project.org/package=multinomineq)
-[![Build Status](https://travis-ci.org/danheck/multinomineq.svg?branch=master)](https://travis-ci.org/danheck/multinomineq)
-[![Licence](https://img.shields.io/badge/licence-GPL--2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![monthly downloads](http://cranlogs.r-pkg.org/badges/multinomineq)](http://cranlogs.r-pkg.org/badges/multinomineq)
 [![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/multinomineq)](http://cranlogs.r-pkg.org/badges/grand-total/multinomineq)
-[![Research software impact](http://depsy.org/api/package/cran/multinomineq/badge.svg)](http://depsy.org/package/r/multinomineq)
 -->
+
+[![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Build Status](https://travis-ci.org/danheck/multinomineq.svg?branch=master)](https://travis-ci.org/danheck/multinomineq)
+[![Coverage status](https://codecov.io/gh/danheck/multinomineq/branch/master/graph/badge.svg)](https://codecov.io/github/danheck/multinomineq?branch=master)
+
+<img src="man/figures/multinomineq.png" width="150">
 
 R package `multinomineq`
 =====
+
 
 Implements Gibbs sampling and Bayes factors for multinomial models with
 linear inequality constraints on the vector of probability parameters. As
@@ -95,8 +99,6 @@ Moreover, on Mac, it might be necessary to install the library `gfortran` manual
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
-<!--The package can be downloaded from CRAN by typing `install.packages("multinomineq")` in an active R session.-->
-<!--The manual is available within R by typing `vignette('multinomineq')`.-->
 
 
 
