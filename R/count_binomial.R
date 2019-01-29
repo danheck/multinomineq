@@ -109,14 +109,14 @@
 count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
                          steps, start, cmin = 0, maxiter = 500,
                          burnin = 5, progress = TRUE, cpu = 1){
+  check_Mminmax(M, cmin, maxiter, steps)
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
-                  # function(i) tryCatch(eval(i), error = function(e) NULL))
     count <- run_parallel(arg, fun = "count_binom", cpu = cpu, simplify = "count")
     return(count)
   }
-  check_Mminmax(M, cmin, maxiter)
+
   if (missing(A) || is.null(A)) A <- V
   aggr <- map_k_to_A(k, n, A, map, prior)
   k <- aggr$k
@@ -129,6 +129,8 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
 
     } else {
       steps <- check_stepsA(steps, A)
+      if (length(M) == 2)
+        M <- c(M[1], rep(M[2], length(steps) - 1))
       if (missing(start) || is.null(start) || any(start < 0))
         start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1, start,
                            control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par

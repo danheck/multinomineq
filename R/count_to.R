@@ -71,17 +71,17 @@ count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
   l_post <- sum(log(posterior[,1] / posterior[,2]))
   l_prior <- sum(log(prior[,1] / prior[,2]))
   est <- l_post - l_prior + const
-  lbf_0u <- s_post - s_prior + const
-  lbf_u0 <- s_prior - s_post + const
+  lbf_0u <- + s_post - s_prior + const
 
   # lbf_0n0 = log(f) - log(c) + log(1-c) - log(1-f)
   est_0n0 <- l_post - log1mexp(l_post) - l_prior + log1mexp(l_prior)
   lbf_0n0 <- s_post - s_prior + log1mexp(s_prior) - log1mexp(s_post)
 
   bf <- cbind("bf" = c("bf_0u" = est, "bf_u0" = -est, "bf_00'" = est_0n0),
-              t(sapply(list(lbf_0u, lbf_u0, lbf_0n0),
+              t(sapply(list(lbf_0u, - lbf_0u, lbf_0n0),
                        summary_samples, exp = !log)))
-  if(!log) bf[,"bf"] <- exp(bf[,"bf"])
+  if (!log) bf[,"bf"] <- exp(bf[,"bf"])
+  if (const != 0) bf["bf_00'",] <- NA
   bf
 }
 

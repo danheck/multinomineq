@@ -68,7 +68,7 @@ bf_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)),
 count_nonlinear <- function(k = 0, options, inside, prior = rep(1, sum(options)),
                             M = 5000, progress = TRUE, cpu = 1){
   check_io(inside, options)
-  check_Mminmax(M)
+  stopifnot(length(M) == 1, M > 0, M == round(M))
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     if (class(inside) == "XPtr")

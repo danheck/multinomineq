@@ -29,8 +29,8 @@ of the beta prior distributions for each binomial rate parameter.}
 
 \item{log}{whether to return the log-Bayes factor instead of the Bayes factor}
 
-\item{...}{further arguments passed to \code{\link{count_binom}}/\code{\link{count_multinom}}
-(e.g., \code{M}, \code{steps}).}
+\item{...}{further arguments passed to \code{\link{count_binom}} or
+\code{\link{count_multinom}} (e.g., \code{M}, \code{steps}).}
 
 \item{M}{number of posterior samples drawn from the encompassing model}
 

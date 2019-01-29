@@ -40,7 +40,7 @@
 #' # define function via C++ pointer:
 #' model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
 #' mcmc <- sampling_nonlinear(k=0, options = c(2,2),
-#'                            inside = model_cpp, M=1000)
+#'                            inside = model_cpp)
 #' head(mcmc)
 #' plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
 #' }
@@ -49,7 +49,7 @@ sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options))
                                 M = 1000, start, burnin = 10, eps = 1e-6,
                                 progress = TRUE, cpu = 1){
 
-  stopifnot(M > burnin, burnin > 0)
+  stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
   if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_ko(k, options)

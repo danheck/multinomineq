@@ -4,7 +4,7 @@ BOUND <- 1e-10
 MIN_LL <- - 1e100
 
 # reduce memory load by counting in batches:
-BATCH <- 50000
+BATCH <- 5000
 
 
 ############################# S3 methods: drop / add fixed dimensions

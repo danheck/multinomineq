@@ -196,13 +196,16 @@ check_data_strategy <- function (k, n, strategy){
   check_knp(k, n, strategy$pattern)
 }
 
-check_Mminmax <- function(M, cmin = 0, maxiter = 100){
-  if(any(M < 0) ||  any(M != round(M)))
-    stop("'M' must contain positive integers.")
-  if(length(cmin) != 1 || cmin < 0 ||  cmin != round(cmin))
+check_Mminmax <- function(M, cmin = 0, maxiter = 100, steps){
+  stopifnot(all(M > 0), all(M == round(M)))
+  if(!missing(cmin) && length(cmin) != 1 || cmin < 0 ||  cmin != round(cmin))
     stop("'cmin' must be a nonnegative integer.")
-  if(length(maxiter) != 1 || maxiter < 1 ||  maxiter != round(maxiter))
+  if(!missing(maxiter) &&
+     length(maxiter) != 1 || maxiter < 1 ||  maxiter != round(maxiter))
     stop("'maxiter' must be a positive integer.")
+  if (!missing(steps) && !length(M) %in% c(1, 2, length(steps)))
+    stop("'M' must be of length 1, 2, or, length(steps). \n",
+         "  (identical number of iterations for all steps)")
 }
 
 check_count <- function(count){

@@ -65,6 +65,7 @@
 count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)),
                             M = 5000, steps, start, cmin = 0, maxiter = 500,
                             burnin = 5, progress = TRUE, cpu = 1){
+  check_Mminmax(M, cmin, maxiter, steps)
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
@@ -77,13 +78,14 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
 
   if (!missing(b) && !is.null(b)){
     check_Abokprior(A, b, options, k, prior)
-    check_Mminmax(M, cmin, maxiter)
 
     if (cmin == 0 && (missing(steps) || is.null(steps))){
       count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
 
     } else {
       steps <- check_stepsA(steps, A)
+      if (length(M) == 2)
+        M <- c(M[1], rep(M[2], length(steps) - 1))
       if (missing(start) || is.null(start) || any(start < 0))
         start <-  ml_multinom(k + prior, options, A, b, n.fit = 1, start,
                               control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par

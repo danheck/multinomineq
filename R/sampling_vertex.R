@@ -5,7 +5,7 @@
 #' @importFrom utils txtProgressBar setTxtProgressBar
 sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
                        start, burnin = 10, progress = TRUE){
-  stopifnot(M > burnin, burnin > 0)
+  stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
   options <- check_V(V, options)
   # 1) Approximate MAP estimate as starting value
   if (missing(start) || is.null(start))

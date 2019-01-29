@@ -62,7 +62,7 @@
 sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options)),
                                M = 5000, start, burnin = 10,
                                progress = TRUE, cpu = 1){
-  stopifnot(M > burnin, burnin > 0)
+  stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
   if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_ko(k, options)
@@ -99,7 +99,7 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
 sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
                             M = 5000, start, burnin = 10,
                             progress = TRUE, cpu = 1){
-  stopifnot(M > burnin, burnin > 0)
+  stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
   if (length(n) == 1) n <- rep(n, length(k))
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {

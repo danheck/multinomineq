@@ -416,7 +416,7 @@ arma::mat sampling_nonlin(const arma::vec& k, const arma::vec& options, T inside
       }
       X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
       double check_new = as<double>(inside(wrap(X.col(i))));
-      Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
+      // Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
     }
   }
   X.shed_cols(0,burnin - 1);

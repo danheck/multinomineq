@@ -140,8 +140,11 @@ NumericMatrix count_stepwise_bin(const arma::vec& k, arma::vec& n,
   unsigned int S = steps.n_elem;    // number of unique steps
   if (M.n_elem == 1)
     M = M(0) * ones(S);
+
+  // dynamic start values for each step
   mat starts(steps.n_elem, A.n_cols);
-  for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
+  for (unsigned int s = 0; s < steps.n_elem; s++)
+    starts.row(s) = start.t();
 
   mat sample;
   uvec inside_idx;
@@ -178,10 +181,14 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
   vec inside;
   uvec inside_idx;
   mat prob;
+
+  // dynamic starting values for each step
   mat starts(steps.n_elem, A.n_cols);
-  for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
-  int i, from, iter = 0;  // from: can be negative!
-  while(count.min() < cmin){
+  for (unsigned int s = 0; s < steps.n_elem; s++)
+    starts.row(s) = start.t();
+
+  int i, from, iter = 0;  // from: can be negative, thus not unsigned!
+  while (count.min() < cmin){
     Rcpp::checkUserInterrupt();
     if (progress && iter % (maxiter/100) == 0)
       Rcout << (iter== 0 ? " current cmin: " : " , ") << count.min();
@@ -207,7 +214,7 @@ NumericMatrix count_auto_bin(const arma::vec& k, const arma::vec& n,
     }
     count(i) += accu(inside);
     M(i) += M_iter;
-    // compute precision
+    // TODO: compute precision intead of cmin
   }
   if (progress) Rcout << "\n";
   return results(count, M, steps + 1); // C++ --> R indexing

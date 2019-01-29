@@ -88,7 +88,7 @@ cpp_code <- "SEXP inside(NumericVector x){
 # define function via C++ pointer:
 model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
 mcmc <- sampling_nonlinear(k=0, options = c(2,2),
-                           inside = model_cpp, M=1000)
+                           inside = model_cpp)
 head(mcmc)
 plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
 }
