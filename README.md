@@ -12,7 +12,7 @@
 R package `multinomineq`
 =====
 
-<img src="man/figures/multinomineq.png" width="200" align="right">
+<img src="man/figures/multinomineq.png" width="200" align="left">
 
 Implements Gibbs sampling and Bayes factors for multinomial models with linear
 inequality constraints on the vector of probability parameters. As special
@@ -36,7 +36,7 @@ comparing probabilistic choice models. Cognitive Psychology, 96, 26–40).
 A formal definition of inequality-constrained multinomial models and the 
 implemented computational methods for Bayesian inference is provided in:
 
-* Heck, D. W., & Davis-Stober, C. P. (2018). 
+* Heck, D. W., & Davis-Stober, C. P. (2019). 
   Multinomial models with linear inequality constraints: 
   Overview and improvements of computational methods for Bayesian inference. 
   *Manuscript under revision.* https://arxiv.org/abs/1808.07140
@@ -48,6 +48,7 @@ The package vignette provides a short introduction of how to apply the main func
 vignette('multinomineq_intro')
 ```
 
+The vignette is also available <https://www.dwheck.de/vignettes/multinomineq_intro.html>.
 
 
 ## Installation

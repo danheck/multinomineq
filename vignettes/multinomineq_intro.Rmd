@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{multinomineq: Multinomial Models with Inequality Constraints}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+header-includes: 
+  - \usepackage{bm}
 ---
   
 ```{r setup, include = FALSE}
@@ -15,8 +17,10 @@ knitr::opts_chunk$set(
   comment = "#>"
   )
 ```
-  
-  
+
+
+<img src="../man/figures/multinomineq.png" width="150" align="right" hspace="20" style="border:0px">
+
 The R package `multinomineq` facilitates the Bayesian analysis of discrete/categorical data using multinomial models with inequality constraints.
 Essentially, these types of models allow to analyze discrete choice frequencies while assuming that the corresponding choice probabilities $\theta$ are constrained by linear inequality constraints (e.g., by the simple order $\theta_{1} \leq \theta_{2}\leq \theta_{3}\leq \theta_{4}$).
 In the following, this vignette shows how to define and test such models in R.
@@ -324,9 +328,12 @@ In the following, we define inequality-constrained multinomial models for discre
 We use the term "item type" to refer to a category system $i$ that is modeled by a multinomial distribution with a fixed total number of observations $n_i$.
 For an item type $i$, we label the observed frequencies as $k_{ij}$.
 
+#### Parameters and Likelihood
+
 The parameter vector of interest refers to the choice probabilities:
 $$\theta = (\theta_{11},\dots,\theta_{1 (J_1-1)},\theta_{21},\dots, \theta_{I (J_I-1)})$$
-Note that the last probability within each item type is ommited because probabilities have to sum to one. Hence, for $n_i=3$ choice options there are only 2 free parameters.
+Note that the last probability within each item type is ommited because probabilities have to sum to one. 
+Hence, for $n_i=3$ choice options there are only 2 free parameters.
 
 Using this notation, we can define a product-multinomial likelihood function:
 $$p(k \mid \theta) = \prod_{i=1}^I  
@@ -334,30 +341,49 @@ $$p(k \mid \theta) = \prod_{i=1}^I
 \prod_{j=1}^{J_i - 1}  \theta_{ij}^{k_{ij}} 
 \left(1- \sum_{r=1}^{J_i-1} \theta_{ir}\right)^{k_{J_i}}$$
 
+#### Linear Inequality Constraints
+
 Inequality constraints can be defined in two different, equivalent ways. 
 First, one may define a list of inequality constraints that have to hold for the choice probabilities, for instance:
 \begin{align*}
-\theta_{11}>\theta_{21},\\
-\theta_{21}>\theta_{31},\\
-\theta_{31}>\theta_{41}
+\theta_{11} \leq \theta_{21} \, \text{ and } \, \theta_{21} \leq \theta_{31}
 \end{align*}
+These inequalities can be expressed in vector notation as $A \,\theta \leq  b$ by defining a matrix $ A$ and a vector $ b$ as follows:
+$$ A = \pmatrix{1 & -1 & 0 \\ 0 & 1 & -1} \,\, \text{ and }\,\,  b = \pmatrix{0 \\ 0}$$
 To formalize this notation, we define the constrained parameter space $\Omega_0$ via a matrix $A$ and a vector $b$ that specify a list of inequalities that have to hold:
 $$\Omega_0 = \left\{\theta \in \Omega \, \middle | \, A \, \theta \leq  b \right\}$$
 
+
+
 Alternatively, one may list all the vertices $v^{(s)}$ defining the constrained parameter space in the rows of a matrix $V$.
-
-
+In the example above, we have 
+$$ v^{(1)} = \pmatrix{0\\0\\0} \,,\,
+   v^{(2)} = \pmatrix{0\\0\\1} \,,\,
+   v^{(3)} = \pmatrix{0\\1\\1} \,,\,
+   v^{(1)} = \pmatrix{1\\1\\1}$$
+These vectors can be convenietly summarizes in a matrix $ V$ with one vertex per row:
+$$ V = \pmatrix{0 & 0 & 0\\ 0 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 1}$$
+In general, the restricted parameter space $\Omega_0$ is defined as the convex hull of the set of vertices $v^{(s)}$:
 $$\Omega_0 = \left\{ \theta = \sum_{s=1}^S \alpha_s  v^{(s)} \,\middle |\, \alpha_s \geq 0 \text{ for all } s=1,\dots, S \text{ and }\sum_{s=1}^S \alpha_s=1 \right\}$$
+
+#### Prior & Posterior
 
 As a prior distribution for the parameters $\theta$, we assume independent Dirichlet distributions for the different item types $i$ with shape parameters $\alpha_{ij}$.
 Note that we only allow parameters that are inside the constrained parameter space $\Omega_0$:
-
 $$p(\theta) = \frac {1}{c} \, \mathbb I_{\Omega_0}(\theta) \, 
 \prod_{i=1}^I \prod_{j=1}^{J_i} \theta_{ij}^{\alpha_{ij}-1}$$
+Here, $\mathbb I_{\Omega_0}(\theta)$ is the indicator function which is one if $\theta\in\Omega_0$ and zero otherwise.
+Moreover, the normalizing constant $c$ ensures that the prior density function integrates to one.
 
 Finally, the analytical solution of the posterior distribution is also a product-Dirichlet distribution, truncated to the constrained parameter space:
-
 $$p(\theta \mid  k) = \frac {1}{f} \, \mathbb I_{\Omega_0}(\theta) \, 
 \prod_{i=1}^I \prod_{j=1}^{J_i} \theta_{ij}^{k_{ij} + \alpha_{ij}-1}$$
+Similarly as before, $f$ is the normalizing constant of the posterior density function.
 
+#### Reference
 
+For a more detailed introduction with technical details, see:
+
+* Heck, D. W., & Davis-Stober, C. P. (2019). Multinomial models with linear 
+inequality constraints: Overview and improvements of computational methods for 
+Bayesian inference. Manuscript under revision. <https://arxiv.org/abs/1808.07140>
