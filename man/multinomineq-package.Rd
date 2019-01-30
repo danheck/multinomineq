@@ -19,22 +19,20 @@ vertices.
 }
 }
 \details{
-Inequality-constrained multinomial models have applications in the
-area of judgment and decision making to fit and test random utility models
-(Regenwetter, M., Dana, J., & Davis-Stober, C. P. (2011).
-  Transitivity of preferences. Psychological Review, 118, 42–56,
-  <doi:10.1037/a0021150>) or to perform outcome-based strategy classification
-(i.e., to select the strategy that provides the best account for a vector of
-  observed choice frequencies; Heck, D. W., Hilbig, B. E., & Moshagen, M.
-  (2017). From information processing to decisions: Formalizing and comparing
-  probabilistic choice models. Cognitive Psychology, 96, 26–40.
-  <doi:10.1016/j.cogpsych.2017.05.003>).
-
-The method is implemented for multiple purposes:
+A formal definition of inequality-constrained multinomial models and the
+implemented computational methods for Bayesian inference is provided in:
 \itemize{
- \item Risky decisions between different gambles to test choice axioms
-       such as transitivity (Regenwetter et al., 2012, 2014).
-       See \code{\link{regenwetter2012}}
+\item Heck, D. W., & Davis-Stober, C. P. (2019).
+  Multinomial models with linear inequality constraints:
+  Overview and improvements of computational methods for Bayesian inference.
+  Manuscript under revision. \url{https://arxiv.org/abs/1808.07140}
+}
+
+Inequality-constrained multinomial models have applications in multiple areas
+in psychology, judgement and decision making, and beyond:
+\itemize{
+ \item Testing choice axioms such as transitivity and random utility theory
+       (Regenwetter et al., 2012, 2014). See \code{\link{regenwetter2012}}
  \item Testing deterministic axioms of measurement and choice (Karabatsos, 2005; Myung et al., 2005).
  \item Multiattribute decisions for probabilistic inferences involving strategies such as
        Take-the-best (TTB) vs. weighted additive (WADD; Bröder & Schiffer, 2003; Heck et al., 2017)
@@ -45,6 +43,7 @@ The method is implemented for multiple purposes:
        See \code{\link{bf_nonlinear}}
  \item Testing stochastic dominance of response time distributions (Heathcote et al., 2010).
        See \code{\link{stochdom_bf}}
+ \item Cognitive diagnostic assessment (Hoijtink et al., 2014).
 }
 
 For convex polytopes, the transformation of vertex to inequality representation

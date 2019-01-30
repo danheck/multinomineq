@@ -21,15 +21,18 @@ probabilities (e.g., p[1] < p[2] < p[3] < .50) and mixture models assuming that
 the parameter vector p must be inside the convex hull of a finite number of
 predicted patterns (i.e., vertices).
 
-Inequality-constrained multinomial models have applications in the area of
-judgment and decision making to fit and test random utility models (Regenwetter,
-M., Dana, J., & Davis-Stober, C.P. (2011). Transitivity of preferences.
-Psychological Review, 118, 42–56) or to perform outcome-based strategy
-classification to select the decision strategy that provides the best account
-for a vector of observed choice frequencies (Heck, D.W., Hilbig, B.E., &
-Moshagen, M. (2017). From information processing to decisions: Formalizing and
-comparing probabilistic choice models. Cognitive Psychology, 96, 26–40).
+Inequality-constrained multinomial models have applications in multiple areas 
+in psychology and beyond:
 
+* Risky decisions between different gambles to test choice axioms such as 
+  transitivity (Regenwetter et al., 2012, 2014).
+* Outcome-based strategy classification of multiattribute decision strategies such as
+  take-the-best (TTB) or weighted additive (WADD; Bröder & Schiffer, 2003; Heck et al., 2017).
+* Testing deterministic axioms of measurement and choice (Karabatsos, 2005; Myung et al., 2005).
+* Fitting and testing nonparametric item response theory models (Karabatsos & Sheu, 2004).
+* Order-constrained contingency tables (Klugkist et al., 2007, 2010).
+* Testing stochastic dominance of response time distributions (Heathcote et al., 2010).
+* Cognitive diagnostic assessment (Klugkist et al., 2007, 2010).
 
 ## References and Vignette
 
@@ -99,6 +102,8 @@ Moreover, on Mac, it might be necessary to install the library `gfortran` manual
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
+
+## References
 
 
 

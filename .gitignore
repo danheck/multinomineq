@@ -8,3 +8,6 @@ src/*.dll
 README.Rd
 porta.ieq
 porta.log
+
+src-i386/*
+src-x64/*
