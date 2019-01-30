@@ -1,7 +1,7 @@
 #' multinomineq: Bayesian Inference for Inequality-Constrained Multinomial Models
 #'
 #' @description{
-#' \if{html}{\figure{multinomineq.png}{options: width=100 alt ="multinomineq"}}
+#' \if{html}{\figure{multinomineq.png}{options: width=120 alt ="multinomineq" align="right" hspace="20"}}
 #' \if{latex}{\figure{multinomineq.png}{options: width=0.5in}}
 #'
 #' Implements Gibbs sampling and Bayes factors for multinomial models with
