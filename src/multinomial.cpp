@@ -180,20 +180,32 @@ arma::mat sampling_mult(const arma::vec& k, const arma::vec& options,
   unsigned int j = 0;
   for (unsigned int i = 1 ; i < M  + burnin; i++){
     p.increment();   // update progress bar
-    if(i % 100 == 0) Rcpp::checkUserInterrupt();
+    if(i % 50 == 0) Rcpp::checkUserInterrupt();
     X.col(i) = X.col(i-1);
     idx = sample(idx, D, false);
     for (unsigned int m = 0; m < D; m++){
       j = idx(m);
-      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / A.col(j); // divide by s below
+      // scaling within multinomial:
+      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);
+      // truncation:
+      rhs = (b - A * X.col(i) + A.col(j) * X(j,i)) / A.col(j);
       Aneg = find(A.col(j) < 0);
       Apos = find(A.col(j) > 0);
-      bmin = Aneg.is_empty() ? 0. : rhs(Aneg).max();
-      bmax = Apos.is_empty() ? 1. : rhs(Apos).min(); // bmax=s (cancels out below)
-      // scaled truncated beta:
-      s = 1 - accu(X.col(i).rows(j_low(j),j_up(j))) + X(j,i);  // scaling within multinomial
-      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), std::max(0., bmin/s), std::min(1.,bmax/s));
+      bmin = 0.;
+      bmax = s;
+      if (!Aneg.is_empty())
+        bmin = fmax(0., rhs(Aneg).max());
+      if (!Apos.is_empty())
+        bmax = fmin(s, rhs(Apos).min());
+      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin/s, bmax/s);
+      // //### Debugging:
+      // Rcout << X.col(i).t();
+      // if (as_scalar(inside_Ab(X.col(i).t(), A, b)) == 0){
+      //   Rcout << "rhs(Aneg).max() =" << rhs(Aneg).max() <<"--- rhs(Apos).min()=" << rhs(Apos).min();
+      //   Rcout << "==>" <<i << "//" << j << ":   s="<< s <<" ;bmin=" << bmin <<" bmax=" << bmax << "\n";
+      // }
     }
+
   }
   X.shed_cols(0,burnin - 1);
   return X.t();
@@ -232,9 +244,9 @@ NumericMatrix count_stepwise_multi(const arma::vec& k, const arma::vec& options,
     M = M(0) * ones(S);
   mat starts(S, A.n_cols);
   for (unsigned int s = 0; s < S; s++)
-    starts.row(s) = start.t(); // dynamic start values for each step
+    starts.row(s) = start_random(A, b, M(1), start).t(); // different starting values for each step
 
-  mat sample;
+  mat mcmc;
   uvec inside_idx;
   vec inside, count = zeros(S);
   count(0) = count_mult(k, options, A.rows(0, steps(0)),
@@ -244,13 +256,13 @@ NumericMatrix count_stepwise_multi(const arma::vec& k, const arma::vec& options,
   for (unsigned int s = 1; s < S ; s++){
     Rcpp::checkUserInterrupt();
     if (progress) Rcout << (s==1 ? " step: " : " , ") << s;
-    sample = sampling_mult(k, options, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
-                           prior, M(s), starts.row(s - 1).t(), burnin, false);
-    inside = inside_Ab(sample, A.rows(steps(s-1) + 1, steps(s)),
+    mcmc = sampling_mult(k, options, A.rows(0, steps(s-1)), b.subvec(0, steps(s-1)),
+                         prior, M(s), starts.row(s - 1).t(), burnin, false);
+    inside = inside_Ab(mcmc, A.rows(steps(s-1) + 1, steps(s)),
                        b.subvec(steps(s-1) + 1, steps(s)));
     if (any(inside)){
       inside_idx = find(inside);
-      starts.row(s) = sample.row(inside_idx(inside_idx.n_elem - 1));
+      starts.row(s) = mcmc.row(inside_idx(inside_idx.n_elem - 1));
     }
     count(s) = accu(inside);
   }
@@ -269,9 +281,10 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
   steps = steps - 1; // R --> C++ indexing
   vec inside;
   uvec inside_idx;
-  mat prob;
+  mat mcmc;
   mat starts(steps.n_elem, A.n_cols);
-  for (unsigned int s = 0; s < steps.n_elem; s++) starts.row(s) = start.t(); // dynamic start values
+  for (unsigned int s = 0; s < steps.n_elem; s++)
+    starts.row(s) = start_random(A, b, M(1), start).t(); // different starting values for each step
   int i, from, iter = 0;  // from: can be negative!
   while(count.min() < cmin){
     Rcpp::checkUserInterrupt();
@@ -284,17 +297,17 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
 
     // sampling for step with minimal counts
     if (i == 0){
-      prob = rpdirichlet(M_iter, k + prior, options, true);
+      mcmc = rpdirichlet(M_iter, k + prior, options, true);
     }  else {
-      prob = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
+      mcmc = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
                             prior, M_iter, starts.row(i - 1).t(), burnin, false);
-      starts.row(i - 1) = prob.row(M_iter - 1);
+      starts.row(i - 1) = mcmc.row(M_iter - 1);
     }
     // count samples
-    inside = inside_Ab(prob, A.rows(from + 1, steps(i)), b.subvec(from + 1, steps(i)));
+    inside = inside_Ab(mcmc, A.rows(from + 1, steps(i)), b.subvec(from + 1, steps(i)));
     if (any(inside)){
       inside_idx = find(inside);
-      starts.row(i) = prob.row(inside_idx(inside_idx.n_elem - 1));
+      starts.row(i) = mcmc.row(inside_idx(inside_idx.n_elem - 1));
     }
     count(i) += accu(inside);
     M(i) += M_iter;
@@ -318,8 +331,11 @@ double bisection(T f, NumericVector x, int i, double min, double max,
   double f_min = as<double>(f(x)) - 0.50;
   x[i] = max;
   double f_max = as<double>(f(x)) - 0.50;
-  if ( (f_min <= 0 && f_max <= 0) || (f_min >= 0 && f_max >= 0))
+  if ( (f_min <= 0 && f_max <= 0) || (f_min >= 0 && f_max >= 0)){
+    Rcout << "Bisection with respect to element [" << i+1 << "] on the interval [" << min << "," << max << "]\n";
+    Rcout << "Current state of probability vector: " << x << "\n";
     stop("[Bisection algorithm]\n  Indicator function 'inside' does not have different values (0/1) for min/max.\n  Check whether inequality-constrained parameter space is convex!\n  (multiplicative constraints such as x[1]*x[2]<0.50 are in general not convex)");
+  }
 
   while (min + eps < max) {
     double const mid = 0.5 * min + 0.5 * max;
@@ -416,7 +432,10 @@ arma::mat sampling_nonlin(const arma::vec& k, const arma::vec& options, T inside
       }
       X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
       double check_new = as<double>(inside(wrap(X.col(i))));
-      // Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
+      if (check_new != 1.){
+        Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
+        stop("moved outside of truncated parameter space.");
+      }
     }
   }
   X.shed_cols(0,burnin - 1);

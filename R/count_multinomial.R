@@ -89,7 +89,11 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
       if (missing(start) || is.null(start) || any(start < 0))
         start <-  ml_multinom(k + prior, options, A, b, n.fit = 1, start,
                               control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-      check_start(start, A, b, interior = FALSE)
+      if (!all(A %*% start < b)){
+        # move away into interior
+        start <- .5*find_inside(A, b, options = options, random = TRUE) + .5*start
+      }
+      check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){
         zeros <- rep(0, length(steps))

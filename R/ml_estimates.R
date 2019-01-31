@@ -135,7 +135,7 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
     } else {
       if (missing(start) || is.null(start) || !all(A %*% start < b))
         start <- find_inside(A, b, options = options)
-      check_start(start, A, b, interior = FALSE)
+      check_start(start, A, b, interior = TRUE)
       tryCatch (
         oo <- constrOptim(start, f = loglik_multinom, grad = grad_multinom,
                           k = k, options = options, ui = - A, ci = - b, ...),

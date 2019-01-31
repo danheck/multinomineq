@@ -97,7 +97,7 @@ sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options))
       stop("Could not find starting values (based on 10000 samples).")
   }
   stopifnot(length(start) == sum(options - 1))
-  stopifnot(all(tapply(start, rep(seq(options), options-1), sum) <= 1))
+  stopifnot(all(tapply(start, rep(seq(length(options)), options-1), sum) <= 1))
 
   if (is.function(inside)){
     stopifnot(inside(start))

@@ -134,7 +134,11 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
       if (missing(start) || is.null(start) || any(start < 0))
         start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1, start,
                            control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-      check_start(start, A, b, interior = FALSE)
+      if (!all(A %*% start < b)){
+        # move away into interior
+        start <- .5*find_inside(A, b, options = rep(2,length(k)), random = TRUE) + .5*start
+      }
+      check_start(start, A, b, interior = TRUE)
 
       if (cmin > 0){
         zeros <- rep(0, length(steps))

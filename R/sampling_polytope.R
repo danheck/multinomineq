@@ -66,6 +66,7 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
   if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
     k <- rep(0, sum(options))
   check_ko(k, options)
+  check_ko(prior, options)
 
   if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
@@ -82,7 +83,9 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
     if (missing(start) || is.null(start) || any(start < 0))
       start <-  ml_multinom(k + prior, options, A, b, n.fit = 1,
                             control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-    check_start(start, A, b, interior = FALSE)
+    if (!all(A %*% start < b))
+      start <- .5*find_inside(A, b, options = options, random = TRUE) + .5*start
+    check_start(start, A, b, interior = TRUE)
     if (length(prior) == 1) prior <- rep(prior, sum(options))
     check_Abokprior(A, b, options, k, prior)
     mcmc <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
@@ -121,9 +124,10 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
     n <- aggr$n
     check_Abknprior(A, b, k, n, prior)
     if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1,
+      start <-  ml_binom(k, n, #k + prior[1], n + sum(prior), ML: gives interior values
+                         A, b, map, n.fit = 1,
                          control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-    check_start(start, A, b, interior = FALSE)
+    check_start(start, A, b, interior = TRUE)
     mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
     colnames(mcmc) <- colnames(A)
   }

@@ -1,3 +1,4 @@
+library(testthat)
 
 mcmc.summ <- function(x)
   c(m=mean(x), sd=sd(x), quantile(x, c(.025,.975)))
@@ -39,7 +40,7 @@ test_that("NIRT axioms match with Rasch predictions", {
   DC <- nirt_to_Ab(N, M, axioms = c("W1", "W2", "DC"))
   # count_binom(0,0, DC$exclude[[1]]$A, rep(0,3), M=5e4)
   # relative to W1 / W2
-  ss <- sampling_binom(0, 0, DC$A, DC$b, M = 3e4)
+  ss <- sampling_binom(0,0, DC$A, DC$b, M = 3e4)
   dc <- sapply(DC$exclude, function(ee) inside(ss, ee$A, ee$b)) # violation DC
   table(rowSums(dc))
   mean(apply(dc, 1, any))

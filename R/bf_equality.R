@@ -46,11 +46,11 @@
 #'          map = c(0, 0, 1, 1))
 #' @export
 bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
-                        M1 = 100000, M2 = 20000, delta = .5^(1:20),
+                        M1 = 100000, M2 = 20000, delta = .5^(1:8),
                         return_Ab = FALSE, ...){
   if (missing(A) && missing(b)) {
-    A <- matrix(0, ncol = ncol(C))
-    b <- c(0)
+    A <- matrix(NA_real_, nrow = 0, ncol = ncol(C))
+    b <- numeric()
   }
   check_Abokprior(A, b, options, k, prior)
   check_Abokprior(C, d, options, k, prior)
@@ -59,6 +59,8 @@ bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
   A_delta <- rbind(A, Ab_delta$A)
   b_delta <- c(b, Ab_delta$b)
   steps <- c(nrow(A), nrow(A) + Ab_delta$steps)
+  if (nrow(A) == 0)
+    steps <- steps[-1]
 
   if (return_Ab)
     return(list(A = A_delta, b = b_delta, steps = steps))

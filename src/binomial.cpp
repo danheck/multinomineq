@@ -8,6 +8,8 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 double rgamma_trunc(const double shape, const double rate,
                     const double min, const double max){
+  if (min >= max)
+    stop("Error in truncated gamma: Truncation boundaries violate min<max!\n");
   double pmin = R::pgamma(min, shape, 1/rate, 0, false);  // scale = 1/rate
   double pmax = R::pgamma(max, shape, 1/rate, 0, false);
   double u = R::runif(0, 1);
@@ -18,6 +20,8 @@ double rgamma_trunc(const double shape, const double rate,
 // [[Rcpp::export]]
 double rbeta_trunc(const double shape1, const double shape2,
                    const double min, const double max){
+  if (min >= max)
+    stop("Error in truncated beta: Truncation boundaries violate min<max!\n");
   double pmin = R::pbeta(min, shape1, shape2, 0, false);
   double pmax = R::pbeta(max, shape1, shape2, 0, false);
   double u = R::runif(0, 1);
@@ -92,14 +96,15 @@ arma::mat sampling_bin(const arma::vec& k, const arma::vec& n,
     for (unsigned int m = 0; m < D; m++){
       j = idx(m);
       // get min/max for truncated beta:
-      bmax = 1.; bmin = 0.;
+      bmax = 1.;
+      bmin = 0.;
       rhs = (b - A * X.col(i) + A.col(j) * X(j,i))/ A.col(j);
       Aneg = find(A.col(j) < 0);
       Apos = find(A.col(j) > 0);
       if (!Aneg.is_empty())
-        bmin = rhs(Aneg).max();
+        bmin = fmax(0., rhs(Aneg).max());
       if (!Apos.is_empty())
-        bmax = rhs(Apos).min();
+        bmax = fmin(1, rhs(Apos).min());
       X(j,i) = rbeta_trunc(k(j) + prior(0), n(j) - k(j) + prior(1), bmin, bmax);
     }
   }
