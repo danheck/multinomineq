@@ -421,20 +421,23 @@ arma::mat sampling_nonlin(const arma::vec& k, const arma::vec& options, T inside
       if (check0 != 1.){
         double rmin = bisection(inside, wrap(X.col(i)), j, bmin, X(j,i-1), eps);
         // approximation from below: add epsilon to ensure that inside(p)==TRUE
-        bmin = std::max(0., (rmin + eps) / s);
+        bmin = fmax(0., rmin + eps);
       }
 
       X(j,i) = bmax;
       double check1 = as<double>(inside(wrap(X.col(i))));
       if (check1 != 1.){
         double rmax = bisection(inside, wrap(X.col(i)), j, X(j,i-1), bmax, eps);
-        bmax = std::min(1., rmax / s);
+        bmax = fmin(s, rmax);
       }
-      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin, bmax);
+      X(j,i) = s * rbeta_trunc(beta_j(j), beta_J(j), bmin / s, bmax / s);
       double check_new = as<double>(inside(wrap(X.col(i))));
       if (check_new != 1.){
-        Rcout << "j= " << j << "  |" << s*bmin <<"---"<< s*bmax<<"|" << X.col(i).t() << "\n" ;
-        stop("moved outside of truncated parameter space.");
+        Rcout << "index of updated parameter = " << j+1 ;
+        Rcout << "\n  [scaling factor s = " << s << ";  lower bound = "<< bmin;
+        Rcout <<";  upper bound = "<< bmax<<"]\n\ntheta[m]   = " << X.col(i).t();
+        Rcout << "theta[m-1] = " << X.col(i-1).t() << "\n";
+        stop("Gibbs sampler outside of truncated parameter space.\nPlease check whether restricted parameter space is convex.");
       }
     }
   }
