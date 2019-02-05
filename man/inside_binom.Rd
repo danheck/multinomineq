@@ -53,11 +53,23 @@ inside_binom(k, n, A, b)
 #     (a1,a2,a3,   b1,b2,b3)
 k <- c(1,4,10,     5,9,1)
 options <- c(3, 3)
-# a1<b1, a2<b2:
+# a1<b1, a2<b2, no constraints on a3, b3
 A <- matrix(c(1,-1,0, 0,
               0, 0,1,-1), ncol=4, byrow=TRUE)
 b <- c(0, 0)
 inside_multinom(k, options, A, b)
+
+# V-representation:
+V <- matrix(c(0, 0, 0, 0,
+              0, 0, 0, 1,
+              0, 1, 0, 0,
+              0, 0, 1, 1,
+              0, 1, 0, 1,
+              1, 1, 0, 0,
+              0, 1, 1, 1,
+              1, 1, 0, 1,
+              1, 1, 1, 1),  9, 4, byrow = TRUE)
+inside_multinom(k, options, V = V)
 }
 \seealso{
 \code{\link{inside}}

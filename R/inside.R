@@ -80,15 +80,32 @@ inside <- function(x, A, b, V){
 #' #     (a1,a2,a3,   b1,b2,b3)
 #' k <- c(1,4,10,     5,9,1)
 #' options <- c(3, 3)
-#' # a1<b1, a2<b2:
+#' # a1<b1, a2<b2, no constraints on a3, b3
 #' A <- matrix(c(1,-1,0, 0,
 #'               0, 0,1,-1), ncol=4, byrow=TRUE)
 #' b <- c(0, 0)
 #' inside_multinom(k, options, A, b)
+#'
+#' # V-representation:
+#' V <- matrix(c(0, 0, 0, 0,
+#'               0, 0, 0, 1,
+#'               0, 1, 0, 0,
+#'               0, 0, 1, 1,
+#'               0, 1, 0, 1,
+#'               1, 1, 0, 0,
+#'               0, 1, 1, 1,
+#'               1, 1, 0, 1,
+#'               1, 1, 1, 1),  9, 4, byrow = TRUE)
+#' inside_multinom(k, options, V = V)
 #' @seealso \code{\link{inside}}
 #' @export
 inside_binom <- function(k, n, A, b, V){
-  x <- k / n
+  check_kn(k, n)
+  if (!is.null(dim(k)) && length(dim(k_free)) == 2){
+    x <- t(t(k) / n)
+  } else {
+    x <- k / n
+  }
   if (missing(V) || is.null(V)){
     inside(x, A, b)
   } else {
@@ -101,8 +118,13 @@ inside_binom <- function(k, n, A, b, V){
 inside_multinom <- function(k, options, A, b, V){
   k_free <- drop_fixed(k, options)
   sel <- rep(1:length(options), options - 1)
-  n <- tapply(k, rep(1:length(options), options), sum)[sel]
-  x <- k_free / n
+  if (!is.null(dim(k_free)) && length(dim(k_free)) == 2){
+    n <- tapply(t(k), rep(1:length(options), options), sum)[sel]
+    x <- t(t(k_free) / c(n))
+  } else {
+    n <- tapply(k, rep(1:length(options), options), sum)[sel]
+    x <- k_free / n
+  }
   if (missing(V) || is.null(V)){
     inside(x, A, b)
   } else {
@@ -111,9 +133,13 @@ inside_multinom <- function(k, options, A, b, V){
 }
 
 inside_V <- function (x, V, return_glpk = FALSE){
-  if (!is.null(dim(x))){
+  if (!is.null(dim(x)) && length(dim(x)) == 2){
     return (apply(x, 1, inside_V, V = V, return_glpk = return_glpk))
   } else {
+
+    # mb <- microbenchmark::microbenchmark(times = 20, fukuda = {
+
+    # Fukuda 2004:  (similar to Smeulders 3.2)
     npar <- length(x) + 1
     obj <- c(-1, x)  # z0, z
     mat <- cbind(-1, rbind(V, x))  # z0, z
@@ -122,6 +148,34 @@ inside_V <- function (x, V, return_glpk = FALSE){
     bnd <- list(lower = list(ind = 1:npar, val = rep(-Inf, npar)),
                 upper = list(ind = 1:npar, val = rep(Inf, npar)))
     glpk <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE, bounds = bnd)
+
+    # }, smeulders = {
+    #   # [CURRENTLY WRONG] Smeulders 2018: linear problem in 3.1
+    # npar <- 1 + nrow(V)   # c(z, x_m)  where x_m is the mixture weight for row m of V
+    # obj <- c(1, rep(0, npar - 1))  # minimize z
+    # mat <- rbind(cbind(1, t(V)),            # sum x_m + z >= p
+    #              c(0, rep(1, npar - 1)))   # sum -x_n >= -1
+    # dir <- c(rep(">=", nrow(mat) - 1), "==")
+    # rhs <- c(x, 1)
+    # glpk2 <- Rglpk_solve_LP(obj, mat, dir, rhs, max = FALSE) # default: x_m, z >= 0
+    #   # sum(glpk2$solution[-1])
+    # },{
+    #   # [CURRENTLY WRONG] Smeulders 2018: linear problem in 3.2
+    # npar <- length(x) + 1  # c, y_ij
+    # obj <- c(-1, x)       # -c, p_ij
+    # mat <- rbind(cbind(-1, V),            # sum_ij  - c <= 0
+    #              c(0, rep(1, npar - 1)))  # sum y_ij <= 1
+    # dir <- c(rep("<=", nrow(mat) - 1),
+    #          "<=")
+    # rhs <- c(rep(0, nrow(V)), 1)
+    # bnd <- list(lower = list(ind = 1:npar, val = rep(0, npar)),
+    #             upper = list(ind = 1:npar, val = rep(Inf, npar)))
+    # glpk3 <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE, bounds = bnd)
+    # })
+    # print(mb)
+    # Ab <- V_to_Ab(V)
+    # cat("Fukuda: ", glpk$optimum, " . Smeulders: ", glpk2$optimum, ". A*x<b: ", inside(x, Ab$A, Ab$b), "\n")
+
     if (return_glpk){
       glpk$inside <- !glpk$optimum > 0
       glpk

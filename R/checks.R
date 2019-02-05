@@ -1,7 +1,11 @@
 
 check_kn <- function(k = NULL, n = NULL){
   stopifnot(all(n >= 0))
-  stopifnot(length(k) == length(n), all(k >= 0), all(k <= n))
+  if (!is.null(dim(k)) && length(dim(k)) == 2)
+    stopifnot(ncol(k) == length(n), all(k >= 0), all(t(k) <= n))
+  else
+    stopifnot(length(k) == length(n), all(k >= 0), all(k <= n))
+
 }
 
 
