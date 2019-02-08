@@ -244,7 +244,7 @@ NumericMatrix count_stepwise_multi(const arma::vec& k, const arma::vec& options,
     M = M(0) * ones(S);
   mat starts(S, A.n_cols);
   for (unsigned int s = 0; s < S; s++)
-    starts.row(s) = start_random(A, b, M(1), start).t(); // different starting values for each step
+    starts.row(s) = start_random(A, b, M(0), start).t(); // different starting values for each step
 
   mat mcmc;
   uvec inside_idx;
@@ -282,9 +282,10 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
   vec inside;
   uvec inside_idx;
   mat mcmc;
-  mat starts(steps.n_elem, A.n_cols);
-  for (unsigned int s = 0; s < steps.n_elem; s++)
-    starts.row(s) = start_random(A, b, M(1), start).t(); // different starting values for each step
+  mat starts(steps.n_elem, A.n_cols);        // first row: A[1:steps[1],] satisfied
+  for (unsigned int s = 0; s < steps.n_elem; s++){
+    starts.row(s) = start_random(A, b, M(0), start).t(); // different starting values for each step
+  }
   int i, from, iter = 0;  // from: can be negative!
   while(count.min() < cmin){
     Rcpp::checkUserInterrupt();
@@ -293,12 +294,13 @@ NumericMatrix count_auto_mult(const arma::vec& k, const arma::vec& options,
     iter += 1;
     // find step with smallest count:
     i = count.index_min();
-    from = (i == 0) ? -1 : steps(i-1);  // i==0: start at A(0,:)
 
     // sampling for step with minimal counts
     if (i == 0){
+      from = -1;   // i==0: start at A(0,:). note +1 below
       mcmc = rpdirichlet(M_iter, k + prior, options, true);
     }  else {
+      from = steps(i-1);
       mcmc = sampling_mult(k, options, A.rows(0, from), b.subvec(0, from),
                             prior, M_iter, starts.row(i - 1).t(), burnin, false);
       starts.row(i - 1) = mcmc.row(M_iter - 1);

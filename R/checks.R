@@ -176,7 +176,7 @@ check_stepsA <- function(steps, A){
   if (any(steps <= 0) || any(steps > nrow(A)) || any(steps != round(steps)))
     stop("'steps' must be a vector with positive integers not larger",
          "\n  than the number of rows of the matrix 'A'.")
-  sort(unique(c(steps, nrow(A))))
+  unique(sort(c(steps, nrow(A))))
 }
 
 check_strategy <- function (strategy){
@@ -207,7 +207,7 @@ check_Mminmax <- function(M, cmin = 0, maxiter = 100, steps){
   if(!missing(maxiter) &&
      length(maxiter) != 1 || maxiter < 1 ||  maxiter != round(maxiter))
     stop("'maxiter' must be a positive integer.")
-  if (!missing(steps) && !length(M) %in% c(1, 2, length(steps)))
+  if (!missing(steps) && !length(M) %in% c(1, 2, length(steps) + 1:2))
     stop("'M' must be of length 1, 2, or, length(steps). \n",
          "  (identical number of iterations for all steps)")
 }
