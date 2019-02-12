@@ -36,7 +36,7 @@
 #' round(post.mean, 2)
 #'
 #' # posterior predictive checks (Table 4, p. 121)
-#' ppp <- ppp_binom(p, karabatsos2004$k.M, karabatsos2004$n.M,
+#' ppp <- ppp_binom(p, c(karabatsos2004$k.M), c(karabatsos2004$n.M),
 #'                  by = 1:prod(IJ))
 #' ppp <- matrix(ppp[,3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
 #' round(ppp, 2)

@@ -166,7 +166,7 @@ test_that("Karabatsos, 2004 (Table 3) matches (posterior mean)", {
                       dimnames = dimnames(karabatsos2004$k.M))
   expect_equal(pmean, unname(post.mean), tol = .01)
 
-  ppp <- ppp_binom(pp, karabatsos2004$k.M, karabatsos2004$n.M,
+  ppp <- ppp_binom(pp, c(karabatsos2004$k.M), c(karabatsos2004$n.M),
                    by = 1:prod(IJ))[,3]
   expect_equal(unname(ppp), c(ppp.ij), tol = .03)
 })
