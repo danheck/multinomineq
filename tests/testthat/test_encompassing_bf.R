@@ -38,9 +38,9 @@ test_that("encompassing Bayes factors returns correct results", {
   expect_silent(res <- sort_Ab(A, b, M = 2e5))
   A2 <- res$A
   b2 <- res$b
-  bf3 <- bf_binom(k, n, A2, b2, prior = c(1, 1), M = 1e5, log = TRUE)
-  bf4 <- bf_binom(k, n, A2, b2, prior = c(1, 1), M = c(2e5, 1e4, 1e4), steps = c(1,3,nrow(A2)), log = TRUE)
-  expect_equal(5.3, bf3["bf_0u","bf"], tolerance = .2)
-  expect_equal(5.3, bf4["bf_0u","bf"], tolerance = .2)
+  bf3 <- bf_binom(k, n, A2, b2, prior = c(1, 1), M = 1e6, log = TRUE)
+  bf4 <- bf_binom(k, n, A2, b2, prior = c(1, 1), M = c(3e5, 5e4, 5e4), steps = c(1, 3, 4), log = TRUE)
+  expect_equal(5.3, bf3["bf_0u","bf"], tolerance = 2 * bf3["bf_0u","se"])
+  expect_equal(5.3, bf4["bf_0u","bf"], tolerance = 2 * bf4["bf_0u","bf"])
 })
 

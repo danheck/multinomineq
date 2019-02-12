@@ -101,7 +101,7 @@ inside <- function(x, A, b, V){
 #' @export
 inside_binom <- function(k, n, A, b, V){
   check_kn(k, n)
-  if (!is.null(dim(k)) && length(dim(k_free)) == 2){
+  if (!is.null(dim(k)) && length(dim(k)) == 2){
     x <- t(t(k) / n)
   } else {
     x <- k / n

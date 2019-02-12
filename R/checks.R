@@ -207,7 +207,7 @@ check_Mminmax <- function(M, cmin = 0, maxiter = 100, steps){
   if(!missing(maxiter) &&
      length(maxiter) != 1 || maxiter < 1 ||  maxiter != round(maxiter))
     stop("'maxiter' must be a positive integer.")
-  if (!missing(steps) && !length(M) %in% c(1, 2, length(steps) + 1:2))
+  if (!missing(steps) && !length(M) %in% c(1, 2, length(steps) + 0:1))
     stop("'M' must be of length 1, 2, or, length(steps). \n",
          "  (identical number of iterations for all steps)")
 }
