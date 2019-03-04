@@ -211,16 +211,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rpdirichlet
-arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options, const bool p_drop);
-RcppExport SEXP _multinomineq_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP, SEXP p_dropSEXP) {
+arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha, const arma::vec options, const bool drop_fixed);
+RcppExport SEXP _multinomineq_rpdirichlet(SEXP nSEXP, SEXP alphaSEXP, SEXP optionsSEXP, SEXP drop_fixedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const unsigned int >::type n(nSEXP);
     Rcpp::traits::input_parameter< const arma::vec >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< const arma::vec >::type options(optionsSEXP);
-    Rcpp::traits::input_parameter< const bool >::type p_drop(p_dropSEXP);
-    rcpp_result_gen = Rcpp::wrap(rpdirichlet(n, alpha, options, p_drop));
+    Rcpp::traits::input_parameter< const bool >::type drop_fixed(drop_fixedSEXP);
+    rcpp_result_gen = Rcpp::wrap(rpdirichlet(n, alpha, options, drop_fixed));
     return rcpp_result_gen;
 END_RCPP
 }

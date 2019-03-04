@@ -156,7 +156,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
     a <- c(rbind(k + prior[1], n - k + prior[2]))
     if (progress) pb <- txtProgressBar(0, M, style = 3)
     while (m > 0 ){
-      X <- rpdirichlet(round(BATCH/1000), a, rep(2, ncol(V)), p_drop = TRUE)
+      X <- rpdirichlet(round(BATCH/1000), a, rep(2, ncol(V)), drop_fixed = TRUE)
       count <- count + sum(inside_V(X, V))
       m <- m - round(BATCH/1000)
       if (progress) setTxtProgressBar(pb, M - m)

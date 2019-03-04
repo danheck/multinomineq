@@ -71,7 +71,7 @@ drop_fixed <- function(x, options = 2)
 
 #' @export
 drop_fixed.matrix <- function(x, options = 2){
-  options <- rep_options(options, x[1,], p_drop = FALSE)
+  options <- rep_options(options, x[1,], drop_fixed = FALSE)
   xn <- x[,- cumsum(options), drop = FALSE]
   if (is.null(colnames(xn)))
     colnames(xn) <- index_mult(options, fixed = FALSE)
@@ -85,7 +85,7 @@ drop_fixed.data.frame <- function(x, options = 2){
 
 #' @export
 drop_fixed.default <- function(x, options = 2){
-  options <- rep_options(options, x, p_drop = FALSE)
+  options <- rep_options(options, x, drop_fixed = FALSE)
   check_ko(k = x, options = options, label = "x")
   xn <- x[- cumsum(options)]
   if (is.null(names(xn)))
@@ -162,13 +162,13 @@ index_free_to_fixed <- function(i, options){
   i + option - 1
 }
 
-rep_options <- function(options, x, p_drop = TRUE){
+rep_options <- function(options, x, drop_fixed = TRUE){
   if (length(options) == 1){
-    times <- length(x) / (options - p_drop)
+    times <- length(x) / (options - drop_fixed)
     if (times != round(times))
       stop("Check input: The length/number of columns of 'x' is not a multiple of (options-1)")
     options <- rep(options, times)
-  } else if (length(x) != sum(options - p_drop)){
+  } else if (length(x) != sum(options - drop_fixed)){
     stop("Length of 'options' does not match number of frequencies/probabilities/columns.")
   }
   options

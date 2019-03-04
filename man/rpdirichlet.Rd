@@ -4,7 +4,7 @@
 \alias{rpdirichlet}
 \title{Random Samples from the Product-Dirichlet Distribution}
 \usage{
-rpdirichlet(n, alpha, options, p_drop = TRUE)
+rpdirichlet(n, alpha, options, drop_fixed = TRUE)
 }
 \arguments{
 \item{n}{number of samples}
@@ -16,7 +16,7 @@ rpdirichlet(n, alpha, options, p_drop = TRUE)
 for a binary and ternary condition.
 The sum of \code{options} must be equal to the length of \code{alpha}.}
 
-\item{p_drop}{whether the output matrix includes the last probability for each category
+\item{drop_fixed}{whether the output matrix includes the last probability for each category
 (which is not a free parameter since probabilities must sum to one).}
 }
 \description{
@@ -26,9 +26,9 @@ product-multinomial model (the encompassing model).
 \examples{
 # standard uniform Dirichlet
 rpdirichlet(5, c(1,1,1,1), 4)
-rpdirichlet(5, c(1,1,1,1), 4, p_drop = FALSE)
+rpdirichlet(5, c(1,1,1,1), 4, drop_fixed = FALSE)
 
 # two ternary outcomes: (a1,a2,a3,  b1,b2,b3)
 rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
-rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3), p_drop = FALSE)
+rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3), drop_fixed = FALSE)
 }

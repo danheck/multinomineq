@@ -7,21 +7,22 @@
 \usage{
 rpbinom(prob, n)
 
-rpmultinom(prob, n, options, p_drop = TRUE)
+rpmultinom(prob, n, options, drop_fixed = TRUE)
 }
 \arguments{
 \item{prob}{vector with probabilities or a matrix with one probability vector per row.
 For \code{rpbinom}: probabilities of a success for each option.
 For \code{rpmultinom}: probabilities of all categories excluding
-the last category for each option (cf. \code{p_drop}).
+the last category for each option (cf. \code{drop_fixed}).
 See also \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{n}{integer vector, specifying the number of trials for each binomial/multinomial distribution
 Note that this is the \code{size} argument in \code{rmultinom}, cf. \code{\link[stats]{Multinom}}.}
 
-\item{options}{number of categories/probabilities for each option/multinomial distribution.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
-\item{p_drop}{whether the output matrix includes the last probability for each category
+\item{drop_fixed}{whether the output matrix includes the last probability for each category
 (which is not a free parameter since probabilities must sum to one).}
 }
 \value{
@@ -42,7 +43,7 @@ rpmultinom(prob = c(a1=.5,   b1=.3,b2=.6),
 # or:
 rpmultinom(prob = c(a1=.5,a2=.5,   b1=.3,b2=.6,b3=.1),
            n = c(10, 20), options = c(2, 3),
-           p_drop = FALSE)
+           drop_fixed = FALSE)
 
 # matrix with one probability vector per row:
 p <- rpdirichlet(n = 6, alpha = c(1,1,  1,1,1),

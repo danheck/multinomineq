@@ -102,7 +102,7 @@ strategy_marginal <- function (k, n, strategy){
 # ' @inheritParams strategy_nml
 #' @inheritParams strategy_marginal
 #' @param strategies list of strategies. See \link{strategy_multiattribute}
-#' @param cores number of processing units for parallel computation.
+#' @param cpu number of processing units for parallel computation.
 # @param c upper boundary for parameters/error probabilities.
 #   A vector of the same length as \code{strategies}
 #   can be provided to use a different upper bound per model.
@@ -128,15 +128,15 @@ strategy_marginal <- function (k, n, strategy){
 #' n <- c(20, 20, 20)             # number of choices
 #' strategy_postprob(k, n, list(strat1, strat2, baseline))
 #' @export
-strategy_postprob <- function (k, n, strategies, cores = 1){
+strategy_postprob <- function (k, n, strategies, cpu = 1){
 
   if (!is.null(dim(k))){
     if (is.null(dim(n)) || is.table(n))
       n <- matrix(n, nrow(k), length(n), byrow = TRUE)
     if (is.table(k))
       k <- unclass(k)
-    if (cores > 1){
-      cl <- makeCluster(cores)
+    if (cpu > 1){
+      cl <- makeCluster(cpu)
       pp <- clusterMap(cl, strategy_postprob,
                        k = as.list(data.frame(t(k))),
                        n = as.list(data.frame(t(n))),

@@ -32,21 +32,21 @@ arma::mat rdirichlet(const unsigned int n, const arma::vec alpha){
 //' @param options the number of choice options per item type, e.g., \code{c(2,3)}
 //'     for a binary and ternary condition.
 //'     The sum of \code{options} must be equal to the length of \code{alpha}.
-//' @param p_drop whether the output matrix includes the last probability for each category
+//' @param drop_fixed whether the output matrix includes the last probability for each category
 //'     (which is not a free parameter since probabilities must sum to one).
 //'
 //' @examples
 //' # standard uniform Dirichlet
 //' rpdirichlet(5, c(1,1,1,1), 4)
-//' rpdirichlet(5, c(1,1,1,1), 4, p_drop = FALSE)
+//' rpdirichlet(5, c(1,1,1,1), 4, drop_fixed = FALSE)
 //'
 //' # two ternary outcomes: (a1,a2,a3,  b1,b2,b3)
 //' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3))
-//' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3), p_drop = FALSE)
+//' rpdirichlet(5, c(9,5,1,  3,6,6), c(3,3), drop_fixed = FALSE)
 //' @export
 // [[Rcpp::export]]
 arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha,
-                      const arma::vec options, const bool p_drop = true){
+                      const arma::vec options, const bool drop_fixed = true){
   unsigned int D = options.n_elem;  // number of conditions/item types
   mat X(n, alpha.n_elem);
   vec sel = cumsum(options);
@@ -57,7 +57,7 @@ arma::mat rpdirichlet(const unsigned int n, const arma::vec alpha,
     l = sel(i + 1) - 1;
     X.cols(k, l) = rdirichlet(n, alpha.rows(k, l));
   }
-  if (p_drop){
+  if (drop_fixed){
     // omit last column for each item type: [a1 a2 a3  b1 b2]  => [a1 a2  b1]
     vec dep_idx = cumsum(options) - 1;
     for (int i = D - 1; i >= 0; i--){

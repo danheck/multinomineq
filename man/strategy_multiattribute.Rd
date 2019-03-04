@@ -41,13 +41,14 @@ a \code{strategy} object (a list) with the entries:
 Returns a list defining the predictions of different choice strategies (e.g., TTB, WADD)
 }
 \examples{
+# single item type
 v <- c(.9, .8, .7, .6)
 ca <- c(1, -1, -1, 1)
 cb <- c(-1, 1, -1, -1)
 strategy_multiattribute(ca, cb, v, "TTB")
 strategy_multiattribute(ca, cb, v, "WADDprob")
 
-# multiple cues
+# multiple item types
 data(heck2017_raw)
 strategy_multiattribute(heck2017_raw[1:10, c("a1","a2","a3","a4")],
                         heck2017_raw[1:10, c("b1","b2","b3","b4")],

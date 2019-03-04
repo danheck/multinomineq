@@ -363,8 +363,8 @@ grad_multinom_mixture <- function(alpha, k, V, options){
   - g
 }
 
-loglik_multinom <- function (p, k, options, p_drop = FALSE){
-  if (!p_drop){
+loglik_multinom <- function (p, k, options, drop_fixed = FALSE){
+  if (!drop_fixed){
     p_all <- add_fixed(p, options = options, sum = 1)
   } else {
     p_all <- p

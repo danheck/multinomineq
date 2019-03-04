@@ -10,11 +10,11 @@
 #'    thus the number of columns must be equal to \code{sum(options-1)}
 #'    (e.g., the column order of \code{A} for \code{k = c(a1,a2,a2, b1,b2)}
 #'    is \code{c(a1,a2, b1)}).
-#' @param options the number of observable categories per item type,
-#'    e.g., \code{c(3,2)} for a ternary and binary item.
-#'     The sum of \code{options} must be equal to the length of \code{k}.
+#' @param options number of observable categories/probabilities for each item
+#'    type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.
 #' @param k the number of choices for each alternative ordered by item type (e.g.
 #'     \code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
+#'     The length of \code{k} must be equal to the sum of \code{options}.
 #'     The default \code{k=0} is equivalent to sampling from the prior.
 #' @param prior the prior parameters of the Dirichlet-shape parameters.
 #'    Must have the same length as \code{k}.
@@ -80,6 +80,7 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     check_Abokprior(A, b, options, k, prior)
 
     if (cmin == 0 && (missing(steps) || is.null(steps))){
+      # Ab <- Ab_sort(A, b, k, options, M = 100, drop_irrelevant = TRUE)
       count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
 
     } else {
@@ -113,7 +114,7 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     a <- k + prior #c(rbind(k + prior[1], n - k + prior[2]))
     if (progress) pb <- txtProgressBar(0, M, style = 3)
     while (m > 0 ){
-      X <- rpdirichlet(n = round(BATCH/1000), alpha = a, options = options, p_drop = TRUE)
+      X <- rpdirichlet(n = round(BATCH/1000), alpha = a, options = options, drop_fixed = TRUE)
       count <- count + sum(inside_V(X, V))
       m <- m - round(BATCH/1000)
       if (progress) setTxtProgressBar(pb, M - m)

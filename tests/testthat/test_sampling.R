@@ -117,7 +117,7 @@ test_that("Gibbs sampling for multinomial [prior: k=0]", {
   X1 <- sampling_multinom(k, options, A, b = b, M = 2000, start = start)
   expect_true(test_sum1_free(X1, options))
   expect_true(test_Ab(X1, A, b))
-  X2 <- rpdirichlet(M*5, k+1, options, p_drop = TRUE)
+  X2 <- rpdirichlet(M*5, k+1, options, drop_fixed = TRUE)
   sel <- sel_Ab(X2, A, b)
   for (i in 1:ncol(X1)){
     # qqplot(X1[,i],X2[sel,i])
@@ -145,7 +145,7 @@ test_that("Gibbs sampling for multinomial [posterior]", {
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:1000,], A, b))
   # accept-reject
-  X1 <- rpdirichlet(M*5, k + 1, options, p_drop = TRUE)
+  X1 <- rpdirichlet(M*5, k + 1, options, drop_fixed = TRUE)
   sel <- sel_Ab(X1, A, b)
   # par(mfrow=c(2,2))
   # for (i in 1:ncol(A)){
@@ -183,7 +183,7 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   expect_true(test_sum1_free(X[1:100,], options))
   expect_true(test_Ab(X[1:100,], A, b))
   # accept-reject
-  X1 <- rpdirichlet(M*2, k + 1, options, p_drop = TRUE)
+  X1 <- rpdirichlet(M*2, k + 1, options, drop_fixed = TRUE)
   sel <- sel_Ab(X1, A, b)
   cnt <- count_multinom(k, options, A, b, M = 5e5)
   expect_equal(mean(sel), attr(cnt, "proportion"), tol = 5 * attr(cnt, "se")) ## integral
@@ -205,7 +205,7 @@ test_that("Gibbs sampling for product-multinomial [posterior]", {
   data(swop5)
   options <- rep(3, 10)
   k <- rep(0, 30)
-  X <- rpdirichlet(M, k + 1, options, p_drop = TRUE)
+  X <- rpdirichlet(M, k + 1, options, drop_fixed = TRUE)
   int <- multinomineq:::count_samples(X, swop5$A, swop5$b)/(M)
   cnt <- count_multinom(k, options, swop5$A, swop5$b, M=M)
   expect_equal(int, attr(cnt, "proportion"), tol = 5*attr(cnt, "se"))

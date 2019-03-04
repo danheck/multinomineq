@@ -14,11 +14,11 @@ sampling_binom(k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type (e.g.
 \code{c(a1,a2,a3,  b1,b2)} for a ternary and a binary item type).
+The length of \code{k} must be equal to the sum of \code{options}.
 The default \code{k=0} is equivalent to sampling from the prior.}
 
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
 \item{A}{a matrix with one row for each linear inequality constraint and one
 column for each of the free parameters. The parameter space is defined

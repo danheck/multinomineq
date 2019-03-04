@@ -15,9 +15,8 @@ is \code{c(a1,a2, b1)}).}
 
 \item{b}{a vector of the same length as the number of rows of \code{A}.}
 
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 }
 \description{
 Often inequalities refer to all probability parameters of a multinomial distribution.

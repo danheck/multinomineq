@@ -82,7 +82,7 @@ sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options))
         start <- proposal[idx[which.min(ll)],]
 
         # rough convexity check:
-        alpha <- rpdirichlet(100, rep(1, length(idx)), length(idx), p_drop = FALSE)
+        alpha <- rpdirichlet(100, rep(1, length(idx)), length(idx), drop_fixed = FALSE)
         xx <- alpha %*% proposal[idx,,drop=FALSE]
         if (is.function(inside))
           convex <- apply(xx, 1, inside)

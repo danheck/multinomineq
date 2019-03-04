@@ -60,7 +60,7 @@ test_that("if unconstrained MLE == constrained MLE", {
   m <- 5
   options = rep(3,m)
   V <- round(rpdirichlet(n, rep(1,3*5), options = options))
-  alpha <- c(rpdirichlet(1, rep(1, n), n, p_drop = FALSE))
+  alpha <- c(rpdirichlet(1, rep(1, n), n, drop_fixed = FALSE))
   p <- add_fixed( c(alpha %*% V), options)
   k <- c(round(p*10000))
   n <- c(tapply(k, rep(1:length(options), options), sum))

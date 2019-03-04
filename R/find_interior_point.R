@@ -64,7 +64,7 @@ find_inside <- function(A, b, V, options = NULL, random = FALSE, probs = TRUE){
     # convex combination of vertices
     check_V(V)
     if (random){
-      u <- c(rpdirichlet(1, rep(1, nrow(V)), nrow(V), p_drop = FALSE))
+      u <- c(rpdirichlet(1, rep(1, nrow(V)), nrow(V), drop_fixed = FALSE))
     } else {
       u <- rep(1/nrow(V), nrow(V))
     }

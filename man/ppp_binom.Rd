@@ -7,13 +7,13 @@
 \usage{
 ppp_binom(prob, k, n, by)
 
-ppp_multinom(prob, k, options, p_drop = TRUE)
+ppp_multinom(prob, k, options, drop_fixed = TRUE)
 }
 \arguments{
 \item{prob}{vector with probabilities or a matrix with one probability vector per row.
 For \code{rpbinom}: probabilities of a success for each option.
 For \code{rpmultinom}: probabilities of all categories excluding
-the last category for each option (cf. \code{p_drop}).
+the last category for each option (cf. \code{drop_fixed}).
 See also \code{\link{sampling_binom}} and \code{\link{sampling_multinom}}.}
 
 \item{k}{vector of observed response frequencies.}
@@ -24,9 +24,10 @@ Note that this is the \code{size} argument in \code{rmultinom}, cf. \code{\link[
 \item{by}{optional: a vector of the same length as \code{k} indicating factor levels
 by which the posterior-predictive checks should be split (e.g., by item sets).}
 
-\item{options}{number of categories/probabilities for each option/multinomial distribution.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
-\item{p_drop}{whether the output matrix includes the last probability for each category
+\item{drop_fixed}{whether the output matrix includes the last probability for each category
 (which is not a free parameter since probabilities must sum to one).}
 }
 \description{

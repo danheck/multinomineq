@@ -45,9 +45,8 @@ If missing, an approximate maximum-likelihood estimate is used.}
 maximum iterations should be sufficiently large (e.g., by setting
 \code{control = list(maxit = 1e6, reltol=.Machine$double.eps^.6), outer.iterations = 1000}.}
 
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
 \item{V}{a matrix of vertices (one per row) that define the polytope of
 admissible parameters as the convex hull over these points

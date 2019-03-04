@@ -7,9 +7,8 @@
 Ab_multinom(options, A = NULL, b = NULL, nonneg = FALSE)
 }
 \arguments{
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
 \item{A}{a matrix defining the convex polytope via \code{A*x <= b}.
 The columns of \code{A} do not include the last choice option per item type and

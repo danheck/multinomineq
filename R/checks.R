@@ -48,13 +48,13 @@ check_probkn <- function (prob, k, n){
     stop("length(k)  must be identical to  ncol(prob).")
 }
 
-check_probko <- function (prob, k, options, p_drop = TRUE){
+check_probko <- function (prob, k, options, drop_fixed = TRUE){
   check_ko(k, options)
   check_prob(prob)
-  if (p_drop && ncol(prob) != sum(options - 1))
-    stop("If p_drop==TRUE: Number of probabilities must be identical to  sum(options-1).")
-  if (!p_drop && ncol(prob) != sum(options))
-    stop("If p_drop==FALSE: Number of probabilities must be identical to  sum(options).")
+  if (drop_fixed && ncol(prob) != sum(options - 1))
+    stop("If drop_fixed==TRUE: Number of probabilities must be identical to  sum(options-1).")
+  if (!drop_fixed && ncol(prob) != sum(options))
+    stop("If drop_fixed==FALSE: Number of probabilities must be identical to  sum(options).")
 }
 
 

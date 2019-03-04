@@ -14,9 +14,8 @@ count_nonlinear(k = 0, options, inside, prior = rep(1, sum(options)),
 \arguments{
 \item{k}{vector of observed response frequencies.}
 
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 
 \item{inside}{an indicator function that takes a vector with probabilities
 \code{p=c(p11,p12,  p21,p22,...)} (where the last probability for each

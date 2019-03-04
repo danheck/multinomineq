@@ -45,9 +45,8 @@ of the beta prior distributions for each binomial rate parameter.}
 \item{...}{further arguments passed to \code{\link{count_binom}} or
 \code{\link{count_multinom}} (e.g., \code{M}, \code{steps}).}
 
-\item{options}{the number of observable categories per item type,
-e.g., \code{c(3,2)} for a ternary and binary item.
- The sum of \code{options} must be equal to the length of \code{k}.}
+\item{options}{number of observable categories/probabilities for each item
+type/multinomial distribution, e.g., \code{c(3,2)} for a ternary and binary item.}
 }
 \value{
 a matrix with two columns (Bayes factor and SE of approximation) and three rows:

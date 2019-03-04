@@ -4,7 +4,7 @@
 \alias{strategy_postprob}
 \title{Strategy Classification: Posterior Model Probabilities}
 \usage{
-strategy_postprob(k, n, strategies, cores = 1)
+strategy_postprob(k, n, strategies, cpu = 1)
 }
 \arguments{
 \item{k}{observed frequencies of Option B.
@@ -14,7 +14,7 @@ Either a vector or a matrix/data frame (one person per row).}
 
 \item{strategies}{list of strategies. See \link{strategy_multiattribute}}
 
-\item{cores}{number of processing units for parallel computation.}
+\item{cpu}{number of processing units for parallel computation.}
 }
 \description{
 Posterior model probabilities for multiple strategies (with equal prior model probabilities).

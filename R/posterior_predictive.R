@@ -50,10 +50,10 @@ ppp_binom <- function(prob, k, n, by){
 
 #' @rdname ppp_binom
 #' @export
-ppp_multinom <- function(prob, k, options, p_drop = TRUE){
+ppp_multinom <- function(prob, k, options, drop_fixed = TRUE){
   if (is.list(prob)) prob <- do.call("rbind", prob)
-  check_probko(prob, k, options, p_drop = p_drop)
-  if (p_drop)
+  check_probko(prob, k, options, drop_fixed = drop_fixed)
+  if (drop_fixed)
     prob <- add_fixed(prob, options)
   ppp_mult(prob, k, options)
 

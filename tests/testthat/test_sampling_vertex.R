@@ -15,7 +15,7 @@ test_that("posterior sampling for vertex representation works", {
   set.seed(123)
 
   ###### check: accept-reject
-  u <- rpdirichlet(1e5, 1 + k, options, p_drop = TRUE)
+  u <- rpdirichlet(1e5, 1 + k, options, drop_fixed = TRUE)
   sel <- apply(u, 1, inside, A=Ab$A, b = Ab$b)
   s.AR <- u[sel,,drop = FALSE]
   s.V <- sampling_multinom(k, options, V = V, M = 2000, start = s.AR[nrow(s.AR),])
