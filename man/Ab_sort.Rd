@@ -21,7 +21,7 @@ Uniform sampling on [0,1] for each parameter is used if omitted.}
 \item{M}{number of samples.}
 
 \item{drop_irrelevant}{whether to drop irrelevant constraints for probabilities such as
-\code{theta[1] > 0} or \code{theta[1] < 1}.}
+\code{theta[1] >= 0}, \code{theta[1] <= 1}, or \code{sum(theta) <= 1}.}
 }
 \description{
 Uses samples from the prior/posterior to order the inequalities by the acceptance rate.

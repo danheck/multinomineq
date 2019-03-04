@@ -8,7 +8,7 @@
 #'      Uniform sampling on [0,1] for each parameter is used if omitted.
 #' @param M number of samples.
 #' @param drop_irrelevant whether to drop irrelevant constraints for probabilities such as
-#'     \code{theta[1] > 0} or \code{theta[1] < 1}.
+#'     \code{theta[1] >= 0}, \code{theta[1] <= 1}, or \code{sum(theta) <= 1}.
 #' @details
 #'
 #' Those constraints that are rejected most often are placed at the first positions.
@@ -87,20 +87,19 @@ Ab_drop_irrelevant <- function(A, b, options){
   list(A = A1, b = b1)
 }
 
-### split A into block-diagonal matrices => allows to compute encompassing BF independently
-Ab_split <- function(A, b){
-
-  order1 <- order(-abs(A1[,1]))
-  A2 <- A1[order1,]
-  b2 <- b1[order1]
-  for (i in 2:ncol(A2) ){
-    sel <- apply(A2[,seq(1, i - 1), drop = FALSE] == 0, 1, all)
-    if (any(sel)){
-      orderi <- order(-abs(A2[sel,i]))
-      A2[sel,] <- A2[sel,,drop=FALSE][orderi,]
-      b2[sel] <- b2[sel][orderi]
-    }
-  }
-  (cbind(A2, .....b2 = b2))
-
-}
+# ### split A into block-diagonal matrices => allows to compute encompassing BF independently
+# Ab_split <- function(A, b){
+#
+#   order1 <- order(-abs(A1[,1]))
+#   A2 <- A1[order1,]
+#   b2 <- b1[order1]
+#   for (i in 2:ncol(A2) ){
+#     sel <- apply(A2[,seq(1, i - 1), drop = FALSE] == 0, 1, all)
+#     if (any(sel)){
+#       orderi <- order(-abs(A2[sel,i]))
+#       A2[sel,] <- A2[sel,,drop=FALSE][orderi,]
+#       b2[sel] <- b2[sel][orderi]
+#     }
+#   }
+#   list(cbind(A2, .....b2 = b2))
+# }

@@ -35,7 +35,7 @@ test_that("encompassing Bayes factors returns correct results", {
 
 
   # invariance under reordering of order inequalities
-  expect_silent(res <- sort_Ab(A, b, M = 2e5))
+  expect_silent(res <- Ab_sort(A, b, M = 2e5))
   A2 <- res$A
   b2 <- res$b
   bf3 <- bf_binom(k, n, A2, b2, prior = c(1, 1), M = 1e6, log = TRUE)
