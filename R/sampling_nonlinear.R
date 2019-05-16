@@ -31,7 +31,7 @@
 #'
 #'
 #'
-#' \dontrun{
+#' \donttest{
 #' ##### Using a C++ indicator function (much faster)
 #' cpp_code <- "SEXP inside(NumericVector x){
 #'   return wrap( sum(pow(x-.50, 2)) <= .15);}"

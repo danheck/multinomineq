@@ -1,8 +1,8 @@
 Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
-Version: 0.2.0
-Date: 2019-01-30
+Version: 0.2.1
+Date: 2019-05-16
 Authors@R: person("Daniel W.", "Heck", email="heck@uni-mannheim.de", role=c("aut","cre"))
 Maintainer: Daniel W. Heck <heck@uni-mannheim.de>
 Description: 
@@ -15,7 +15,8 @@ Description:
     inequality-constrained multinomial models and the implemented computational
     methods is provided in: Heck, D.W., & Davis-Stober, C.P. (2019). 
     Multinomial models with linear inequality constraints: Overview and improvements 
-    of computational methods for Bayesian inference. <arXiv:1808.07140>
+    of computational methods for Bayesian inference. Journal of Mathematical 
+    Psychology, 91, 70-87. <doi:10.1016/j.jmp.2019.03.004>.
     Inequality-constrained multinomial models have applications in the area of 
     judgment and decision making to fit and test random utility models  
     (Regenwetter, M., Dana, J., & Davis-Stober, C.P. (2011). Transitivity of 

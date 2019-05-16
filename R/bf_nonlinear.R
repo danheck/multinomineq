@@ -37,7 +37,7 @@
 #' bf_nonlinear(k, 8, model, M=50000)
 #'
 #'
-#' \dontrun{
+#' \donttest{
 #' ##### Using a C++ indicator function (much faster)
 #' cpp_code <- "SEXP model(NumericVector x){
 #'   return wrap(x[0]*x[5] < x[4]*x[1] & x[2]*(1-sum(x)) < x[6]*x[3]);}"

@@ -136,7 +136,7 @@
 #' data(heck2017_raw)
 #' head(heck2017_raw)
 #'
-#' \dontrun{
+#' \donttest{
 #' # get cue values, validities, and predictions
 #' cueA <- heck2017_raw[,paste0("a",1:4)]
 #' cueB <- heck2017_raw[,paste0("b",1:4)]

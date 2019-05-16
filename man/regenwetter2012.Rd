@@ -33,7 +33,7 @@ tail(swop5$A, 3)
 p1 <- regenwetter2012[1,-c(1:2)]
 inside_multinom(p1, swop5$options, swop5$A, swop5$b)
 
-\dontrun{
+\donttest{
 # posterior samples
 p <- sampling_multinom(regenwetter2012[1,-c(1:2)],
                        swop5$options, swop5$A, swop5$b,

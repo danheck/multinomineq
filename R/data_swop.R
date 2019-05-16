@@ -23,7 +23,7 @@
 #' # check whether point is in polytope:
 #' inside(swop5$start, swop5$A, swop5$b)
 #'
-#' \dontrun{
+#' \donttest{
 #' # get prior samples:
 #' p <- sampling_multinom(0, swop5$options,
 #'                        swop5$A, swop5$b,

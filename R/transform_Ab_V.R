@@ -22,7 +22,7 @@
 #' @template ref_regenwetter2014
 #' @template ref_regenwetter2017
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ######## (requires rPorta) ########
 #'
 #' ### binary choice:

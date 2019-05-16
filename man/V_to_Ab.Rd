@@ -46,7 +46,7 @@ For ternary choices (\code{options=3}), constraints are added to ensure that 0 <
 for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinom}}.
 }
 \examples{
-\dontrun{
+\donttest{
 ######## (requires rPorta) ########
 
 ### binary choice:

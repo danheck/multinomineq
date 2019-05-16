@@ -68,7 +68,8 @@ C <- matrix(c(1, 0, 0, 0,    # p1 = .50
             ncol = 4, byrow = TRUE)
 k <- c(3,7, 6,4,  2,8,  5,5)
 options <- c(2, 2, 2, 2)
-bf_equality(k, options, C = C, d = d, delta = .5^(1:5))
+bf_equality(k, options, C = C, d = d, delta = .5^(1:5),
+            M1 = 50000, M2 = 5000)  # only for CRAN checks
 
 # check against exact equality constraints (see ?bf_binom)
 k_binom = k[seq(1,7,2)]
