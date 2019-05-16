@@ -39,10 +39,11 @@ in psychology and beyond:
 A formal definition of inequality-constrained multinomial models and the 
 implemented computational methods for Bayesian inference is provided in:
 
-* Heck, D. W., & Davis-Stober, C. P. (2019). 
-  Multinomial models with linear inequality constraints: 
-  Overview and improvements of computational methods for Bayesian inference. 
-  *Manuscript under revision.* https://arxiv.org/abs/1808.07140
+* Heck, D. W., & Davis-Stober, C. P. (2019). Multinomial models with linear 
+  inequality constraints: Overview and improvements of computational methods 
+  for Bayesian inference. *Journal of Mathematical Psychology, 91*, 70-87. 
+  https://doi.org/10.1016/j.jmp.2019.03.004 
+* Preprint version: https://arxiv.org/abs/1808.07140
   
 Please cite this paper if you use `multinomineq` in publications.
 
@@ -56,8 +57,13 @@ The vignette is also available <https://www.dwheck.de/vignettes/multinomineq_int
 
 ## Installation
 
-If developer tools for R are available (see below), the most recent version of 
-the package `multinomineq` can directly be installed from GitHub via:
+The package `multinomineq` can directly be installed from CRAN via:
+```
+install.packages("multinomineq")
+```
+
+Alternatively, if developer tools for R are installed (see instructions below),
+the most recent version of `multinomineq` can also be installed from GitHub via:
 ```
 ### install dependencies:
 install.packages("devtools","RcppArmadillo","RcppProgress",
@@ -67,6 +73,7 @@ install.packages("devtools","RcppArmadillo","RcppProgress",
 devtools::install_github("danheck/multinomineq")
 ```
 
+<!--
 If the compilation of the source package causes any problems, the following code 
 will install a binary version of `multinomineq` (only for Windows):
 ```
@@ -74,14 +81,13 @@ install.packages("drat")
 drat::addRepo("danheck")
 install.packages("multinomineq")
 ```
+-->
 
 To transform between the vertex (V) and the inequality (A*x<b) representation of 
 a poyltope, it is necessary to install the pacakge `rPorta`. The package is available on
 GitHub (https://github.com/TasCL/rPorta) or as a precompiled package via:
 ```
-install.packages("drat")
-drat::addRepo("danheck")
-install.packages("rPorta")
+install.packages("rPorta", repos = "https://danheck.github.io/drat/")
 ```
 
 
