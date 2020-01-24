@@ -1,6 +1,10 @@
 language: r
+latex: true
+sudo: false
 
-sudo: true
+warnings_are_errors: TRUE
+r_check_args: '--ignore-vignettes'
+r_build_args: '--no-build-vignettes'
 
 r:
   - release
@@ -10,9 +14,13 @@ repos:
   CRAN: https://cloud.r-project.org
   danheck: https://danheck.github.com/drat/
 
-cache: packages
+cache:
+  - packages
+  - ccache
 
-warnings_are_errors: true
+env:
+  - _R_CHECK_FORCE_SUGGESTS_=true
+    _R_CHECK_CRAN_INCOMING_=true
 
 r_packages:
   - Rglpk
