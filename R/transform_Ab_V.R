@@ -208,9 +208,9 @@ Ab_drop_fixed <- function(A, b, options){
   cnt <- 0
   for (i in 1:length(options)){
     idx <- seq.int(1, options[i] - 1) + cnt
-    A[,idx] <- A[,idx] - A[,max(idx) + 1]
+    A[,idx] <- A[,idx,drop=FALSE] - A[,max(idx) + 1]
     b <- b - A[,max(idx) + 1]
-    A <- A[,- (max(idx) + 1)]
+    A <- A[,- (max(idx) + 1),drop=FALSE]
     cnt <- cnt + options[i] - 1
   }
 
