@@ -32,14 +32,13 @@
 #' # posterior samples
 #' p <- sampling_multinom(regenwetter2012[1,-c(1:2)],
 #'                        swop5$options, swop5$A, swop5$b,
-#'                        M=1000, start = swop5$start)
+#'                        M=100, start = swop5$start)
 #' colMeans(p)
 #' apply(p[,1:6], 2, plot, type = "l")
 #' ppp_multinom(p, p1, swop5$options)
 #'
 #' # Bayes factor
 #' bf_multinom(regenwetter2012[1,-c(1:2)], swop5$options,
-#'             swop5$A, swop5$b,
-#'             M = 1000, cmin = 1, steps = seq(2000,75000,2000))
+#'             swop5$A, swop5$b, M = 10000)
 #' }
 "regenwetter2012"

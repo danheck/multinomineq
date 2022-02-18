@@ -27,7 +27,7 @@
 #' # get prior samples:
 #' p <- sampling_multinom(0, swop5$options,
 #'                        swop5$A, swop5$b,
-#'                        M = 1000, start = swop5$start)
+#'                        M = 100, start = swop5$start)
 #' colMeans(p)
 #' apply(p[,1:5], 2, plot, type = "l")
 #' }
