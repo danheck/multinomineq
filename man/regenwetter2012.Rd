@@ -4,14 +4,16 @@
 \name{regenwetter2012}
 \alias{regenwetter2012}
 \title{Data: Ternary Risky Choices (Regenwetter & Davis-Stober, 2012)}
-\format{A matrix with 22 columns:
+\format{
+A matrix with 22 columns:
 \describe{
   \item{\code{participant}: }{Participant number}
   \item{\code{gamble_set}: }{Gamble set}
   \item{\code{a>b}: }{Number of times a preferred over b}
   \item{\code{b>a}: }{Number of times b preferred over a}
   \item{\code{a=b}: }{Number of times being indifferent between a and b}
-}}
+}
+}
 \usage{
 regenwetter2012
 }

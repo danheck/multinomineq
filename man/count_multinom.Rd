@@ -4,9 +4,22 @@
 \alias{count_multinom}
 \title{Count How Many Samples Satisfy Linear Inequalities (Multinomial)}
 \usage{
-count_multinom(k = 0, options, A, b, V, prior = rep(1, sum(options)),
-  M = 5000, steps, start, cmin = 0, maxiter = 500, burnin = 5,
-  progress = TRUE, cpu = 1)
+count_multinom(
+  k = 0,
+  options,
+  A,
+  b,
+  V,
+  prior = rep(1, sum(options)),
+  M = 5000,
+  steps,
+  start,
+  cmin = 0,
+  maxiter = 500,
+  burnin = 5,
+  progress = TRUE,
+  cpu = 1
+)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type (e.g.

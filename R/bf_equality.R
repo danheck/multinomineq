@@ -67,8 +67,8 @@ bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
     return(list(A = A_delta, b = b_delta, steps = steps))
 
   start <- find_inside(A_delta, b_delta)
-  bf <- bf_multinom(k, options, A_delta, b_delta, M = c(M1, M2), steps = steps,
-                    start = start, ...)
+  bf <- bf_multinom(k, options, A_delta, b_delta, prior = prior,
+                    M = c(M1, M2), steps = steps, start = start, ...)
   bf["bf_00'",] <- NA  # bf_00' not defined for equality constraints
   bf
 }

@@ -4,14 +4,16 @@
 \name{karabatsos2004}
 \alias{karabatsos2004}
 \title{Data: Item Responses Theory (Karabatsos & Sheu, 2004)}
-\format{A list with 4 matrices:
+\format{
+A list with 4 matrices:
 \describe{
   \item{\code{k.M}: }{Number of correct responses for participants with rest scores
       j=0,...,5 (i.e., the sum score minus the score for item i)}
   \item{\code{n.M}: }{Total number of participants for each cell of matrix \code{k.M}}
   \item{\code{k.IIO}: }{Number of correct responses for participants with sum scores j=0,...,6}
   \item{\code{n.IIO}: }{Total number of participants for each cell of matrix \code{k.IIO}}
-}}
+}
+}
 \usage{
 karabatsos2004
 }

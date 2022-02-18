@@ -4,13 +4,15 @@
 \name{heck2017}
 \alias{heck2017}
 \title{Data: Multiattribute Decisions (Heck, Hilbig & Moshagen, 2017)}
-\format{A data frame 4 variables:
+\format{
+A data frame 4 variables:
 \describe{
   \item{\code{B1}}{Frequency of choosing Option B for Item Type 1}
   \item{\code{B2}}{Frequency of choosing Option B for Item Type 2}
   \item{\code{B3}}{Frequency of choosing Option B for Item Type 3}
   \item{\code{B4}}{Frequency of choosing Option B for Item Type 4}
-}}
+}
+}
 \usage{
 heck2017
 }

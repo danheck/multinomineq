@@ -5,11 +5,9 @@
 \alias{ml_multinom}
 \title{Maximum-likelihood Estimate}
 \usage{
-ml_binom(k, n, A, b, map, strategy, n.fit = 3, start, progress = FALSE,
-  ...)
+ml_binom(k, n, A, b, map, strategy, n.fit = 3, start, progress = FALSE, ...)
 
-ml_multinom(k, options, A, b, V, n.fit = 3, start, progress = FALSE,
-  ...)
+ml_multinom(k, options, A, b, V, n.fit = 3, start, progress = FALSE, ...)
 }
 \arguments{
 \item{k}{vector of observed response frequencies.}

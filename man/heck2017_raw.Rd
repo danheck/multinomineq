@@ -4,7 +4,8 @@
 \name{heck2017_raw}
 \alias{heck2017_raw}
 \title{Data: Multiattribute Decisions (Heck, Hilbig & Moshagen, 2017)}
-\format{A data frame with 21 variables:
+\format{
+A data frame with 21 variables:
 \describe{
   \item{\code{vp}}{ID code of participant}
   \item{\code{trial}}{Trial index}
@@ -27,7 +28,8 @@
   \item{\code{b2}}{Value of Cue 2 for Option B}
   \item{\code{b3}}{Value of Cue 3 for Option B}
   \item{\code{b4}}{Value of Cue 4 for Option B}
-}}
+}
+}
 \usage{
 heck2017_raw
 }

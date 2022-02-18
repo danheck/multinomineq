@@ -4,8 +4,7 @@
 \alias{strategy_multiattribute}
 \title{Strategy Predictions for Multiattribute Decisions}
 \usage{
-strategy_multiattribute(cueA, cueB, v, strategy, c = 0.5, prior = c(1,
-  1))
+strategy_multiattribute(cueA, cueB, v, strategy, c = 0.5, prior = c(1, 1))
 }
 \arguments{
 \item{cueA}{cue values of Option A (-1/+1 = negative/positive; 0 = missing).

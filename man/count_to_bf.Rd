@@ -4,8 +4,14 @@
 \alias{count_to_bf}
 \title{Compute Bayes Factor Using Prior/Posterior Counts}
 \usage{
-count_to_bf(posterior, prior, exact_prior, log = FALSE, beta = c(1/2,
-  1/2), samples = 3000)
+count_to_bf(
+  posterior,
+  prior,
+  exact_prior,
+  log = FALSE,
+  beta = c(1/2, 1/2),
+  samples = 3000
+)
 }
 \arguments{
 \item{posterior}{a vector (or matrix) with entries (or columns)

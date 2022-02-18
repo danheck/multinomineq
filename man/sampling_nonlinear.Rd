@@ -4,9 +4,18 @@
 \alias{sampling_nonlinear}
 \title{Posterior Sampling for Multinomial Models with Nonlinear Inequalities}
 \usage{
-sampling_nonlinear(k, options, inside, prior = rep(1, sum(options)),
-  M = 1000, start, burnin = 10, eps = 1e-06, progress = TRUE,
-  cpu = 1)
+sampling_nonlinear(
+  k,
+  options,
+  inside,
+  prior = rep(1, sum(options)),
+  M = 1000,
+  start,
+  burnin = 10,
+  eps = 1e-06,
+  progress = TRUE,
+  cpu = 1
+)
 }
 \arguments{
 \item{k}{vector of observed response frequencies.}

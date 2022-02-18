@@ -4,8 +4,13 @@
 \alias{Ab_max}
 \title{Automatic Construction of Ab-Representation for Common Inequality Constraints}
 \usage{
-Ab_max(which_max, options, exclude = c(), exclude_fixed = FALSE,
-  drop_fixed = TRUE)
+Ab_max(
+  which_max,
+  options,
+  exclude = c(),
+  exclude_fixed = FALSE,
+  drop_fixed = TRUE
+)
 }
 \arguments{
 \item{which_max}{vector of indices refering to probabilities that are

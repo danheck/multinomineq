@@ -4,7 +4,6 @@
 #' (1) all inequalities \code{A*x <= b} are satisfied or
 #' (2) the point \code{x} is in the convex hull of the vertices in \code{V}.
 #'
-#' @inheritParams inside
 #' @param x a vector of length equal to the number of columns of \code{A} or \code{V}
 #' (i.e., a single point in D-dimensional space) or matrix of points/vertices (one per row).
 #' @param A a matrix with one row for each linear inequality constraint and one

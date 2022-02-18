@@ -5,11 +5,34 @@
 \alias{sampling_binom}
 \title{Posterior Sampling for Inequality-Constrained Multinomial Models}
 \usage{
-sampling_multinom(k, options, A, b, V, prior = rep(1, sum(options)),
-  M = 5000, start, burnin = 10, progress = TRUE, cpu = 1)
+sampling_multinom(
+  k,
+  options,
+  A,
+  b,
+  V,
+  prior = rep(1, sum(options)),
+  M = 5000,
+  start,
+  burnin = 10,
+  progress = TRUE,
+  cpu = 1
+)
 
-sampling_binom(k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
-  M = 5000, start, burnin = 10, progress = TRUE, cpu = 1)
+sampling_binom(
+  k,
+  n,
+  A,
+  b,
+  V,
+  map = 1:ncol(A),
+  prior = c(1, 1),
+  M = 5000,
+  start,
+  burnin = 10,
+  progress = TRUE,
+  cpu = 1
+)
 }
 \arguments{
 \item{k}{the number of choices for each alternative ordered by item type (e.g.

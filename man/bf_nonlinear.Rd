@@ -5,11 +5,24 @@
 \alias{count_nonlinear}
 \title{Bayes Factor for Nonlinear Inequality Constraints}
 \usage{
-bf_nonlinear(k, options, inside, prior = rep(1, sum(options)),
-  log = FALSE, ...)
+bf_nonlinear(
+  k,
+  options,
+  inside,
+  prior = rep(1, sum(options)),
+  log = FALSE,
+  ...
+)
 
-count_nonlinear(k = 0, options, inside, prior = rep(1, sum(options)),
-  M = 5000, progress = TRUE, cpu = 1)
+count_nonlinear(
+  k = 0,
+  options,
+  inside,
+  prior = rep(1, sum(options)),
+  M = 5000,
+  progress = TRUE,
+  cpu = 1
+)
 }
 \arguments{
 \item{k}{vector of observed response frequencies.}

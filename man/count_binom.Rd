@@ -4,9 +4,23 @@
 \alias{count_binom}
 \title{Count How Many Samples Satisfy Linear Inequalities (Binomial)}
 \usage{
-count_binom(k, n, A, b, V, map, prior = c(1, 1), M = 10000, steps,
-  start, cmin = 0, maxiter = 500, burnin = 5, progress = TRUE,
-  cpu = 1)
+count_binom(
+  k,
+  n,
+  A,
+  b,
+  V,
+  map,
+  prior = c(1, 1),
+  M = 10000,
+  steps,
+  start,
+  cmin = 0,
+  maxiter = 500,
+  burnin = 5,
+  progress = TRUE,
+  cpu = 1
+)
 }
 \arguments{
 \item{k}{vector of observed response frequencies.}

@@ -4,12 +4,14 @@
 \name{hilbig2014}
 \alias{hilbig2014}
 \title{Data: Multiattribute Decisions (Hilbig & Moshagen, 2014)}
-\format{A data frame 3 variables:
+\format{
+A data frame 3 variables:
 \describe{
   \item{\code{B1}}{Frequency of choosing Option B for Item Type 1}
   \item{\code{B2}}{Frequency of choosing Option B for Item Type 2}
   \item{\code{B3}}{Frequency of choosing Option B for Item Type 3}
-}}
+}
+}
 \usage{
 hilbig2014
 }

@@ -14,7 +14,6 @@
 #'   automatically added to the list of models (at the last position).
 #' @param include_unconstr whether to include the unconstrained, encompassing
 #'   model without inequality constraints (i.e., the saturated model).
-#' @inheritParams count_to_bf
 #'
 #' @examples
 #' # data: binomial frequencies in 4 conditions

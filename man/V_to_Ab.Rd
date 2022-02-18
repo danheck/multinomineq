@@ -100,7 +100,7 @@ V_to_Ab(V)
 \references{
 Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
 
-Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., â€¦ Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \url{https://doi.org/10.1037/dec0000007}
 
-Regenwetter, M., & Robinson, M. M. (2017). The construct–behavior gap in behavioral decision research: A challenge beyond replicability. Psychological Review, 124(5), 533-550. https://doi.org/10.1037/rev0000067
+Regenwetter, M., & Robinson, M. M. (2017). The constructâ€“behavior gap in behavioral decision research: A challenge beyond replicability. Psychological Review, 124(5), 533-550. https://doi.org/10.1037/rev0000067
 }

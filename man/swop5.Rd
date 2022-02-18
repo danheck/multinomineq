@@ -4,13 +4,15 @@
 \name{swop5}
 \alias{swop5}
 \title{Strict Weak Order Polytope for 5 Elements and Ternary Choices}
-\format{A list with 3 elements:
+\format{
+A list with 3 elements:
 \describe{
   \item{\code{A}: }{Matrix with inequality constraints that define a polytope via \code{A*x <= b}.}
   \item{\code{b}: }{vector with upper bounds for the inequalities.}
   \item{\code{start}: }{A point in the polytope.}
   \item{\code{options}: }{A vector with the number of options (=3) per item type.}
-}}
+}
+}
 \usage{
 swop5
 }

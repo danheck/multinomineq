@@ -2,7 +2,7 @@ Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
 Version: 0.2.2
-Date: 2020-01-23
+Date: 2022-02-18
 Authors@R: person("Daniel W.", "Heck", email="dheck@uni-marburg.de", 
                   role=c("aut","cre"), comment = c(ORCID = "0000-0002-6302-9252"))
 Maintainer: Daniel W. Heck <dheck@uni-marburg.de>
@@ -50,5 +50,5 @@ LinkingTo:
     RcppArmadillo,
     RcppProgress
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.2
 Additional_repositories: https://danheck.github.io/drat/
