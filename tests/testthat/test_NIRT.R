@@ -37,6 +37,7 @@ test_that("NIRT axioms match with Rasch predictions", {
   # matrix(apply(tt, 2, mean), N)
 
   ################### strength of DC constraint:
+  skip("functions not yet fully implemented")
   DC <- nirt_to_Ab(N, M, axioms = c("W1", "W2", "DC"))
   # count_binom(0,0, DC$exclude[[1]]$A, rep(0,3), M=5e4)
   # relative to W1 / W2
@@ -65,6 +66,7 @@ dimnames(ppw) <- dimnames(N) <- list(score=paste0("s", 3:5),
                                      item=paste0("i", c(4, 9, 2)))
 p.obs <- round(ppw / N, 2)
 test_that("Examples in Karabatsos (2004, Figure 4) give identical results",{
+  skip("functions not yet fully implemented")
   IRT_W1 <- nirt_to_Ab(3, 3, axioms = "W1")
   pp <- sampling_binom(c(ppw), c(N), IRT_W1$A, IRT_W1$b,
                        M = 10000, burnin = 1000)
@@ -102,6 +104,7 @@ dimnames(ppw2) <- dimnames(N2) <- list(score=paste0("s", 4:6),
                                        item=paste0("i", c(6, 1, 8)))
 p.obs2 <- round(ppw2 / N2, 2)
 test_that("Examples in Karabatsos (2001, Figure 7) give identical results",{
+  skip("functions not yet fully implemented")
   IRT_all <- nirt_to_Ab(3, 3, axioms = c("W1", "W2", "DC"))
   pp <- sampling_binom(c(ppw2), c(N2), IRT_all$A, IRT_all$b, #prior = c(.5,.5),
                        M = 15000, burnin = 1000)

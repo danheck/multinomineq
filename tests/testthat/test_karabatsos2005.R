@@ -1,10 +1,11 @@
+library(testthat)
 
 # compare results to
 # Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. https://doi.org/10.1016/j.jmp.2004.11.001
 
 
 
-testthat::test_that("results match to those of Karabatsos (2005)", {
+test_that("results match to those of Karabatsos (2005)", {
   # example from appendix:
   H0 <- list(pattern =  1, c = .5, ordered = FALSE, prior = c(.5,.5))  # predict: non-violations (k = n)
   H1 <- list(pattern = -1, c = .5, ordered = FALSE, prior = c(.5,.5))

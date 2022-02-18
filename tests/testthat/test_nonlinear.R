@@ -44,8 +44,8 @@ test_that("nonlinear Gibbs/BF gives identical results as A*x<b version",{
   expect_equal(bf_Ab[,1], bf_cpp[,1], tolerance = bf_cpp[,2]*3)
 })
 
-test_that("nonlinear Gibbs/BF gives correct results for contigency tables",{
 
-
-})
+# test_that("nonlinear Gibbs/BF gives correct results for contigency tables",{
+#
+# })
 

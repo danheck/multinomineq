@@ -71,7 +71,7 @@ test_that("counting is equivalent for: A/b-method and V-method", {
                 1,1,1,1,1,1,
                 0,1,0,1,0,1,
                 0,0,0,0,0,1), ncol=6, byrow=TRUE)
-  tmp <- V_to_Ab(V)
+  tmp <- V_to_Ab(unique(V))
   A <- tmp$A
   b <- tmp$b
 
