@@ -51,7 +51,7 @@ bf_multinom(regenwetter2012[1,-c(1:2)], swop5$options,
 }
 }
 \references{
-Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \url{https://doi.org/10.1037/a0027372}
+Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \doi{10.1037/a0027372}
 }
 \seealso{
 The substantive model of interest was the strict weak order polytope (see \code{\link{swop5}}).

@@ -153,7 +153,7 @@ count_to_bf(posterior, prior)
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
 
-Fukuda, K. (2004). Is there an efficient way of determining whether a given point q is in the convex hull of a given finite set S of points in Rd? Retrieved from \url{http://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}
+Fukuda, K. (2004). Is there an efficient way of determining whether a given point q is in the convex hull of a given finite set S of points in Rd? Retrieved from \url{https://www.cs.mcgill.ca/~fukuda/soft/polyfaq/node22.html}
 }
 \seealso{
 \code{\link{bf_binom}}, \code{\link{count_multinom}}

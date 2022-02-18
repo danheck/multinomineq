@@ -104,7 +104,7 @@ bf_nonlinear(k=c(19,132, 0,9, 11,52, 6,97), M = 100000,
 }
 }
 \references{
-Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \url{https://doi.org/10.1016/j.csda.2007.01.024}
+Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \doi{10.1016/j.csda.2007.01.024}
 
-Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \url{https://doi.org/10.1037/a0020137}
+Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \doi{10.1037/a0020137}
 }

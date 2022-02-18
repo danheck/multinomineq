@@ -1,1 +1,1 @@
-#' @references Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \url{https://doi.org/10.1037/a0020137}
+#' @references Klugkist, I., Laudy, O., & Hoijtink, H. (2010). Bayesian evaluation of inequality and equality constrained hypotheses for contingency tables. Psychological Methods, 15(3), 281-299. \doi{10.1037/a0020137}

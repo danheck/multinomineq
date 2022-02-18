@@ -69,7 +69,7 @@ ppp <- ppp_binom(p, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
 round(ppp[,3], 2)
 }
 \references{
-Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \url{https://doi.org/10.1177/0146621603260678}
+Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \doi{10.1177/0146621603260678}
 }
 \seealso{
 The polytope for the nonparametric item response theory can be obtained

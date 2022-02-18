@@ -54,6 +54,6 @@ n <- rep(32, 3)
 strategy_postprob(k = hilbig2014[1:5,], n, preds)
 }
 \references{
-Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \url{https://doi.org/10.3758/s13423-014-0643-0}
+Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \doi{10.3758/s13423-014-0643-0}
 }
 \keyword{datasets}

@@ -58,6 +58,6 @@ strats <- strategy_multiattribute(cueA, cueB, v, strategies)
 strategy_postprob(heck2017[1:4,], n, strats)
 }
 \references{
-Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \url{https://doi.org/10.1016/j.cogpsych.2017.05.003}
+Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \doi{10.1016/j.cogpsych.2017.05.003}
 }
 \keyword{datasets}

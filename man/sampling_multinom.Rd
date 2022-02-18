@@ -133,7 +133,7 @@ head(samp)
 plot(samp)
 }
 \references{
-Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \url{https://doi.org/10.1016/j.jmp.2005.02.004}
+Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \doi{10.1016/j.jmp.2005.02.004}
 }
 \seealso{
 \code{\link{count_multinom}}, \code{\link{ml_multinom}}

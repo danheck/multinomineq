@@ -39,5 +39,5 @@ b12$bf
 b13$bf
 }
 \references{
-Heathcote, A., Brown, S., Wagenmakers, E. J., & Eidels, A. (2010). Distribution-free tests of stochastic dominance for small samples. Journal of Mathematical Psychology, 54(5), 454-463. \url{https://doi.org/10.1016/j.jmp.2010.06.005}
+Heathcote, A., Brown, S., Wagenmakers, E. J., & Eidels, A. (2010). Distribution-free tests of stochastic dominance for small samples. Journal of Mathematical Psychology, 54(5), 454-463. \doi{10.1016/j.jmp.2010.06.005}
 }
