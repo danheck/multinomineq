@@ -11,3 +11,8 @@ porta.log
 
 src-i386/*
 src-x64/*
+
+
+vignettes/*.R
+vignettes/*.html
+
