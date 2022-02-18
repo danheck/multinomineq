@@ -23,7 +23,7 @@ test_that("nonlinear Gibbs/BF gives identical results as A*x<b version",{
   expect_gt(ks.test(mcmc_Ab[,1], mcmc_r[,1])$p, .01)
   expect_gt(ks.test(mcmc_Ab[,2], mcmc_r[,2])$p, .01)
 
-  expect_equal(bf_Ab[,1], bf_r[,1], tolerance = bf_r[,2]*3)
+  expect_equal(bf_Ab[,1], bf_r[,1], tolerance = bf_r[,2]*5)
 
 
   ############ indicator function in C++: x1 < x2 < x3

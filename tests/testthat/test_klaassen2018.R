@@ -20,7 +20,7 @@ test_that("Klaassen Table3: Hyp. 1 results match", {
   bf_1u <- lapply(cb1, count_to_bf, exact_prior = 1/factorial(4))
 
   bfs <- sapply(bf_1u, "[", "bf_0u", c("bf", "se"))
-  expect_equal(unname(bfs["bf",]), c(13.16, 1.40, .24), tol = bfs["se",])
+  expect_equal(unname(bfs["bf",]), c(13.16, 1.40, .24), tol = bfs["se",]*3)
 })
 
 test_that("Klaassen Table3: Hyp. 2 results match", {
@@ -30,7 +30,7 @@ test_that("Klaassen Table3: Hyp. 2 results match", {
   bf_2u <- lapply(cb2, count_to_bf, exact_prior = .5)
 
   bfs <- sapply(bf_2u, "[", "bf_0u", c("bf", "se"))
-  expect_equal(unname(bfs["bf",]), c(2.00, 1.79, 1.01), tol = pmax(bfs["se",], .01))
+  expect_equal(unname(bfs["bf",]), c(2.00, 1.79, 1.01), tol = pmax(bfs["se",], .03))
 
 })
 
