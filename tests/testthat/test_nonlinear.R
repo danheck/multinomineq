@@ -7,7 +7,7 @@ test_that("nonlinear Gibbs/BF gives identical results as A*x<b version",{
   opt <- 3
   k <-c (4,1,53)
   mod <- function(x) x[1] < x[2] & x[2] < 1- x[1]-x[2]
-  set.seed(1234)
+  set.seed(12345)
   expect_silent(mcmc_r <- sampling_nonlinear(k, opt, mod, M = 2000,
                                              progress = FALSE))
   expect_true(all(apply(mcmc_r, 1, mod)))
@@ -23,7 +23,7 @@ test_that("nonlinear Gibbs/BF gives identical results as A*x<b version",{
   expect_gt(ks.test(mcmc_Ab[,1], mcmc_r[,1])$p, .01)
   expect_gt(ks.test(mcmc_Ab[,2], mcmc_r[,2])$p, .01)
 
-  expect_equal(bf_Ab[,1], bf_r[,1], tolerance = bf_r[,2]*5)
+  expect_equal(bf_Ab[,1], bf_r[,1], tolerance = max(bf_r[,2])*3)
 
 
   ############ indicator function in C++: x1 < x2 < x3
@@ -41,7 +41,7 @@ test_that("nonlinear Gibbs/BF gives identical results as A*x<b version",{
   expect_gt(ks.test(mcmc_Ab[,2], mcmc_cpp[,2])$p, .01)
 
   expect_silent(bf_cpp <- bf_nonlinear(k, opt, mod_ptr, M = 100000, progress = FALSE))
-  expect_equal(bf_Ab[,1], bf_cpp[,1], tolerance = bf_cpp[,2]*3)
+  expect_equal(bf_Ab[,1], bf_cpp[,1], tolerance = max(bf_cpp[,2])*3)
 })
 
 

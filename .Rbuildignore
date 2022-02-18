@@ -9,3 +9,7 @@ README.Rmd
 porta.log
 porta.ieq
 .travis.yml
+tests/testthat/_snaps
+vignettes/multinomineq_intro.html
+vignettes/multinomineq_intro.R
+

@@ -15,5 +15,5 @@ test_that("transformation of A/b to V representation works",{
 
   # tmp <- V_to_Ab(V)
 
-  expect_equal(Ab_to_V(A, b), V)
+  expect_equal(suppressWarnings(Ab_to_V(A, b)), V)
 })
