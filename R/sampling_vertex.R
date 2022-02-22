@@ -22,7 +22,8 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
   prior_free <- drop_fixed(prior, options)
 
   X <- matrix(NA, M, I)
-  if (progress) pb <- txtProgressBar(0, M, style = 3)
+  if (interactive() && progress)
+    pb <- txtProgressBar(0, M, style = 3)
   X[1,] <- start
   for (m in 2:M){
     x <- X[m - 1,]
@@ -40,9 +41,11 @@ sampling_V <- function(k, options, V, prior = rep(1, sum(options)), M = 5000,
                           shape2[oo[i]], bnd[2], min(bnd[1], 1)) * xi_max
     }
     X[m,] <- x
-    if (progress) setTxtProgressBar(pb, m)
+    if (interactive() && progress)
+      setTxtProgressBar(pb, m)
   }
-  if (progress) close(pb)
+  if (interactive() && progress)
+    close(pb)
   colnames(X) <- colnames(V)
   X
 }

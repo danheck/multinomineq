@@ -90,7 +90,8 @@ count_nonlinear <- function(k = 0, options, inside, prior = rep(1, sum(options))
       todo <- todo - BATCH
     }
   } else {
-    count <- count_nonlin_cpp(k, options, inside, prior, M, BATCH, progress)
+    count <- count_nonlin_cpp(k, options, inside, prior, M, BATCH,
+                              interactive() && progress)
   }
 
   as_ineq_count(cbind(count = count, M = M, steps = 1))

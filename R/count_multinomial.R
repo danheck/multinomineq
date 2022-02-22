@@ -81,7 +81,7 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
 
     if (cmin == 0 && (missing(steps) || is.null(steps))){
       # Ab <- Ab_sort(A, b, k, options, M = 100, drop_irrelevant = TRUE)
-      count <- count_mult(k, options, A, b, prior, M, batch = BATCH, progress)
+      count <- count_mult(k, options, A, b, prior, M, batch = BATCH, interactive() && progress)
 
     } else {
       steps <- check_stepsA(steps, A)
@@ -100,10 +100,10 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
         zeros <- rep(0, length(steps))
         count <- count_auto_mult(k, options, A, b, prior, zeros, zeros, steps, ## SUM TO ZERO!!!!
                                  M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
-                                 start, burnin, progress)
+                                 start, burnin, interactive() && progress)
       } else {
         count <- count_stepwise_multi(k, options, A, b, prior, M, steps,
-                                      batch = BATCH, start, burnin, progress)
+                                      batch = BATCH, start, burnin, interactive() && progress)
       }
     }
 
@@ -112,14 +112,17 @@ count_multinom <- function (k = 0, options, A, b, V, prior = rep(1, sum(options)
     count <- 0
     m <- M
     a <- k + prior #c(rbind(k + prior[1], n - k + prior[2]))
-    if (progress) pb <- txtProgressBar(0, M, style = 3)
+    if (interactive() && progress)
+      pb <- txtProgressBar(0, M, style = 3)
     while (m > 0 ){
       X <- rpdirichlet(n = round(BATCH/1000), alpha = a, options = options, drop_fixed = TRUE)
       count <- count + sum(inside_V(X, V))
       m <- m - round(BATCH/1000)
-      if (progress) setTxtProgressBar(pb, M - m)
+      if (interactive() && progress)
+        setTxtProgressBar(pb, M - m)
     }
-    if (progress) close(pb)
+    if (interactive() && progress)
+      close(pb)
     count <- cbind("count" = count, "M" = M, "steps" = NA)
 
   } else {

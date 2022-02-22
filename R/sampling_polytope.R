@@ -78,7 +78,8 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
 
   if (!missing(V) && !is.null(V)){
     mcmc <- sampling_V(k, options, V, prior = prior, M = M,
-                       start = start, burnin = burnin, progress = progress)
+                       start = start, burnin = burnin,
+                       progress = interactive() && progress)
   } else {
     if (missing(start) || is.null(start) || any(start < 0))
       start <-  ml_multinom(k + prior, options, A, b, n.fit = 1,
@@ -88,7 +89,8 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
     check_start(start, A, b, interior = TRUE)
     if (length(prior) == 1) prior <- rep(prior, sum(options))
     check_Abokprior(A, b, options, k, prior)
-    mcmc <- sampling_mult(k, options, A, b, prior, M, start, burnin, progress)
+    mcmc <- sampling_mult(k, options, A, b, prior, M, start, burnin,
+                          interactive() && progress)
     colnames(mcmc) <- colnames(A)
     if (is.null(colnames(A)))
       colnames(mcmc) <- index_mult(options, fixed = FALSE)
@@ -117,7 +119,8 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
     k2 <- add_fixed(k, options = options, sum = n)
     mcmc <- sampling_V(k2, options = options, V = V,
                        prior = rep(prior, length(k)), # extended prior for multinomial
-                       M = M, start = start, burnin = burnin, progress = progress)
+                       M = M, start = start, burnin = burnin,
+                       progress = interactive() && progress)
   } else {
     aggr <- map_k_to_A(k, n, A, map)
     k <- aggr$k
@@ -128,7 +131,8 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
                          A, b, map, n.fit = 1,
                          control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
     check_start(start, A, b, interior = TRUE)
-    mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin, progress)
+    mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin,
+                         interactive() && progress)
     colnames(mcmc) <- colnames(A)
   }
   mcmc(mcmc, start = burnin + 1, end = M)

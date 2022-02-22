@@ -101,10 +101,12 @@ sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options))
 
   if (is.function(inside)){
     stopifnot(inside(start))
-    mcmc <- sampling_nonlin_r(k, options, inside, prior, M, start, burnin, progress, eps)
+    mcmc <- sampling_nonlin_r(k, options, inside, prior, M, start, burnin,
+                              interactive() && progress, eps)
   } else {
     stopifnot(call_xptr(inside, start) == 1)
-    mcmc <- sampling_nonlin_cpp(k, options, inside, prior, M, start, burnin, progress, eps)
+    mcmc <- sampling_nonlin_cpp(k, options, inside, prior, M, start, burnin,
+                                interactive() && progress, eps)
   }
 
   colnames(mcmc) <- index_mult(options, fixed = FALSE)

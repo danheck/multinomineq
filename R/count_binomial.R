@@ -125,7 +125,7 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
   if (!missing(b) && !is.null(b)){
     check_Abknprior(A, b, k, n, prior)
     if (cmin == 0 && (missing(steps) || is.null(steps))){
-      count <- count_bin(k, n, A, b, prior, M, batch = BATCH, progress)
+      count <- count_bin(k, n, A, b, prior, M, batch = BATCH, interactive() && progress)
 
     } else {
       steps <- check_stepsA(steps, A)
@@ -144,24 +144,27 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
         zeros <- rep(0, length(steps))
         count <- count_auto_bin(k, n, A, b, prior, count = zeros, M = zeros, steps = steps,
                                 M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
-                                start, burnin, progress)
+                                start, burnin, interactive() && progress)
       } else {
         count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch = BATCH,
-                                    start, burnin, progress)
+                                    start, burnin, interactive() && progress)
       }
     }
   } else if (!missing(V) && !is.null(V)){
     count <- 0
     m <- M
     a <- c(rbind(k + prior[1], n - k + prior[2]))
-    if (progress) pb <- txtProgressBar(0, M, style = 3)
+    if (interactive() && progress)
+      pb <- txtProgressBar(0, M, style = 3)
     while (m > 0 ){
       X <- rpdirichlet(round(BATCH/1000), a, rep(2, ncol(V)), drop_fixed = TRUE)
       count <- count + sum(inside_V(X, V))
       m <- m - round(BATCH/1000)
-      if (progress) setTxtProgressBar(pb, M - m)
+      if (interactive() && progress)
+        setTxtProgressBar(pb, M - m)
     }
-    if (progress) close(pb)
+    if (interactive() && progress)
+      close(pb)
     count <- cbind("count" = count, "M" = M, "steps" = NA)
   } else {
     stop("A/b or V must be provided.")

@@ -100,8 +100,9 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
                         progress = FALSE, ...){
 
   t0 <- Sys.time()
-  if (progress) cat("ML estimation starts at", format(t0), "using", n.fit, "starting values.\n",
-                    "Current ML value: ")
+  if (interactive() && progress)
+    cat("ML estimation starts at", format(t0), "using", n.fit, "starting values.\n",
+        "Current ML value: ")
 
   check_ko(k, options)
   n <- c(tapply(k, rep(1:length(options), options), sum))
@@ -124,7 +125,8 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
     if (!anyNA(est_unconstr))
       inside_unconstr <- inside(est_unconstr, A = A, b = b)
     if (inside_unconstr){
-      if (progress) cat("Unconstrained MLE within: A*x <= b;  -loglik:", ll_unconstr)
+      if (interactive() && progress)
+        cat("Unconstrained MLE within: A*x <= b;  -loglik:", ll_unconstr)
       oo <- list(par = est_unconstr,
                  value = ll_unconstr,
                  counts = NA,
@@ -144,13 +146,15 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
           cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
         })
       cnt <- 1
-      if (progress) cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
+      if (interactive() && progress)
+        cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
       while (cnt < n.fit){
         start <- find_inside(A, b, random = TRUE)
         oo2 <- constrOptim(start, loglik_multinom, grad = grad_multinom,
                            k = k, options = options, ui = - A, ci = - b, ...)
         cnt <- cnt + 1
-        if (progress) cat("(",cnt,") ",round(oo2$value, 1), "; ", sep = "")
+        if (interactive() && progress)
+          cat("(",cnt,") ",round(oo2$value, 1), "; ", sep = "")
         if (oo2$value < oo$value) oo <- oo2
       }
     }
@@ -168,7 +172,8 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
     if (!anyNA(est_unconstr))
       inside_unconstr <- inside_V(x = est_unconstr, V = V, return_glpk = TRUE)
     if (inside_unconstr$inside){
-      if (progress) cat("Unconstrained MLE within convex hull of V;  -loglik:", ll_unconstr)
+      if (interactive() && progress)
+        cat("Unconstrained MLE within convex hull of V;  -loglik:", ll_unconstr)
       oo <- list(par = rep(NA, S - 1),
                  value = ll_unconstr,
                  counts = NA,
@@ -194,14 +199,16 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
           cat("\n\n  (optimization failed with starting value:\n  ", start, ")\n")
         })
       cnt <- 1
-      if (progress) cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
+      if (interactive() && progress)
+        cat("(",cnt,") ", round(oo$value, 1), "; ", sep = "")
       while (cnt < n.fit){
         start <- rdirichlet(1, rep(1, S))[,-S]
         oo2 <- constrOptim(start, f = loglik_mixture, grad = grad_multinom_mixture,
                            k = k, options = options, V =V,
                            ui = - alpha_Ab$A, ci = - alpha_Ab$b, ...)
         cnt <- cnt + 1
-        if (progress) cat("(",cnt,") ", round(oo2$value, 1), "; ", sep = "")
+        if (interactive() && progress)
+          cat("(",cnt,") ", round(oo2$value, 1), "; ", sep = "")
         if (oo2$value < oo$value) oo <- oo2
       }
     }
@@ -214,7 +221,8 @@ ml_multinom <- function(k, options, A, b, V, n.fit = 3, start,
     oo$V <- V
   }
   t1 <- Sys.time()
-  if (progress) cat("\nFinished at", format(t1), " (difference:", format(t1-t0), ").\n")
+  if (interactive() && progress)
+    cat("\nFinished at", format(t1), " (difference:", format(t1-t0), ").\n")
   oo$k <- k
   oo$options <- options
   oo$n.fit <- n.fit
