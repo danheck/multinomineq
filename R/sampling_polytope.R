@@ -68,7 +68,7 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
   check_ko(k, options)
   check_ko(prior, options)
 
-  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
+  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
     if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0))
       arg$k <- rep(0, sum(arg$options))
@@ -107,7 +107,7 @@ sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
   stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
   if (length(n) == 1) n <- rep(n, length(k))
 
-  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
+  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1],
                   function(i) tryCatch(eval(i), error = function(e) NULL))
     mcmc.list <- run_parallel(arg, fun = "sampling_binom", cpu = cpu, simplify = "as.mcmc.list")

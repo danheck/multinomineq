@@ -55,8 +55,8 @@ sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options))
   check_ko(k, options)
   check_io(inside, options)
 
-  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
-    if (class(inside) == "XPtr")
+  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
+    if (inherits(inside, "XPtr"))
       stop("C++ functions (defined via RcppXPtrUtils::cppXPtr) not supported if cpu>1.")
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
     if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0))

@@ -13,7 +13,7 @@ test_that("bisection method works", {
     if (is.function(f)){
       stopifnot(length(f(x)) == 1, is.numeric(f(x) + 0))
       multinomineq:::bisection_r(f, x, i, min, max, eps)
-    } else if (class(f) == "XPtr") {
+    } else if (inherits(f, "XPtr")) {
       RcppXPtrUtils::checkXPtr(f, type="SEXP", args=c("NumericVector"))
       multinomineq:::bisection_cpp(f, x, i, min, max, eps)
     } else {

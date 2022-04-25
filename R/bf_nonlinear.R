@@ -70,8 +70,8 @@ count_nonlinear <- function(k = 0, options, inside, prior = rep(1, sum(options))
   check_io(inside, options)
   stopifnot(length(M) == 1, M > 0, M == round(M))
 
-  if (class(cpu) %in% c("SOCKcluster", "cluster") || is.numeric(cpu) && cpu > 1) {
-    if (class(inside) == "XPtr")
+  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
+    if (inherits(inside, "XPtr"))
       stop("C++ functions (defined via RcppXPtrUtils::cppXPtr) not supported if cpu>1.")
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
     count <- run_parallel(arg, fun = "count_nonlinear", cpu = cpu, simplify = "count")

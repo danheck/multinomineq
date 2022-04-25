@@ -231,7 +231,7 @@ check_io <- function(inside, options){
               error = function(e)
                 stop("The function 'inside' must be valid for vector of length ", sum(options - 1)))
     stopifnot(inside_output %in% c(0, 1))
-  } else if(class(inside) == "XPtr"){
+  } else if(inherits(inside, "XPtr")){
     RcppXPtrUtils::checkXPtr(inside, type = "SEXP", args = "NumericVector")
     tryCatch (inside_output <- call_xptr(inside, x),
               error = function(e)
