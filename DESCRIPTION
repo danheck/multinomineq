@@ -1,8 +1,8 @@
 Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
-Version: 0.2.3
-Date: 2022-02-22
+Version: 0.2.4
+Date: 2022-04-25
 Authors@R: person("Daniel W.", "Heck", email="dheck@uni-marburg.de", 
                   role=c("aut","cre"), comment = c(ORCID = "0000-0002-6302-9252"))
 Maintainer: Daniel W. Heck <dheck@uni-marburg.de>
