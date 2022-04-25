@@ -12,7 +12,7 @@ r:
 
 repos:
   CRAN: https://cloud.r-project.org
-  danheck: https://danheck.github.com/drat/
+  danheck: https://danheck.github.io/drat/
 
 cache:
   - packages
