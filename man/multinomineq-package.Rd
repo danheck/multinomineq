@@ -50,9 +50,9 @@ For convex polytopes, the transformation of vertex to inequality representation
 requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 }
 \references{
-BrÃ¶der, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. \doi{10.1002/bdm.442}
+Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. \doi{10.1002/bdm.442}
 
-BrÃ¶der, A., & Schiffer, S. (2003). Take The Best versus simultaneous feature matching: Probabilistic inferences from memory and effects of reprensentation format. Journal of Experimental Psychology: General, 132, 277-293. \doi{10.1037/0096-3445.132.2.277}
+Bröder, A., & Schiffer, S. (2003). Take The Best versus simultaneous feature matching: Probabilistic inferences from memory and effects of reprensentation format. Journal of Experimental Psychology: General, 132, 277-293. \doi{10.1037/0096-3445.132.2.277}
 
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \doi{10.1016/j.cogpsych.2017.05.003}
 
@@ -60,7 +60,7 @@ Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classif
 
 Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \doi{10.1037/a0027372}
 
-Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., â€¦ Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \doi{10.1037/dec0000007}
+Regenwetter, M., Davis-Stober, C. P., Lim, S. H., Guo, Y., Popova, A., Zwilling, C., … Messner, W. (2014). QTest: Quantitative testing of theories of binary choice. Decision, 1(1), 2-34. \doi{10.1037/dec0000007}
 
 Karabatsos, G. (2005). The exchangeable multinomial model as an approach to testing deterministic axioms of choice and measurement. Journal of Mathematical Psychology, 49(1), 51-69. \doi{10.1016/j.jmp.2004.11.001}
 
@@ -70,7 +70,7 @@ Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dich
 
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.
 
-Hoijtink, H., BÃ©land, S., & Vermeulen, J. A. (2014). Cognitive diagnostic assessment via Bayesian evaluation of informative diagnostic hypotheses. Psychological Methods, 19(1), 21â€“38. doi:10.1037/a0034176
+Hoijtink, H., Béland, S., & Vermeulen, J. A. (2014). Cognitive diagnostic assessment via Bayesian evaluation of informative diagnostic hypotheses. Psychological Methods, 19(1), 21–38. doi:10.1037/a0034176
 
 Klugkist, I., & Hoijtink, H. (2007). The Bayes factor for inequality and about equality constrained models. Computational Statistics & Data Analysis, 51(12), 6367-6379. \doi{10.1016/j.csda.2007.01.024}
 

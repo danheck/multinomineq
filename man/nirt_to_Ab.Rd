@@ -48,15 +48,15 @@ by Scheiblechner (1999; ).
 nirt_to_Ab(5, 3)
 }
 \references{
-Karabatsos, G. (2001). The Rasch model, additive conjoint measurement, and new models of probabilistic measurement theory. Journal of Applied Measurement, 2(4), 389â€“423.
+Karabatsos, G. (2001). The Rasch model, additive conjoint measurement, and new models of probabilistic measurement theory. Journal of Applied Measurement, 2(4), 389–423.
 
 Karabatsos, G., & Sheu, C.-F. (2004). Order-constrained Bayes inference for dichotomous models of unidimensional nonparametric IRT. Applied Psychological Measurement, 28(2), 110-125. \doi{10.1177/0146621603260678}
 
 Mokken, R. J. (1971). A theory and procedure of scale analysis: With applications in political research (Vol. 1). Berlin: Walter de Gruyter.
 
 Scheiblechner, H. (1995). Isotonic ordinal probabilistic models (ISOP).
-Psychometrika, 60(2), 281â€“304. \doi{10.1007/BF02301417}
+Psychometrika, 60(2), 281–304. \doi{10.1007/BF02301417}
 
 Scheiblechner, H. (1999). Additive conjoint isotonic probabilistic models (ADISOP).
-Psychometrika, 64(3), 295â€“316. \doi{10.1007/BF02294297}
+Psychometrika, 64(3), 295–316. \doi{10.1007/BF02294297}
 }
