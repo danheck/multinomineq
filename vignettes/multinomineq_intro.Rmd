@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ```
 
 
-<img src="../man/figures/multinomineq.png" width="150" align="right" hspace="20" style="border:0px">
+<img src="../man/figures/multinomineq.png" width="150" style="float: right;  border: 0px">
 
 The R package `multinomineq` facilitates the Bayesian analysis of discrete/categorical data using multinomial models with inequality constraints.
 Essentially, these types of models allow to analyze discrete choice frequencies while assuming that the corresponding choice probabilities $\theta$ are constrained by linear inequality constraints (e.g., by the simple order $\theta_{1} \leq \theta_{2}\leq \theta_{3}\leq \theta_{4}$).
