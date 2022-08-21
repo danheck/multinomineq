@@ -10,3 +10,4 @@ porta.log
 porta.ieq
 .travis.yml
 tests/testthat/_snaps
+^\.github$
