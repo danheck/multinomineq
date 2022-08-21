@@ -12,7 +12,7 @@
 R package `multinomineq`
 =====
 
-<img src="man/figures/multinomineq.png" width="200" align="right">
+<img src="man/figures/multinomineq.png" width="200" style="float: right">
 
 Implements Gibbs sampling and Bayes factors for multinomial models with linear
 inequality constraints on the vector of probability parameters. As special
