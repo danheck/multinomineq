@@ -24,7 +24,7 @@ V <- matrix(c(
 # transform to Ab-representation
 # Ab <- V_to_Ab(V)
 
-# for CRAN: use pre-computed solution provided by rPorta
+# for CRAN: use pre-computed solution
 Ab <- list(A = structure(c(-1, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 1, 0,
                            0, 1, 0, -1, 0, 0, 0, 0, 0, 0, -1, -1, 1, 0, 0, 0, 1, 0, 0, -1,
                            0, 0, 0, 0, 1, -1, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, -1,

@@ -155,10 +155,10 @@ find_inside(A, b, random = TRUE)
 ```
 
 Note that it is sometimes possible to convert the vertex ($V$-)representation (convex hull) to the inequality ($Ab$-)representation using specific software.
-To do this in R, it is necessary to install the package `rPorta` from Github:
+For older R versions (before 4.0.0), this could be done with the package `rPorta` from Github:
 
 ```{r, eval = FALSE}
-### (not run):
+### (not functional for R >= 4.0.0):
 devtools::install_github("TasCL/rPorta")
 Ab <- V_to_Ab(V)
 Ab 

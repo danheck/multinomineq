@@ -40,8 +40,9 @@
 #'  \item Cognitive diagnostic assessment (Hoijtink et al., 2014).
 #' }
 #'
-#' For convex polytopes, the transformation of vertex to inequality representation
-#' requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
+##### For convex polytopes, the transformation of the vertex to the inequality representation
+##### was possible with the R package \code{rPorta} (see \url{https://github.com/TasCL/rPorta}).
+##### However, \code{rPorta} cannot be compiled anymore with R>=4.0.0.
 #'
 #' @author Daniel W. Heck
 #' @docType package

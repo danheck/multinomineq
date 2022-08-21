@@ -2,6 +2,8 @@
 #'
 #' For convex polytopes: Requires \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 #' to transform the vertex representation to/from the inequality representation.
+#' Since \code{rPorta} cannot be compiled with R versions >=4.0.0 anymore,
+#' the function is currently deprecated.
 #'
 #' @param V a matrix with one vertex of a polytope per row
 #'        (e.g., the admissible preference orders of a random utility model or any other theory).
@@ -15,86 +17,87 @@
 #' For the general approach and theory underlying binary and ternary choice models,
 #' see Regenwetter et al. (2012, 2014, 2017).
 #'
-#' Note that the transformation can be very slow and might require days or months
-#' of computing or not converge at all!
+#' The function is currently deprecated since the package \code{rPorta} cannot be compiled with R>=4.0.0!
+##### Note that the transformation can be very slow and might require days or months
+##### of computing or not converge at all!
 #'
 #' @template ref_regenwetter2012
 #' @template ref_regenwetter2014
 #' @template ref_regenwetter2017
-#' @examples
-#' \donttest{
-#' ######## (requires rPorta) ########
-#'
-#' ### binary choice:
-#' # linear order: x1 < x2 < x3 < .50
-#' # (cf. WADDprob in ?predict_multiattribute)
-#' A <- matrix(c(1, -1,  0,
-#'               0,  1, -1,
-#'               0,  0,  1),
-#'             ncol = 3, byrow = TRUE)
-#' b <- c(0, 0, .50)
-#' Ab_to_V(A, b)
-#'
-#'
-#' ### binary choice polytope:
-#' # choice options: {prefer_a, prefer_b}
-#' # column order of vertices: (ab, ac, bc)
-#' # with:  ij = 1  <=>  utility(i) > utility(j)
-#' V <- matrix(c(1, 1, 1,  # c < b < a
-#'               1, 1, 0,  # b < c < a
-#'               0, 1, 1,  # c < a < b
-#'               0, 0, 1   # a < c < b
-#'             ), ncol = 3, byrow = TRUE)
-#' V_to_Ab(V)
-#'
-#'
-#' ### ternary choice (Regenwetter & Davis-Stober, 2012)
-#' # choice options:  {prefer_a, indifferent, prefer_b}
-#' # column order:    (ab,ba,  ac,ca,  bc,cb)
-#' # with:            ij = 1  <=> utility(i) > utility(j)
-#' V <- matrix(c(
-#'   # strict weak orders
-#'   0, 1, 0, 1, 0, 1,  # a < b < c
-#'   1, 0, 0, 1, 0, 1,  # b < a < c
-#'   0, 1, 0, 1, 1, 0,  # a < c < b
-#'   0, 1, 1, 0, 1, 0,  # c < a < b
-#'   1, 0, 1, 0, 1, 0,  # c < b < a
-#'   1, 0, 1, 0, 0, 1,  # b < c < a
-#'
-#'   0, 0, 0, 1, 0, 1,  # a ~ b < c
-#'   0, 1, 0, 0, 1, 0,  # a ~ c < b
-#'   1, 0, 1, 0, 0, 0,  # c ~ b < a
-#'   0, 1, 0, 1, 0, 0,  # a < b ~ c
-#'   1, 0, 0, 0, 0, 1,  # b < a ~ c
-#'   0, 0, 1, 0, 1, 0,  # c < a ~ b
-#'
-#'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
-#' ), byrow = TRUE, ncol = 6)
-#' V_to_Ab(V)
-#' }
+#    ' @examples
+#    ' \donttest{
+#    ' ######## (requires rPorta; not available for R>=4.0.0) ########
+#    '
+#    ' ### binary choice:
+#    ' # linear order: x1 < x2 < x3 < .50
+#    ' # (cf. WADDprob in ?predict_multiattribute)
+#    ' A <- matrix(c(1, -1,  0,
+#    '               0,  1, -1,
+#    '               0,  0,  1),
+#    '             ncol = 3, byrow = TRUE)
+#    ' b <- c(0, 0, .50)
+#    ' Ab_to_V(A, b)
+#    '
+#    '
+#    ' ### binary choice polytope:
+#    ' # choice options: {prefer_a, prefer_b}
+#    ' # column order of vertices: (ab, ac, bc)
+#    ' # with:  ij = 1  <=>  utility(i) > utility(j)
+#    ' V <- matrix(c(1, 1, 1,  # c < b < a
+#    '               1, 1, 0,  # b < c < a
+#    '               0, 1, 1,  # c < a < b
+#    '               0, 0, 1   # a < c < b
+#    '             ), ncol = 3, byrow = TRUE)
+#    ' V_to_Ab(V)
+#    '
+#    '
+#    ' ### ternary choice (Regenwetter & Davis-Stober, 2012)
+#    ' # choice options:  {prefer_a, indifferent, prefer_b}
+#    ' # column order:    (ab,ba,  ac,ca,  bc,cb)
+#    ' # with:            ij = 1  <=> utility(i) > utility(j)
+#    ' V <- matrix(c(
+#    '   # strict weak orders
+#    '   0, 1, 0, 1, 0, 1,  # a < b < c
+#    '   1, 0, 0, 1, 0, 1,  # b < a < c
+#    '   0, 1, 0, 1, 1, 0,  # a < c < b
+#    '   0, 1, 1, 0, 1, 0,  # c < a < b
+#    '   1, 0, 1, 0, 1, 0,  # c < b < a
+#    '   1, 0, 1, 0, 0, 1,  # b < c < a
+#    '
+#    '   0, 0, 0, 1, 0, 1,  # a ~ b < c
+#    '   0, 1, 0, 0, 1, 0,  # a ~ c < b
+#    '   1, 0, 1, 0, 0, 0,  # c ~ b < a
+#    '   0, 1, 0, 1, 0, 0,  # a < b ~ c
+#    '   1, 0, 0, 0, 0, 1,  # b < a ~ c
+#    '   0, 0, 1, 0, 1, 0,  # c < a ~ b
+#    '
+#    '   0, 0, 0, 0, 0, 0   # a ~ b ~ c
+#    ' ), byrow = TRUE, ncol = 6)
+#    ' V_to_Ab(V)
+#    ' }
 #' @export
 V_to_Ab <- function (V){
-  # options <- check_V(V, options)
-  check_V(V)
-
-  if (requireNamespace("rPorta", quietly = TRUE)){
-    poi <- rPorta::as.poiFile(V)
-    ieq <- rPorta::traf(poi)
-    unlink("porta.log")
-    if (!all(ieq@inequalities@sign == -1)){
-      warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1).",
-               "\n  Complete Porta object is returned.")
-      return (ieq)
-    }
-    Ab <- ieq@inequalities@num / ieq@inequalities@den
-    A <- Ab[,1:(ncol(Ab)-1 )]
-    colnames(A) <- colnames(V)
-    return(list("A" = A, "b" = Ab[,ncol(Ab)]))
-
-  } else {
-    stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
-          call. = FALSE)
-  }
+  # check_V(V)
+  # if (requireNamespace("rPorta", quietly = TRUE)){
+  #   poi <- rPorta::as.poiFile(V)
+  #   ieq <- rPorta::traf(poi)
+  #   unlink("porta.log")
+  #   if (!all(ieq@inequalities@sign == -1)){
+  #     warning ("Inequalities are not '<=' (i.e., Porta::ieq sign != -1).",
+  #              "\n  Complete Porta object is returned.")
+  #     return (ieq)
+  #   }
+  #   Ab <- ieq@inequalities@num / ieq@inequalities@den
+  #   A <- Ab[,1:(ncol(Ab)-1 )]
+  #   colnames(A) <- colnames(V)
+  #   return(list("A" = A, "b" = Ab[,ncol(Ab)]))
+  #
+  # } else {
+  #   stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
+  #         call. = FALSE)
+  # }
+  stop ("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
+        call. = FALSE)
 }
 
 
@@ -111,23 +114,26 @@ V_to_Ab <- function (V){
 #' @export
 Ab_to_V <- function (A, b, options = 2){
 
-  options <- check_Ab(A, b, options)
-  tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
-  A <- tmp$A
-  b <- tmp$b
+  # options <- check_Ab(A, b, options)
+  # tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
+  # A <- tmp$A
+  # b <- tmp$b
+  #
+  # if (requireNamespace("rPorta", quietly = TRUE)){
+  #   ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
+  #   poi <- rPorta::traf(ieq)
+  #   unlink("porta.log")
+  #   V <- poi@convex_hull@num / poi@convex_hull@den
+  #   colnames(V) <- colnames(A)
+  #   return(V)
+  #
+  # } else {
+  #   stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
+  #         call. = FALSE)
+  # }
 
-  if (requireNamespace("rPorta", quietly = TRUE)){
-    ieq <- rPorta::as.ieqFile(cbind(A, b), sign = rep(- 1, length(b)))
-    poi <- rPorta::traf(ieq)
-    unlink("porta.log")
-    V <- poi@convex_hull@num / poi@convex_hull@den
-    colnames(V) <- colnames(A)
-    return(V)
-
-  } else {
-    stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
-          call. = FALSE)
-  }
+  stop ("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
+        call. = FALSE)
 }
 
 

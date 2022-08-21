@@ -30,6 +30,8 @@ Can be a vector \code{options=c(2,3,4)} if item types have 2/3/4 choice options.
 \description{
 For convex polytopes: Requires \code{rPorta} (\url{https://github.com/TasCL/rPorta})
 to transform the vertex representation to/from the inequality representation.
+Since \code{rPorta} cannot be compiled with R versions >=4.0.0 anymore,
+the function is currently deprecated.
 }
 \details{
 Choice models can be represented as polytopes if they assume a latent
@@ -37,65 +39,12 @@ mixture over a finite number preference patterns (random preference model).
 For the general approach and theory underlying binary and ternary choice models,
 see Regenwetter et al. (2012, 2014, 2017).
 
-Note that the transformation can be very slow and might require days or months
-of computing or not converge at all!
+The function is currently deprecated since the package \code{rPorta} cannot be compiled with R>=4.0.0!
 
 For binary choices (\code{options=2}), additional constraints are added to \code{A} and \code{b}
 to ensure that all dimensions of the polytope satisfy:  0 <= p_i <= 1.
 For ternary choices (\code{options=3}), constraints are added to ensure that 0 <= p_1+p_2 <=1
 for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinom}}.
-}
-\examples{
-\donttest{
-######## (requires rPorta) ########
-
-### binary choice:
-# linear order: x1 < x2 < x3 < .50
-# (cf. WADDprob in ?predict_multiattribute)
-A <- matrix(c(1, -1,  0,
-              0,  1, -1,
-              0,  0,  1),
-            ncol = 3, byrow = TRUE)
-b <- c(0, 0, .50)
-Ab_to_V(A, b)
-
-
-### binary choice polytope:
-# choice options: {prefer_a, prefer_b}
-# column order of vertices: (ab, ac, bc)
-# with:  ij = 1  <=>  utility(i) > utility(j)
-V <- matrix(c(1, 1, 1,  # c < b < a
-              1, 1, 0,  # b < c < a
-              0, 1, 1,  # c < a < b
-              0, 0, 1   # a < c < b
-            ), ncol = 3, byrow = TRUE)
-V_to_Ab(V)
-
-
-### ternary choice (Regenwetter & Davis-Stober, 2012)
-# choice options:  {prefer_a, indifferent, prefer_b}
-# column order:    (ab,ba,  ac,ca,  bc,cb)
-# with:            ij = 1  <=> utility(i) > utility(j)
-V <- matrix(c(
-  # strict weak orders
-  0, 1, 0, 1, 0, 1,  # a < b < c
-  1, 0, 0, 1, 0, 1,  # b < a < c
-  0, 1, 0, 1, 1, 0,  # a < c < b
-  0, 1, 1, 0, 1, 0,  # c < a < b
-  1, 0, 1, 0, 1, 0,  # c < b < a
-  1, 0, 1, 0, 0, 1,  # b < c < a
-
-  0, 0, 0, 1, 0, 1,  # a ~ b < c
-  0, 1, 0, 0, 1, 0,  # a ~ c < b
-  1, 0, 1, 0, 0, 0,  # c ~ b < a
-  0, 1, 0, 1, 0, 0,  # a < b ~ c
-  1, 0, 0, 0, 0, 1,  # b < a ~ c
-  0, 0, 1, 0, 1, 0,  # c < a ~ b
-
-  0, 0, 0, 0, 0, 0   # a ~ b ~ c
-), byrow = TRUE, ncol = 6)
-V_to_Ab(V)
-}
 }
 \references{
 Regenwetter, M., & Davis-Stober, C. P. (2012). Behavioral variability of choices versus structural inconsistency of preferences. Psychological Review, 119(2), 408-416. \doi{10.1037/a0027372}

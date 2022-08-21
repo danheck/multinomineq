@@ -45,9 +45,6 @@ in psychology, judgement and decision making, and beyond:
        See \code{\link{stochdom_bf}}
  \item Cognitive diagnostic assessment (Hoijtink et al., 2014).
 }
-
-For convex polytopes, the transformation of vertex to inequality representation
-requires the R package \code{rPorta} available at \url{https://github.com/TasCL/rPorta}
 }
 \references{
 Bröder, A., & Schiffer, S. (2003). Bayesian strategy assessment in multi-attribute decision making. Journal of Behavioral Decision Making, 16(3), 193-213. \doi{10.1002/bdm.442}

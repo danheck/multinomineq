@@ -41,7 +41,6 @@ Imports:
     coda,
     RcppXPtrUtils
 Suggests:
-    rPorta,
     knitr,
     testthat,
     covr
@@ -51,4 +50,3 @@ LinkingTo:
     RcppProgress
 VignetteBuilder: knitr
 RoxygenNote: 7.2.1
-Additional_repositories: https://danheck.github.io/drat/

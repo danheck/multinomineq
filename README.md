@@ -84,8 +84,9 @@ install.packages("multinomineq")
 -->
 
 To transform between the vertex (V) and the inequality (A*x<b) representation of 
-a poyltope, it is necessary to install the pacakge `rPorta`. The package is available on
-GitHub (https://github.com/TasCL/rPorta) or as a precompiled package via:
+a polytope, it is necessary to install the package `rPorta`. The package is available on
+GitHub (https://github.com/TasCL/rPorta). The package cannot be compiled with R>=4.0.0.
+For older R versions, the precompiled package can be installed via:
 ```
 install.packages("rPorta", repos = "https://danheck.github.io/drat/")
 ```
