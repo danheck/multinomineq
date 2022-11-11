@@ -1,13 +1,9 @@
-<!--
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/multinomineq)](http://cran.r-project.org/package=multinomineq)
-[![monthly downloads](http://cranlogs.r-pkg.org/badges/multinomineq)](http://cranlogs.r-pkg.org/badges/multinomineq)
-[![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/multinomineq)](http://cranlogs.r-pkg.org/badges/grand-total/multinomineq)
--->
-
-[![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Build Status](https://travis-ci.org/danheck/multinomineq.svg?branch=master)](https://travis-ci.org/danheck/multinomineq)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/multinomineq)](https://cran.r-project.org/package=multinomineq)
+[![Workflow](https://github.com/danheck/multinomineq/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/danheck/multinomineq/actions/workflows/check-standard.yaml)
 [![Coverage status](https://codecov.io/gh/danheck/multinomineq/branch/master/graph/badge.svg)](https://codecov.io/github/danheck/multinomineq?branch=master)
-
+[![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![monthly downloads](https://cranlogs.r-pkg.org/badges/multinomineq)](https://cranlogs.r-pkg.org/badges/multinomineq)
+[![total downloads](https://cranlogs.r-pkg.org/badges/grand-total/multinomineq)](https://cranlogs.r-pkg.org/badges/grand-total/multinomineq)
 
 R package `multinomineq`
 =====
