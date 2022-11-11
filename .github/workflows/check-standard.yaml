@@ -44,10 +44,9 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install rmarkdown
+      - name: Query dependencies
         run: |
-          remotes::install_cran("rmarkdown")
-        shell: Rscript {0}
+          install.packages('rmarkdown')
 
       - uses: r-lib/actions/check-r-package@v2
         with:
