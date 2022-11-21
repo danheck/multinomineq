@@ -17,3 +17,6 @@ vignettes/*.R
 vignettes/*.html
 
 zz_roxygen_error.R
+
+
+tests/testthat/*.pdf

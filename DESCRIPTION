@@ -1,11 +1,13 @@
 Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
-Version: 0.2.4
-Date: 2022-08-21
-Authors@R: person("Daniel W.", "Heck", email="dheck@uni-marburg.de", 
-                  role=c("aut","cre"), comment = c(ORCID = "0000-0002-6302-9252"))
-Maintainer: Daniel W. Heck <dheck@uni-marburg.de>
+Version: 0.2.5
+Date: 2022-11-21
+Authors@R: person("Daniel W.", "Heck", 
+                  email = "daniel.heck@uni-marburg.de", 
+                  role = c("aut","cre"), 
+                  comment = c(ORCID = "0000-0002-6302-9252"))
+Maintainer: Daniel W. Heck <daniel.heck@uni-marburg.de>
 Description: 
     Implements Gibbs sampling and Bayes factors for multinomial models with
     linear inequality constraints on the vector of probability parameters. As
@@ -49,4 +51,4 @@ LinkingTo:
     RcppArmadillo,
     RcppProgress
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2

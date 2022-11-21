@@ -11,3 +11,5 @@ porta.ieq
 .travis.yml
 tests/testthat/_snaps
 ^\.github$
+
+tests/testthat/*.pdf

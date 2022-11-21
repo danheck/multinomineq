@@ -1,5 +1,5 @@
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/multinomineq)](https://cran.r-project.org/package=multinomineq)
-[![Workflow](https://github.com/danheck/multinomineq/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/danheck/multinomineq/actions/workflows/check-standard.yaml)
+[![R-CMD-check](https://github.com/danheck/multinomineq/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/danheck/multinomineq/actions/workflows/R-CMD-check.yaml)
 [![Coverage status](https://codecov.io/gh/danheck/multinomineq/branch/master/graph/badge.svg)](https://codecov.io/github/danheck/multinomineq?branch=master)
 [![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![monthly downloads](https://cranlogs.r-pkg.org/badges/multinomineq)](https://cranlogs.r-pkg.org/badges/multinomineq)
