@@ -21,27 +21,31 @@
 #' @seealso \code{\link{Ab_to_V}} and \code{\link{V_to_Ab}} to change between A/b and V representation.
 #' @examples
 #' # linear order constraints:  x1<x2<x3<.5
-#' A <- matrix(c(1,-1, 0,
-#'               0, 1,-1,
-#'               0, 0, 1), ncol = 3, byrow = TRUE)
+#' A <- matrix(c(
+#'   1, -1, 0,
+#'   0, 1, -1,
+#'   0, 0, 1
+#' ), ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
 #'
 #' # vertices: admissible points (corners of polytope)
-#' V <- matrix(c( 0, 0, 0,
-#'                0, 0,.5,
-#'                0,.5,.5,
-#'               .5,.5,.5), ncol = 3, byrow = TRUE)
+#' V <- matrix(c(
+#'   0, 0, 0,
+#'   0, 0, .5,
+#'   0, .5, .5,
+#'   .5, .5, .5
+#' ), ncol = 3, byrow = TRUE)
 #'
-#' xin <- c(.1, .2, .45)  # inside
+#' xin <- c(.1, .2, .45) # inside
 #' inside(xin, A, b)
 #' inside(xin, V = V)
 #'
-#' xout <- c(.4, .1, .55)  # outside
+#' xout <- c(.4, .1, .55) # outside
 #' inside(xout, A, b)
 #' inside(xout, V = V)
 #' @export
-inside <- function(x, A, b, V){
-  if (!missing(V) && !is.null(V)){
+inside <- function(x, A, b, V) {
+  if (!missing(V) && !is.null(V)) {
     check_Vx(V, x)
     i <- inside_V(x, V)
   } else {
@@ -66,46 +70,52 @@ inside <- function(x, A, b, V){
 #' @examples
 #' ############ binomial
 #' # x1<x2<x3<.50:
-#' A <- matrix(c(1,-1,0,
-#'               0,1,-1,
-#'               0,0, 1), ncol=3, byrow=TRUE)
+#' A <- matrix(c(
+#'   1, -1, 0,
+#'   0, 1, -1,
+#'   0, 0, 1
+#' ), ncol = 3, byrow = TRUE)
 #' b <- c(0, 0, .50)
-#' k <- c( 0, 1, 5)
-#' n <- c(10,10,10)
+#' k <- c(0, 1, 5)
+#' n <- c(10, 10, 10)
 #' inside_binom(k, n, A, b)
 #'
 #' ############ multinomial
 #' # two ternary choices:
 #' #     (a1,a2,a3,   b1,b2,b3)
-#' k <- c(1,4,10,     5,9,1)
+#' k <- c(1, 4, 10, 5, 9, 1)
 #' options <- c(3, 3)
 #' # a1<b1, a2<b2, no constraints on a3, b3
-#' A <- matrix(c(1,-1,0, 0,
-#'               0, 0,1,-1), ncol=4, byrow=TRUE)
+#' A <- matrix(c(
+#'   1, -1, 0, 0,
+#'   0, 0, 1, -1
+#' ), ncol = 4, byrow = TRUE)
 #' b <- c(0, 0)
 #' inside_multinom(k, options, A, b)
 #'
 #' # V-representation:
-#' V <- matrix(c(0, 0, 0, 0,
-#'               0, 0, 0, 1,
-#'               0, 1, 0, 0,
-#'               0, 0, 1, 1,
-#'               0, 1, 0, 1,
-#'               1, 1, 0, 0,
-#'               0, 1, 1, 1,
-#'               1, 1, 0, 1,
-#'               1, 1, 1, 1),  9, 4, byrow = TRUE)
+#' V <- matrix(c(
+#'   0, 0, 0, 0,
+#'   0, 0, 0, 1,
+#'   0, 1, 0, 0,
+#'   0, 0, 1, 1,
+#'   0, 1, 0, 1,
+#'   1, 1, 0, 0,
+#'   0, 1, 1, 1,
+#'   1, 1, 0, 1,
+#'   1, 1, 1, 1
+#' ), 9, 4, byrow = TRUE)
 #' inside_multinom(k, options, V = V)
 #' @seealso \code{\link{inside}}
 #' @export
-inside_binom <- function(k, n, A, b, V){
+inside_binom <- function(k, n, A, b, V) {
   check_kn(k, n)
-  if (!is.null(dim(k)) && length(dim(k)) == 2){
+  if (!is.null(dim(k)) && length(dim(k)) == 2) {
     x <- t(t(k) / n)
   } else {
     x <- k / n
   }
-  if (missing(V) || is.null(V)){
+  if (missing(V) || is.null(V)) {
     inside(x, A, b)
   } else {
     inside(x, V = V)
@@ -114,38 +124,39 @@ inside_binom <- function(k, n, A, b, V){
 
 #' @rdname inside_binom
 #' @export
-inside_multinom <- function(k, options, A, b, V){
+inside_multinom <- function(k, options, A, b, V) {
   k_free <- drop_fixed(k, options)
   sel <- rep(1:length(options), options - 1)
-  if (!is.null(dim(k_free)) && length(dim(k_free)) == 2){
+  if (!is.null(dim(k_free)) && length(dim(k_free)) == 2) {
     n <- tapply(t(k), rep(1:length(options), options), sum)[sel]
     x <- t(t(k_free) / c(n))
   } else {
     n <- tapply(k, rep(1:length(options), options), sum)[sel]
     x <- k_free / n
   }
-  if (missing(V) || is.null(V)){
+  if (missing(V) || is.null(V)) {
     inside(x, A, b)
   } else {
     inside(x, V = V)
   }
 }
 
-inside_V <- function (x, V, return_glpk = FALSE){
-  if (!is.null(dim(x)) && length(dim(x)) == 2){
-    return (apply(x, 1, inside_V, V = V, return_glpk = return_glpk))
+inside_V <- function(x, V, return_glpk = FALSE) {
+  if (!is.null(dim(x)) && length(dim(x)) == 2) {
+    return(apply(x, 1, inside_V, V = V, return_glpk = return_glpk))
   } else {
-
     # mb <- microbenchmark::microbenchmark(times = 20, fukuda = {
 
     # Fukuda 2004:  (similar to Smeulders 3.2)
     npar <- length(x) + 1
-    obj <- c(-1, x)  # z0, z
-    mat <- cbind(-1, rbind(V, x))  # z0, z
+    obj <- c(-1, x) # z0, z
+    mat <- cbind(-1, rbind(V, x)) # z0, z
     dir <- rep("<=", nrow(mat))
     rhs <- c(rep(0, nrow(V)), 1)
-    bnd <- list(lower = list(ind = 1:npar, val = rep(-Inf, npar)),
-                upper = list(ind = 1:npar, val = rep(Inf, npar)))
+    bnd <- list(
+      lower = list(ind = 1:npar, val = rep(-Inf, npar)),
+      upper = list(ind = 1:npar, val = rep(Inf, npar))
+    )
     glpk <- Rglpk_solve_LP(obj, mat, dir, rhs, max = TRUE, bounds = bnd)
 
     # }, smeulders = {
@@ -175,12 +186,11 @@ inside_V <- function (x, V, return_glpk = FALSE){
     # Ab <- V_to_Ab(V)
     # cat("Fukuda: ", glpk$optimum, " . Smeulders: ", glpk2$optimum, ". A*x<b: ", inside(x, Ab$A, Ab$b), "\n")
 
-    if (return_glpk){
+    if (return_glpk) {
       glpk$inside <- !glpk$optimum > 0
       glpk
     } else {
-      return (!glpk$optimum > 0)  # >0  --> outside (= separating hyperplane exists)
-
+      return(!glpk$optimum > 0) # >0  --> outside (= separating hyperplane exists)
     }
   }
 }

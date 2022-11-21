@@ -21,43 +21,48 @@
 #' k <- c(59, 54, 74)
 #'
 #' # Hypothesis 1: p1 < p2 < p3
-#' A1 <- matrix(c(1, -1,  0,
-#'                0,  1, -1), 2, 3, TRUE)
+#' A1 <- matrix(c(
+#'   1, -1, 0,
+#'   0, 1, -1
+#' ), 2, 3, TRUE)
 #' b1 <- c(0, 0)
 #'
 #' # Hypothesis 2: p1 < p2 and p1 < p3
-#' A2 <- matrix(c(1, -1,  0,
-#'                1,  0, -1), 2, 3, TRUE)
+#' A2 <- matrix(c(
+#'   1, -1, 0,
+#'   1, 0, -1
+#' ), 2, 3, TRUE)
 #' b2 <- c(0, 0)
 #'
 #' # get posterior probability for hypothesis
 #' bf1 <- bf_binom(k, n, A = A1, b = b1)
 #' bf2 <- bf_binom(k, n, A = A2, b = b2)
 #' postprob(bf1, bf2,
-#'          prior = c(bf1=1/3, bf2=1/3, unconstr=1/3))
+#'   prior = c(bf1 = 1 / 3, bf2 = 1 / 3, unconstr = 1 / 3)
+#' )
 #' @export
-postprob <- function(..., prior, include_unconstr = TRUE){
-
+postprob <- function(..., prior, include_unconstr = TRUE) {
   dots <- list(...)
   bfnames <- sapply(substitute(list(...))[-1], deparse)
 
-  if(!all(sapply(dots, is.matrix)) ||
-     !all(sapply(dots, nrow) == 3 &
-          sapply(dots, ncol) == 4 &
-     sapply(dots, function(x) "bf_0u" %in% rownames(x)) ) )
+  if (!all(sapply(dots, is.matrix)) ||
+    !all(sapply(dots, nrow) == 3 &
+      sapply(dots, ncol) == 4 &
+      sapply(dots, function(x) "bf_0u" %in% rownames(x)))) {
     stop("As input, Bayes-factor objects must be provided as those returned by bf_binom (i.e., 3x4 matrices).")
+  }
 
   bf0u <- sapply(dots, "[", "bf_0u", "bf")
 
-  if (include_unconstr){
+  if (include_unconstr) {
     bfnames <- c(bfnames, "unconstrained")
     bf0u <- c(bf0u, 1)
   }
   names(bf0u) <- bfnames
 
-  if (missing(prior) || is.null(prior)){
+  if (missing(prior) || is.null(prior)) {
     prior <- rep(1, length(bfnames))
-  } else if (any(prior < 0) || length(prior) != length(bfnames)){
+  } else if (any(prior < 0) || length(prior) != length(bfnames)) {
     stop("'prior' must be positive and have the same length as the number of BFs.")
   }
   prior <- prior / sum(prior)

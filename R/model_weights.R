@@ -9,18 +9,21 @@
 #' logmarginal <- c(-3.4, -2.0, -10.7)
 #' model_weights(logmarginal)
 #'
-#' nml <- matrix(c(2.5, 3.1, 4.2,
-#'                 1.4, 0.3, 8.2), nrow = 2, byrow = TRUE)
+#' nml <- matrix(c(
+#'   2.5, 3.1, 4.2,
+#'   1.4, 0.3, 8.2
+#' ), nrow = 2, byrow = TRUE)
 #' model_weights(-nml)
 #' @export
-model_weights <- function(x, prior){
-  if (is.matrix(x) || is.data.frame(x)){
+model_weights <- function(x, prior) {
+  if (is.matrix(x) || is.data.frame(x)) {
     w <- apply(x, 1, model_weights, prior = prior)
-    return (t(w))
+    return(t(w))
   } else {
-    if (missing(prior) || is.null(prior))
+    if (missing(prior) || is.null(prior)) {
       prior <- rep(1, length(x))
-    w <- exp(x)*prior/sum(exp(x) * prior)
-    return (w)
+    }
+    w <- exp(x) * prior / sum(exp(x) * prior)
+    return(w)
   }
 }

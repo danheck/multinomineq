@@ -29,13 +29,17 @@
 #'
 #' @examples
 #' # inequality representation (A*x <= b)
-#' A <- matrix(c(1, -1,  0, 1,  0,
-#'               0,  0, -1, 0,  1,
-#'               0,  0,  0, 1, -1,
-#'               1,  1,  1, 1,  0,
-#'               1,  1,  1, 0,  0,
-#'               -1, 0, 0, 0, 0),
-#'             ncol = 5, byrow = TRUE)
+#' A <- matrix(
+#'   c(
+#'     1, -1, 0, 1, 0,
+#'     0, 0, -1, 0, 1,
+#'     0, 0, 0, 1, -1,
+#'     1, 1, 1, 1, 0,
+#'     1, 1, 1, 0, 0,
+#'     -1, 0, 0, 0, 0
+#'   ),
+#'   ncol = 5, byrow = TRUE
+#' )
 #' b <- c(0.5, 0, 0, .7, .4, -.2)
 #' find_inside(A, b)
 #' find_inside(A, b, random = TRUE)
@@ -44,21 +48,21 @@
 #' # vertex representation
 #' V <- matrix(c(
 #'   # strict weak orders
-#'   0, 1, 0, 1, 0, 1,  # a < b < c
-#'   1, 0, 0, 1, 0, 1,  # b < a < c
-#'   0, 1, 0, 1, 1, 0,  # a < c < b
-#'   0, 1, 1, 0, 1, 0,  # c < a < b
-#'   1, 0, 1, 0, 1, 0,  # c < b < a
-#'   1, 0, 1, 0, 0, 1,  # b < c < a
+#'   0, 1, 0, 1, 0, 1, # a < b < c
+#'   1, 0, 0, 1, 0, 1, # b < a < c
+#'   0, 1, 0, 1, 1, 0, # a < c < b
+#'   0, 1, 1, 0, 1, 0, # c < a < b
+#'   1, 0, 1, 0, 1, 0, # c < b < a
+#'   1, 0, 1, 0, 0, 1, # b < c < a
 #'
-#'   0, 0, 0, 1, 0, 1,  # a ~ b < c
-#'   0, 1, 0, 0, 1, 0,  # a ~ c < b
-#'   1, 0, 1, 0, 0, 0,  # c ~ b < a
-#'   0, 1, 0, 1, 0, 0,  # a < b ~ c
-#'   1, 0, 0, 0, 0, 1,  # b < a ~ c
-#'   0, 0, 1, 0, 1, 0,  # c < a ~ b
+#'   0, 0, 0, 1, 0, 1, # a ~ b < c
+#'   0, 1, 0, 0, 1, 0, # a ~ c < b
+#'   1, 0, 1, 0, 0, 0, # c ~ b < a
+#'   0, 1, 0, 1, 0, 0, # a < b ~ c
+#'   1, 0, 0, 0, 0, 1, # b < a ~ c
+#'   0, 0, 1, 0, 1, 0, # c < a ~ b
 #'
-#'   0, 0, 0, 0, 0, 0   # a ~ b ~ c
+#'   0, 0, 0, 0, 0, 0 # a ~ b ~ c
 #' ), byrow = TRUE, ncol = 6)
 #' find_inside(V = V)
 #' find_inside(V = V, random = TRUE)
@@ -69,26 +73,27 @@ find_inside <- function(A,
                         options = NULL,
                         random = FALSE,
                         probs = TRUE,
-                        boundary = 1e-5){
-
+                        boundary = 1e-5) {
   # (1) V-representation: convex combination of vertices
-  if (!missing(V) && !is.null(V)){
+  if (!missing(V) && !is.null(V)) {
     check_V(V)
-    if (random){
+    if (random) {
       u <- c(rpdirichlet(1, rep(1, nrow(V)), nrow(V), drop_fixed = FALSE))
     } else {
-      u <- rep(1/nrow(V), nrow(V))
+      u <- rep(1 / nrow(V), nrow(V))
     }
     p <- colSums(V * u)
-    if (!inside(p, V = V))
+    if (!inside(p, V = V)) {
       stop("No point found inside of convex hull of V.")
+    }
 
 
-  # (2) Ab-representation: solution of quadratic program
+    # (2) Ab-representation: solution of quadratic program
   } else {
-    if (missing(options) || is.null(options))
+    if (missing(options) || is.null(options)) {
       options <- rep(2, ncol(A))
-    if (probs){
+    }
+    if (probs) {
       zeros <- rep(0, sum(options))
       check_Abokprior(A, b, options, zeros, zeros)
       tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
@@ -96,30 +101,35 @@ find_inside <- function(A,
       b <- tmp$b
     }
 
-    if (random){
+    if (random) {
       u <- runif(ncol(A), 0, 1)
-      B <- diag(ncol(A)) #matrix(runif(ncol(A)^2, -1,1), ncol(A))
-      try (p <- quadprog::solve.QP(Dmat = B,
-                                   dvec = u,
-                                   Amat = - t(A),
-                                   bvec = - b + boundary)$solution)
+      B <- diag(ncol(A)) # matrix(runif(ncol(A)^2, -1,1), ncol(A))
+      try(p <- quadprog::solve.QP(
+        Dmat = B,
+        dvec = u,
+        Amat = -t(A),
+        bvec = -b + boundary
+      )$solution)
       p
     } else {
       # find analytic center of polytope:
       # https://math.stackexchange.com/questions/1377209/analytic-center-of-convex-polytope
       # http://stanford.edu/class/ee364a/lectures/problems.pdf  (page: 4-19)
-      obj <- c(1, rep(0, ncol(A)))  # variables: (r, p1,p2,...)
+      obj <- c(1, rep(0, ncol(A))) # variables: (r, p1,p2,...)
       a <- apply(A, 1, norm, type = "2")
       Ar <- cbind(a, A)
       # QP much faster than LP, almost identical results:
-      try (p <- solve.QP(Dmat = 1e-5*diag(ncol(Ar)),
-                         dvec = obj,
-                         Amat = - t(Ar),
-                         bvec = - b + boundary)$solution[-1])
+      try(p <- solve.QP(
+        Dmat = 1e-5 * diag(ncol(Ar)),
+        dvec = obj,
+        Amat = -t(Ar),
+        bvec = -b + boundary
+      )$solution[-1])
     }
 
-    if (is.null(p) || !inside(p, A, b))
-      stop ("No point found inside of A*x <=b. Maybe not all inequalities can be satisfied?!")
+    if (is.null(p) || !inside(p, A, b)) {
+      stop("No point found inside of A*x <=b. Maybe not all inequalities can be satisfied?!")
+    }
   }
   p
 }

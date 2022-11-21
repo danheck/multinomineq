@@ -21,38 +21,51 @@
 #' rpbinom(prob = c(.2, .7, .9), n = c(10, 50, 30))
 #'
 #' # 2 and 3 options:  [a1,a2,  b1,b2,b3]
-#' rpmultinom(prob = c(a1=.5,   b1=.3,b2=.6),
-#'            n = c(10, 20), options = c(2, 3))
+#' rpmultinom(
+#'   prob = c(a1 = .5, b1 = .3, b2 = .6),
+#'   n = c(10, 20), options = c(2, 3)
+#' )
 #' # or:
-#' rpmultinom(prob = c(a1=.5,a2=.5,   b1=.3,b2=.6,b3=.1),
-#'            n = c(10, 20), options = c(2, 3),
-#'            drop_fixed = FALSE)
+#' rpmultinom(
+#'   prob = c(a1 = .5, a2 = .5, b1 = .3, b2 = .6, b3 = .1),
+#'   n = c(10, 20), options = c(2, 3),
+#'   drop_fixed = FALSE
+#' )
 #'
 #' # matrix with one probability vector per row:
-#' p <- rpdirichlet(n = 6, alpha = c(1,1,  1,1,1),
-#'                  options = c(2, 3))
-#' rpmultinom(prob = p, n = c(20, 50), options = c(2,3))
+#' p <- rpdirichlet(
+#'   n = 6, alpha = c(1, 1, 1, 1, 1),
+#'   options = c(2, 3)
+#' )
+#' rpmultinom(prob = p, n = c(20, 50), options = c(2, 3))
 #' @export
-rpbinom <- function(prob, n){
-  k <- rpmultinom(prob = prob, n = n,
-                  options = rep(2, length(prob)), drop_fixed = TRUE)
+rpbinom <- function(prob, n) {
+  k <- rpmultinom(
+    prob = prob, n = n,
+    options = rep(2, length(prob)), drop_fixed = TRUE
+  )
   drop_fixed(k, options = 2)
 }
 
 #' @rdname rpbinom
 #' @export
-rpmultinom <- function(prob, n, options, drop_fixed = TRUE){
-  if (length(n) == 1)
+rpmultinom <- function(prob, n, options, drop_fixed = TRUE) {
+  if (length(n) == 1) {
     n <- rep(n, sum(options))
-  if (is.null(dim(prob)))
+  }
+  if (is.null(dim(prob))) {
     prob <- t(prob)
-  check_probko(prob = prob, k = rep(0, sum(options)),
-               options = options, drop_fixed = drop_fixed)
+  }
+  check_probko(
+    prob = prob, k = rep(0, sum(options)),
+    options = options, drop_fixed = drop_fixed
+  )
 
   if (drop_fixed) prob <- add_fixed(prob, options = options)
   rr <- rpm_mat(prob, n, options)
   colnames(rr) <- colnames(prob)
-  if (is.null(colnames(rr)))
+  if (is.null(colnames(rr))) {
     colnames(rr) <- index_mult(options, fixed = TRUE)
+  }
   rr
 }

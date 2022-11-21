@@ -26,43 +26,48 @@
 #'
 #' # (A) heterogeneous, inconsistent evidence
 #' # (B) heterogeneous, inconsistent evidence
-#' bfs <- cbind(A = c(2.3, 1.8, 3.3, 2.8, 4.0, 1.9, 2.5),
-#'              B = c(10.3, .7, 3.3, .8, 14.0, .9, 1.5))
+#' bfs <- cbind(
+#'   A = c(2.3, 1.8, 3.3, 2.8, 4.0, 1.9, 2.5),
+#'   B = c(10.3, .7, 3.3, .8, 14.0, .9, 1.5)
+#' )
 #' population_bf(bfs)
 #'
 #' @export
-population_bf <- function(bfs){
+population_bf <- function(bfs) {
   UseMethod("population_bf", bfs)
 }
 
 #' @export
-population_bf.list <- function(bfs){
+population_bf.list <- function(bfs) {
   check_bf <-
     all(sapply(bfs, is.matrix)) &&
-    all("bf" %in% sapply(bfs, colnames)) &&
-    all(sapply(bfs, nrow) == nrow(bfs[[1]]))  &&
-    all(sapply(bfs, rownames) == rownames(bfs[[1]]))
+      all("bf" %in% sapply(bfs, colnames)) &&
+      all(sapply(bfs, nrow) == nrow(bfs[[1]])) &&
+      all(sapply(bfs, rownames) == rownames(bfs[[1]]))
 
-  if (!check_bf)
-    stop("If a list is supplied to 'population_bf', each element must be a matrix with\n:",
-         "   - a column named 'bf' (See ?count_to_bf)\n",
-         "    - identical number of rows and rownames (same BFs per person)")
-  bf_mat <- t(sapply(bfs, function(b) b[,"bf"]))
+  if (!check_bf) {
+    stop(
+      "If a list is supplied to 'population_bf', each element must be a matrix with\n:",
+      "   - a column named 'bf' (See ?count_to_bf)\n",
+      "    - identical number of rows and rownames (same BFs per person)"
+    )
+  }
+  bf_mat <- t(sapply(bfs, function(b) b[, "bf"]))
   population_bf(bf_mat)
 }
 
 #' @export
-population_bf.matrix <- function(bfs){
+population_bf.matrix <- function(bfs) {
   apply(bfs, 2, population_bf)
 }
 
 #' @export
-population_bf.data.frame <- function(bfs){
+population_bf.data.frame <- function(bfs) {
   apply(bfs, 2, population_bf)
 }
 
 #' @export
-population_bf.numeric <- function(bfs){
+population_bf.numeric <- function(bfs) {
   stopifnot(all(bfs >= 0))
   p_bf <- prod(bfs)
   gp_bf <- p_bf^(1 / length(bfs))
@@ -71,11 +76,13 @@ population_bf.numeric <- function(bfs){
   # stability rate
   sr <- ifelse(gp_bf < 1, mean(bfs < gp_bf), mean(bfs > gp_bf))
 
-  c(population_bf = p_bf, geometric_bf = gp_bf,
-    evidence_rate = er, stability_rate = sr)
+  c(
+    population_bf = p_bf, geometric_bf = gp_bf,
+    evidence_rate = er, stability_rate = sr
+  )
 }
 
 #' @export
-population_bf.default <- function(bfs){
+population_bf.default <- function(bfs) {
   stop("'bfs' must be numeric.")
 }

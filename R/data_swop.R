@@ -15,10 +15,10 @@
 #' @seealso The corresponding data set \code{\link{regenwetter2012}}.
 #' @examples
 #' data(swop5)
-#' tail(swop5$A)  # A*x <= b
+#' tail(swop5$A) # A*x <= b
 #' tail(swop5$b)
-#' swop5$start    # inside SWOP polytope
-#' swop5$options  # 3 choice options per item
+#' swop5$start # inside SWOP polytope
+#' swop5$options # 3 choice options per item
 #'
 #' # check whether point is in polytope:
 #' inside(swop5$start, swop5$A, swop5$b)
@@ -26,9 +26,10 @@
 #' \donttest{
 #' # get prior samples:
 #' p <- sampling_multinom(0, swop5$options,
-#'                        swop5$A, swop5$b,
-#'                        M = 100, start = swop5$start)
+#'   swop5$A, swop5$b,
+#'   M = 100, start = swop5$start
+#' )
 #' colMeans(p)
-#' apply(p[,1:5], 2, plot, type = "l")
+#' apply(p[, 1:5], 2, plot, type = "l")
 #' }
 "swop5"

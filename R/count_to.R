@@ -33,8 +33,8 @@
 #' @seealso \code{\link{count_binom}}, \code{\link{count_multinom}}
 #' @examples
 #' # vector input
-#' post  <- c(count = 1447, M = 5000)
-#' prior <- c(count = 152,  M = 10000)
+#' post <- c(count = 1447, M = 5000)
+#' prior <- c(count = 152, M = 10000)
 #' count_to_bf(post, prior)
 #'
 #' # matrix input (due to nested stepwise procedure)
@@ -42,63 +42,76 @@
 #' count_to_bf(post, prior)
 #'
 #' # exact prior probability known
-#' count_to_bf(posterior = c(count = 1447, M = 10000),
-#'             exact_prior = 1/factorial(4))
+#' count_to_bf(
+#'   posterior = c(count = 1447, M = 10000),
+#'   exact_prior = 1 / factorial(4)
+#' )
 #' @export
-count_to_bf <- function (posterior, prior, exact_prior, log = FALSE,
-                         beta = c(1/2, 1/2), samples = 3000){
+count_to_bf <- function(posterior, prior, exact_prior, log = FALSE,
+                        beta = c(1 / 2, 1 / 2), samples = 3000) {
   posterior <- check_count(posterior)
   const <- 0
-  if (!is.null(attr(posterior, "const_map_0u"))){
+  if (!is.null(attr(posterior, "const_map_0u"))) {
     const <- attr(posterior, "const_map_0u")
   }
-  s_post  <- sampling_proportion(posterior[,1], posterior[,2], log = TRUE,
-                                 beta = beta, samples = samples)
+  s_post <- sampling_proportion(posterior[, 1], posterior[, 2],
+    log = TRUE,
+    beta = beta, samples = samples
+  )
 
-  if (missing(exact_prior) || is.null(exact_prior)){
+  if (missing(exact_prior) || is.null(exact_prior)) {
     prior <- check_count(prior)
-    s_prior <- sampling_proportion(prior[,1], prior[,2], log = TRUE,
-                                   beta = beta, samples = samples)
-
-  } else{
+    s_prior <- sampling_proportion(prior[, 1], prior[, 2],
+      log = TRUE,
+      beta = beta, samples = samples
+    )
+  } else {
     if (is.null(exact_prior) || !is.numeric(exact_prior) || length(exact_prior) != 1 ||
-        exact_prior < 0 || exact_prior > 1)
+      exact_prior < 0 || exact_prior > 1) {
       stop("'prior' must be a probability in the interval [0,1].")
+    }
     s_prior <- log(exact_prior)
     prior <- t(c(exact_prior, 1))
   }
 
-  l_post <- sum(log(posterior[,1] / posterior[,2]))
-  l_prior <- sum(log(prior[,1] / prior[,2]))
+  l_post <- sum(log(posterior[, 1] / posterior[, 2]))
+  l_prior <- sum(log(prior[, 1] / prior[, 2]))
   est <- l_post - l_prior + const
-  lbf_0u <- + s_post - s_prior + const
+  lbf_0u <- +s_post - s_prior + const
 
   # lbf_0n0 = log(f) - log(c) + log(1-c) - log(1-f)
   est_0n0 <- l_post - log1mexp(l_post) - l_prior + log1mexp(l_prior)
   lbf_0n0 <- s_post - s_prior + log1mexp(s_prior) - log1mexp(s_post)
 
-  bf <- cbind("bf" = c("bf_0u" = est, "bf_u0" = -est, "bf_00'" = est_0n0),
-              t(sapply(list(lbf_0u, - lbf_0u, lbf_0n0),
-                       summary_samples, exp = !log)))
-  if (!log) bf[,"bf"] <- exp(bf[,"bf"])
-  if (const != 0) bf["bf_00'",] <- NA
+  bf <- cbind(
+    "bf" = c("bf_0u" = est, "bf_u0" = -est, "bf_00'" = est_0n0),
+    t(sapply(list(lbf_0u, -lbf_0u, lbf_0n0),
+      summary_samples,
+      exp = !log
+    ))
+  )
+  if (!log) bf[, "bf"] <- exp(bf[, "bf"])
+  if (const != 0) bf["bf_00'", ] <- NA
   bf
 }
 
 # log(1 - exp(x))
 # cf. https://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
-log1mexp <- function(x, a0 = log(2)){
+log1mexp <- function(x, a0 = log(2)) {
   ifelse(x <= a0,
-         log(- expm1(x)),
-         log1p(- exp(x)))
+    log(-expm1(x)),
+    log1p(-exp(x))
+  )
 }
 
 #' @importFrom stats quantile
-summary_samples <- function(samples, probs = c(.05, .95), exp = FALSE){
-  if(exp) samples <- exp(samples)
+summary_samples <- function(samples, probs = c(.05, .95), exp = FALSE) {
+  if (exp) samples <- exp(samples)
   qq <- quantile(samples, .05)
-  c("se" = sd(samples),
-    "ci" = quantile(samples, probs))
+  c(
+    "se" = sd(samples),
+    "ci" = quantile(samples, probs)
+  )
 }
 
 # check_bf <- function(bf){
@@ -106,25 +119,28 @@ summary_samples <- function(samples, probs = c(.05, .95), exp = FALSE){
 # }
 
 precision_count <- function(count, M, log = TRUE,
-                            beta = c(.5, .5), samples = 5000){
+                            beta = c(.5, .5), samples = 5000) {
   s <- sampling_proportion(count, M, log = TRUE, beta, samples)
-  if (log){
+  if (log) {
     sd(s)
   } else {
     sd(exp(s))
   }
 }
 
-sampling_proportion <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 5000){
+sampling_proportion <- function(count, M, log = TRUE, beta = c(.5, .5), samples = 5000) {
   S <- length(count)
-  if (length(M) == 1)
+  if (length(M) == 1) {
     M <- rep(M, S)
-  probs <- rep(0, samples)
-  for (s in 1:S){
-    probs <- probs + log(rbeta(samples, count[s] + beta[1],
-                               M[s] - count[s]  + beta[2]))
   }
-  if (log){
+  probs <- rep(0, samples)
+  for (s in 1:S) {
+    probs <- probs + log(rbeta(
+      samples, count[s] + beta[1],
+      M[s] - count[s] + beta[2]
+    ))
+  }
+  if (log) {
     probs
   } else {
     exp(probs)

@@ -71,13 +71,17 @@
 #' @examples
 #' ### a set of linear order constraints:
 #' ### x1 < x2 < .... < x6 < .50
-#' A <- matrix(c(1, -1, 0, 0, 0, 0,
-#'               0, 1, -1, 0, 0, 0,
-#'               0, 0, 1, -1, 0, 0,
-#'               0, 0, 0, 1, -1, 0,
-#'               0, 0, 0, 0, 1, -1,
-#'               0, 0, 0, 0, 0, 1),
-#'             ncol = 6, byrow = TRUE)
+#' A <- matrix(
+#'   c(
+#'     1, -1, 0, 0, 0, 0,
+#'     0, 1, -1, 0, 0, 0,
+#'     0, 0, 1, -1, 0, 0,
+#'     0, 0, 0, 1, -1, 0,
+#'     0, 0, 0, 0, 1, -1,
+#'     0, 0, 0, 0, 0, 1
+#'   ),
+#'   ncol = 6, byrow = TRUE
+#' )
 #' b <- c(0, 0, 0, 0, 0, .50)
 #'
 #' ### check whether a specific vector is inside the polytope:
@@ -90,11 +94,11 @@
 #'
 #' ### count prior samples and compare to analytical result
 #' prior <- count_binom(0, 0, A, b, M = 5000, steps = 1:4)
-#' prior    # to get the proportion: attr(prior, "proportion")
+#' prior # to get the proportion: attr(prior, "proportion")
 #' (.50)^6 / factorial(6)
 #'
 #' ### count posterior samples + get Bayes factor
-#' posterior <- count_binom(k, n, A, b, M=2000, steps=1:4)
+#' posterior <- count_binom(k, n, A, b, M = 2000, steps = 1:4)
 #' count_to_bf(posterior, prior)
 #'
 #' ### automatic stepwise algorithm
@@ -106,9 +110,9 @@
 #' @template ref_fukuda2004
 #' @importFrom Rglpk Rglpk_solve_LP
 #' @export
-count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
-                         steps, start, cmin = 0, maxiter = 500,
-                         burnin = 5, progress = TRUE, cpu = 1){
+count_binom <- function(k, n, A, b, V, map, prior = c(1, 1), M = 10000,
+                        steps, start, cmin = 0, maxiter = 500,
+                        burnin = 5, progress = TRUE, cpu = 1) {
   check_Mminmax(M, cmin, maxiter, steps)
 
   if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
@@ -122,49 +126,60 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
   k <- aggr$k
   n <- aggr$n
 
-  if (!missing(b) && !is.null(b)){
+  if (!missing(b) && !is.null(b)) {
     check_Abknprior(A, b, k, n, prior)
-    if (cmin == 0 && (missing(steps) || is.null(steps))){
+    if (cmin == 0 && (missing(steps) || is.null(steps))) {
       count <- count_bin(k, n, A, b, prior, M, batch = BATCH, interactive() && progress)
-
     } else {
       steps <- check_stepsA(steps, A)
-      if (length(M) == 2)
+      if (length(M) == 2) {
         M <- c(M[1], rep(M[2], length(steps) - 1))
-      if (missing(start) || is.null(start) || any(start < 0))
-        start <-  ml_binom(k + prior[1], n + sum(prior), A, b, map, n.fit = 1, start,
-                           control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-      if (!all(A %*% start < b)){
+      }
+      if (missing(start) || is.null(start) || any(start < 0)) {
+        start <- ml_binom(k + prior[1], n + sum(prior), A, b, map,
+          n.fit = 1, start,
+          control = list(maxit = 50, reltol = .Machine$double.eps^.3)
+        )$par
+      }
+      if (!all(A %*% start < b)) {
         # move away into interior
-        start <- .5*find_inside(A, b, options = rep(2,length(k)), random = TRUE) + .5*start
+        start_new <- find_inside(A, b, options = rep(2, length(k)), random = TRUE)
+        start <- .5 * start_new + .5 * start
       }
       check_start(start, A, b, interior = TRUE)
 
-      if (cmin > 0){
+      if (cmin > 0) {
         zeros <- rep(0, length(steps))
-        count <- count_auto_bin(k, n, A, b, prior, count = zeros, M = zeros, steps = steps,
-                                M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
-                                start, burnin, interactive() && progress)
+        count <- count_auto_bin(k, n, A, b, prior,
+          count = zeros, M = zeros, steps = steps,
+          M_iter = M, cmin = cmin, maxiter = maxiter + length(steps),
+          start, burnin, interactive() && progress
+        )
       } else {
-        count <- count_stepwise_bin(k, n, A, b, prior, M, steps, batch = BATCH,
-                                    start, burnin, interactive() && progress)
+        count <- count_stepwise_bin(k, n, A, b, prior, M, steps,
+          batch = BATCH,
+          start, burnin, interactive() && progress
+        )
       }
     }
-  } else if (!missing(V) && !is.null(V)){
+  } else if (!missing(V) && !is.null(V)) {
     count <- 0
     m <- M
     a <- c(rbind(k + prior[1], n - k + prior[2]))
-    if (interactive() && progress)
+    if (interactive() && progress) {
       pb <- txtProgressBar(0, M, style = 3)
-    while (m > 0 ){
-      X <- rpdirichlet(round(BATCH/1000), a, rep(2, ncol(V)), drop_fixed = TRUE)
-      count <- count + sum(inside_V(X, V))
-      m <- m - round(BATCH/1000)
-      if (interactive() && progress)
-        setTxtProgressBar(pb, M - m)
     }
-    if (interactive() && progress)
+    while (m > 0) {
+      X <- rpdirichlet(round(BATCH / 1000), a, rep(2, ncol(V)), drop_fixed = TRUE)
+      count <- count + sum(inside_V(X, V))
+      m <- m - round(BATCH / 1000)
+      if (interactive() && progress) {
+        setTxtProgressBar(pb, M - m)
+      }
+    }
+    if (interactive() && progress) {
       close(pb)
+    }
     count <- cbind("count" = count, "M" = M, "steps" = NA)
   } else {
     stop("A/b or V must be provided.")
@@ -173,4 +188,3 @@ count_binom <- function (k, n, A, b, V, map, prior = c(1, 1), M = 10000,
   attr(count, "const_map_0u") <- aggr$const_map_0u
   as_ineq_count(count)
 }
-

@@ -17,31 +17,33 @@
 #'
 #' @examples
 #' # uniform samples:  p<.10
-#' prob <- matrix(runif(300*3, 0, .1), 300)
+#' prob <- matrix(runif(300 * 3, 0, .1), 300)
 #' n <- rep(10, 3)
-#' ppp_binom(prob, c(1,2,0), n)  # ok
-#' ppp_binom(prob, c(5,4,3), n)  # misfit
+#' ppp_binom(prob, c(1, 2, 0), n) # ok
+#' ppp_binom(prob, c(5, 4, 3), n) # misfit
 #'
 #' # multinomial (ternary choice)
-#' prob <- matrix(runif(300*2, 0, .05), 300)
-#' ppp_multinom(prob, c(1,0,9), 3)  # ok
+#' prob <- matrix(runif(300 * 2, 0, .05), 300)
+#' ppp_multinom(prob, c(1, 0, 9), 3) # ok
 #' @export
-ppp_binom <- function(prob, k, n, by){
-  if (length(n) == 1)
+ppp_binom <- function(prob, k, n, by) {
+  if (length(n) == 1) {
     n <- rep(n, length(k))
+  }
   if (is.list(prob)) prob <- do.call("rbind", prob)
   check_probkn(prob, k, n)
-  if (!missing(by) && !is.null(by)){
-    if (length(by) != length(k))
+  if (!missing(by) && !is.null(by)) {
+    if (length(by) != length(k)) {
       stop("length of 'by' does not match length of 'k'.")
+    }
     levels <- unique(by)
     res <- matrix(NA, length(levels), 3,
-                  dimnames = list(levels, c("X2_obs", "X2_pred", "ppp")))
-    for (i in 1:length(levels)){
+      dimnames = list(levels, c("X2_obs", "X2_pred", "ppp"))
+    )
+    for (i in 1:length(levels)) {
       sel <- by == levels[i]
-      res[i,] <- ppp_binom(prob[,sel, drop = FALSE], k[sel], n[sel])
+      res[i, ] <- ppp_binom(prob[, sel, drop = FALSE], k[sel], n[sel])
     }
-
   } else {
     res <- ppp_bin(matrix(prob, ncol = length(k)), k, n)
   }
@@ -50,11 +52,12 @@ ppp_binom <- function(prob, k, n, by){
 
 #' @rdname ppp_binom
 #' @export
-ppp_multinom <- function(prob, k, options, drop_fixed = TRUE){
+ppp_multinom <- function(prob, k, options, drop_fixed = TRUE) {
   if (is.list(prob)) prob <- do.call("rbind", prob)
   check_probko(prob, k, options, drop_fixed = drop_fixed)
-  if (drop_fixed)
+  if (drop_fixed) {
     prob <- add_fixed(prob, options)
+  }
   ppp_mult(prob, k, options)
 
   ### TODO: by factor (necessary within C++!  => multinomial sampling)
@@ -62,26 +65,28 @@ ppp_multinom <- function(prob, k, options, drop_fixed = TRUE){
 }
 
 # Pearson's X^2
-X2 <- function(e, o){
-  if (is.null(dim(e))){
-    sum( (o - e)^2 / e )
+X2 <- function(e, o) {
+  if (is.null(dim(e))) {
+    sum((o - e)^2 / e)
   } else {
-    rowSums( (o - e)^2 / e )
+    rowSums((o - e)^2 / e)
   }
 }
 
-get_n <- function(k, options){
+get_n <- function(k, options) {
   oo <- rep(1:length(options), options)
   tapply(k, oo, sum)
 }
 
-pred_mult <- function(tf, k, options){
+pred_mult <- function(tf, k, options) {
   oo <- rep(1:length(options), options)
   n <- tapply(k, oo, sum)
   k_pred <- matrix(NA, nrow(tf), sum(options))
-  for(i in 1:nrow(tf)){
-    k_pred[i,] <- unlist(mapply(rmultinom, size = n, prob = split(tf[i,], oo),
-                                MoreArgs = list(n = 1)))
+  for (i in 1:nrow(tf)) {
+    k_pred[i, ] <- unlist(mapply(rmultinom,
+      size = n, prob = split(tf[i, ], oo),
+      MoreArgs = list(n = 1)
+    ))
   }
   k_pred
 }
@@ -104,4 +109,3 @@ pred_mult <- function(tf, k, options){
 # bin_to_mult <- function(k){
 #   list("k" = rep(k, each = 2), "options" = rep(2, length(k)))
 # }
-

@@ -32,23 +32,31 @@
 #' @examples
 #' # Equality constraints:  C * x = d
 #' d <- c(.5, .5, 0)
-#' C <- matrix(c(1, 0, 0, 0,    # p1 = .50
-#'               0, 1, 0, 0,    # p2 = .50
-#'               0, 0, 1, -1),  # p3 = p4
-#'             ncol = 4, byrow = TRUE)
-#' k <- c(3,7, 6,4,  2,8,  5,5)
+#' C <- matrix(
+#'   c(
+#'     1, 0, 0, 0, # p1 = .50
+#'     0, 1, 0, 0, # p2 = .50
+#'     0, 0, 1, -1
+#'   ), # p3 = p4
+#'   ncol = 4, byrow = TRUE
+#' )
+#' k <- c(3, 7, 6, 4, 2, 8, 5, 5)
 #' options <- c(2, 2, 2, 2)
-#' bf_equality(k, options, C = C, d = d, delta = .5^(1:5),
-#'             M1 = 50000, M2 = 5000)  # only for CRAN checks
+#' bf_equality(k, options,
+#'   C = C, d = d, delta = .5^(1:5),
+#'   M1 = 50000, M2 = 5000
+#' ) # only for CRAN checks
 #'
 #' # check against exact equality constraints (see ?bf_binom)
-#' k_binom = k[seq(1,7,2)]
-#' bf_binom(k_binom, n = 10, A = matrix(0), b = 0,
-#'          map = c(0, 0, 1, 1))
+#' k_binom <- k[seq(1, 7, 2)]
+#' bf_binom(k_binom,
+#'   n = 10, A = matrix(0), b = 0,
+#'   map = c(0, 0, 1, 1)
+#' )
 #' @export
 bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
                         M1 = 100000, M2 = 20000, delta = .5^(1:8),
-                        return_Ab = FALSE, ...){
+                        return_Ab = FALSE, ...) {
   if (missing(A) && missing(b)) {
     A <- matrix(NA_real_, nrow = 0, ncol = ncol(C))
     b <- numeric()
@@ -60,16 +68,20 @@ bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
   A_delta <- rbind(A, Ab_delta$A)
   b_delta <- c(b, Ab_delta$b)
   steps <- c(nrow(A), nrow(A) + Ab_delta$steps)
-  if (nrow(A) == 0)
+  if (nrow(A) == 0) {
     steps <- steps[-1]
+  }
 
-  if (return_Ab)
+  if (return_Ab) {
     return(list(A = A_delta, b = b_delta, steps = steps))
+  }
 
   start <- find_inside(A_delta, b_delta)
-  bf <- bf_multinom(k, options, A_delta, b_delta, prior = prior,
-                    M = c(M1, M2), steps = steps, start = start, ...)
-  bf["bf_00'",] <- NA  # bf_00' not defined for equality constraints
+  bf <- bf_multinom(k, options, A_delta, b_delta,
+    prior = prior,
+    M = c(M1, M2), steps = steps, start = start, ...
+  )
+  bf["bf_00'", ] <- NA # bf_00' not defined for equality constraints
   bf
 }
 
@@ -84,13 +96,13 @@ bf_equality <- function(k, options, A, b, C, d, prior = rep(1, sum(options)),
 # (A)  C*x <  d + delta
 # (B) -C*x < -d + delta
 
-Ab_delta <- function(delta, C, d){
+Ab_delta <- function(delta, C, d) {
   A_delta <- rbind(C, -C)
   b_delta <- c(d + delta, -d + delta)
   list(A = A_delta, b = b_delta)
 }
 
-Ab_approx_equal <- function(delta, C, d){
+Ab_approx_equal <- function(delta, C, d) {
   Ab_delta <- lapply(delta, Ab_delta, C = C, d = d)
   A <- do.call("rbind", lapply(Ab_delta, "[[", "A"))
   b <- unlist(lapply(Ab_delta, "[[", "b"))

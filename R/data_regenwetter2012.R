@@ -25,20 +25,23 @@
 #' data(swop5)
 #' tail(swop5$A, 3)
 #' # participant 1, gamble set 1:
-#' p1 <- regenwetter2012[1,-c(1:2)]
+#' p1 <- regenwetter2012[1, -c(1:2)]
 #' inside_multinom(p1, swop5$options, swop5$A, swop5$b)
 #'
 #' \donttest{
 #' # posterior samples
-#' p <- sampling_multinom(regenwetter2012[1,-c(1:2)],
-#'                        swop5$options, swop5$A, swop5$b,
-#'                        M=100, start = swop5$start)
+#' p <- sampling_multinom(regenwetter2012[1, -c(1:2)],
+#'   swop5$options, swop5$A, swop5$b,
+#'   M = 100, start = swop5$start
+#' )
 #' colMeans(p)
-#' apply(p[,1:6], 2, plot, type = "l")
+#' apply(p[, 1:6], 2, plot, type = "l")
 #' ppp_multinom(p, p1, swop5$options)
 #'
 #' # Bayes factor
-#' bf_multinom(regenwetter2012[1,-c(1:2)], swop5$options,
-#'             swop5$A, swop5$b, M = 10000)
+#' bf_multinom(regenwetter2012[1, -c(1:2)], swop5$options,
+#'   swop5$A, swop5$b,
+#'   M = 10000
+#' )
 #' }
 "regenwetter2012"

@@ -34,19 +34,23 @@
 #'
 #' # Example 2: Four binomial probabilities
 #' # Hypothesis: p1 is larger than p2,p3,p4
-#' Ab_max(which_max = 1, options = c(2,2,2,2), exclude_fixed = TRUE)
+#' Ab_max(which_max = 1, options = c(2, 2, 2, 2), exclude_fixed = TRUE)
 #' @export
 Ab_max <- function(which_max, options, exclude = c(), exclude_fixed = FALSE,
-                   drop_fixed = TRUE){
-
+                   drop_fixed = TRUE) {
   check_o(options)
-  stopifnot(length(which_max) < sum(options) - 1,
-            round(which_max) == which_max)
-  stopifnot(length(exclude) <= sum(options) - length(which_max) - 1,
-            is.null(exclude) || all(round(exclude) == exclude))
+  stopifnot(
+    length(which_max) < sum(options) - 1,
+    round(which_max) == which_max
+  )
+  stopifnot(
+    length(exclude) <= sum(options) - length(which_max) - 1,
+    is.null(exclude) || all(round(exclude) == exclude)
+  )
 
-  if (exclude_fixed)
+  if (exclude_fixed) {
     exclude <- sort(unique(c(exclude, cumsum(options))))
+  }
 
   J <- sum(options)
   J_max <- length(which_max)
@@ -59,16 +63,19 @@ Ab_max <- function(which_max, options, exclude = c(), exclude_fixed = FALSE,
   rownames(A) <- 1:nrow(A)
   b <- rep(0, nrow(A))
 
-  for (mm in seq(which_max)){
-    row_idx <- (mm - 1)*rows_per_max + 1:rows_per_max
+  for (mm in seq(which_max)) {
+    row_idx <- (mm - 1) * rows_per_max + 1:rows_per_max
     A[row_idx, which_max[mm]] <- -1
     A[row_idx, smaller] <- diag(length(smaller))
-    rownames(A)[row_idx] <- paste0(colnames(A)[smaller], "<",
-                                   colnames(A)[which_max[mm]])
+    rownames(A)[row_idx] <- paste0(
+      colnames(A)[smaller], "<",
+      colnames(A)[which_max[mm]]
+    )
   }
 
   Ab <- list(A = A, b = b, options = options)
-  if (drop_fixed)
+  if (drop_fixed) {
     Ab <- Ab_drop_fixed(A, b, options)
+  }
   Ab
 }

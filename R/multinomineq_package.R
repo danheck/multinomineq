@@ -70,5 +70,3 @@
 #' @template ref_klugkist2010
 #' @template ref_heathcote2010
 "_PACKAGE"
-
-

@@ -32,23 +32,26 @@
 #'
 #' # linear order constraints:
 #' #             p1 <p2 <p3 <p4 <p5 <p6 <.50
-#' A <- matrix(c(1, -1,  0,  0,  0,  0,
-#'               0,  1, -1,  0,  0,  0,
-#'               0,  0,  1, -1,  0,  0,
-#'               0,  0,  0,  1, -1,  0,
-#'               0,  0,  0,  0,  1, -1,
-#'               0,  0,  0,  0,  0,  1),
-#'             ncol = 6, byrow = TRUE)
+#' A <- matrix(
+#'   c(
+#'     1, -1, 0, 0, 0, 0,
+#'     0, 1, -1, 0, 0, 0,
+#'     0, 0, 1, -1, 0, 0,
+#'     0, 0, 0, 1, -1, 0,
+#'     0, 0, 0, 0, 1, -1,
+#'     0, 0, 0, 0, 0, 1
+#'   ),
+#'   ncol = 6, byrow = TRUE
+#' )
 #' b <- c(0, 0, 0, 0, 0, .50)
 #'
 #' # Bayes factor: unconstrained vs. constrained
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=10000)
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=2000, steps=c(2,4,5))
-#' bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 200)
+#' bf_binom(k, n, A, b, prior = c(1, 1), M = 10000)
+#' bf_binom(k, n, A, b, prior = c(1, 1), M = 2000, steps = c(2, 4, 5))
+#' bf_binom(k, n, A, b, prior = c(1, 1), M = 1000, cmin = 200)
 #'
 #' @export
-bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...){
-
+bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...) {
   arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
   arg$log <- NULL
   po <- do.call("count_binom", arg)
@@ -61,8 +64,7 @@ bf_binom <- function(k, n, A, b, V, map, prior = c(1, 1), log = FALSE, ...){
 #' @rdname bf_binom
 #' @export
 bf_multinom <- function(k, options, A, b, V, prior = rep(1, sum(options)),
-                        log = FALSE, ...){
-
+                        log = FALSE, ...) {
   arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
   arg$log <- NULL
   po <- do.call("count_multinom", arg)

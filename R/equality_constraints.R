@@ -15,9 +15,10 @@
 # 1,1,1  => same columns in A
 # -2,-3  => reversed parameter (1-p) in A matrix
 # 0      => constant probability .50
-map_k_to_A <- function (k, n, A, map, prior = c(1, 1)){
-  if (missing(map) || is.null(map))
+map_k_to_A <- function(k, n, A, map, prior = c(1, 1)) {
+  if (missing(map) || is.null(map)) {
     map <- 1:ncol(A)
+  }
   if (length(k) == 1) k <- rep(k, length(map))
   if (length(n) == 1) n <- rep(n, length(k))
   check_kAmap(k, A, map)
@@ -40,16 +41,17 @@ map_k_to_A <- function (k, n, A, map, prior = c(1, 1)){
   c50 <- sum(n[fix]) * log(.50)
 
   # constants due to different integrals over hypercubes of different dimension
-  int_kn   <- sum(lbeta(k + prior[1], n - k + prior[2]))
+  int_kn <- sum(lbeta(k + prior[1], n - k + prior[2]))
   int_aggr <- sum(lbeta(k_aggr + prior[1], n_aggr - k_aggr + prior[2]))
 
   list("k" = k_aggr, "n" = n_aggr, "const_map_0u" = c50 + int_aggr - int_kn)
 }
 
-get_const_map <- function(post, prior){
+get_const_map <- function(post, prior) {
   const <- 0
-  if (!is.null(attr(post, "const_map_0u")))
+  if (!is.null(attr(post, "const_map_0u"))) {
     const <- attr(post, "const_map_0u")
+  }
   # if (!is.null(prior$const_map_0u) && const != prior$const_map_0u)
   #   warning("Constants due to equality constraints (because of using 'map') do not match.")
   const
@@ -69,13 +71,14 @@ get_const_map <- function(post, prior){
 # apply(samp, 2, plot, type = "l", ylim = c(0,.6))
 
 
-check_kAmap <- function(k, A, map){
-  idx <- map[map == round(map) & map != 0]  # integers
+check_kAmap <- function(k, A, map) {
+  idx <- map[map == round(map) & map != 0] # integers
   I <- ncol(A)
-  if(!all.equal(1:I, sort(unique(abs(idx)))))
+  if (!all.equal(1:I, sort(unique(abs(idx))))) {
     stop("The mapping 'map' must contain each index 1,2,.., I=ncol(A) at least once.")
+  }
 
-  if (any(map != round(map)))
+  if (any(map != round(map))) {
     stop("Only (positive, negative, and zero) integers allowed for 'map'.")
-
+  }
 }

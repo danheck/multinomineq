@@ -26,13 +26,17 @@
 #'
 #' @examples
 #' ### Binomial probabilities
-#' b <- c(0,0,.30,.70, 1)
-#' A <- matrix(c(-1,1,0,  # p1 >= p2
-#'               0,1,-1,  # p2 <= p3
-#'               1,0,0,   # p1 <=.30
-#'               0,1,0,   # p2 <= .70
-#'               0,0,1),  # p3 <= 1 (redundant)
-#'               ncol = 3, byrow = 2)
+#' b <- c(0, 0, .30, .70, 1)
+#' A <- matrix(
+#'   c(
+#'     -1, 1, 0, # p1 >= p2
+#'     0, 1, -1, # p2 <= p3
+#'     1, 0, 0, # p1 <=.30
+#'     0, 1, 0, # p2 <= .70
+#'     0, 0, 1
+#'   ), # p3 <= 1 (redundant)
+#'   ncol = 3, byrow = 2
+#' )
 #' Ab_sort(A, b)
 #'
 #'
@@ -40,22 +44,23 @@
 #' # prior sampling:
 #' Ab_sort(A, b, options = 4)
 #' # posterior sampling:
-#' Ab_sort(A, b, k = c(10,3, 2, 14), options = 4)
+#' Ab_sort(A, b, k = c(10, 3, 2, 14), options = 4)
 #'
 #' @export
-Ab_sort <- function (A, b, k = 0, options, M = 1000, drop_irrelevant = TRUE){
+Ab_sort <- function(A, b, k = 0, options, M = 1000, drop_irrelevant = TRUE) {
   check_Ab(A, b)
   S <- ncol(A)
-  if (missing(options)){
+  if (missing(options)) {
     x <- matrix(runif(M * S), M, S)
   } else {
-    if (length(k) == 1)
+    if (length(k) == 1) {
       k <- rep(k, sum(options))
+    }
     check_ko(k, options)
     x <- rpdirichlet(M, k + 1, options)
   }
 
-  if (drop_irrelevant){
+  if (drop_irrelevant) {
     Ab <- Ab_drop_irrelevant(A, b, options)
     A <- Ab$A
     b <- Ab$b
@@ -64,24 +69,24 @@ Ab_sort <- function (A, b, k = 0, options, M = 1000, drop_irrelevant = TRUE){
   accept_rate <- rowMeans(accept)
   o <- order(accept_rate, decreasing = FALSE)
 
-  list("A" = A[o,], "b" = b[o], "accept_rate" = accept_rate[o])
+  list("A" = A[o, ], "b" = b[o], "accept_rate" = accept_rate[o])
 }
 
 
 ### drop constraints: 0<p<1
-Ab_drop_irrelevant <- function(A, b, options){
-  lower1   <- apply(A, 1, function(a) sum(a==0) == ncol(A)-1 && sum(a==1) == 1) & b==1
-  greater0 <- apply(A, 1, function(a) sum(a==0) == ncol(A)-1 && sum(a==-1) == 1) & b==0
+Ab_drop_irrelevant <- function(A, b, options) {
+  lower1 <- apply(A, 1, function(a) sum(a == 0) == ncol(A) - 1 && sum(a == 1) == 1) & b == 1
+  greater0 <- apply(A, 1, function(a) sum(a == 0) == ncol(A) - 1 && sum(a == -1) == 1) & b == 0
   sum1 <- rep(FALSE, nrow(A))
-  if (!missing(options)){
-    for (i in seq_along(options)){
-      prev <- sum(options[seq(0, i-1)] - 1)
+  if (!missing(options)) {
+    for (i in seq_along(options)) {
+      prev <- sum(options[seq(0, i - 1)] - 1)
       idx <- prev + seq(options[i] - 1)
-      checki <- b == 1 & apply(A[,idx,drop=FALSE]==1, 1, all) & apply(A[,-idx,drop=FALSE]==0, 1, all)
+      checki <- b == 1 & apply(A[, idx, drop = FALSE] == 1, 1, all) & apply(A[, -idx, drop = FALSE] == 0, 1, all)
       sum1 <- sum1 | checki
     }
   }
-  A1 <- A[!lower1 & !greater0 & !sum1,,drop = FALSE]
+  A1 <- A[!lower1 & !greater0 & !sum1, , drop = FALSE]
   b1 <- b[!lower1 & !greater0 & !sum1]
 
   list(A = A1, b = b1)

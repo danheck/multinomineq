@@ -12,20 +12,20 @@
 #' @template ref_heathcote2010
 #' @examples
 #' x1 <- rnorm(300, 0, 1)
-#' x2 <- rnorm(300, .5, 1)  # dominates x1
+#' x2 <- rnorm(300, .5, 1) # dominates x1
 #' x3 <- rnorm(300, 0, 1.2) # intersects x1
 #'
 #' plot(ecdf(x1))
 #' lines(ecdf(x2), col = "red")
 #' lines(ecdf(x3), col = "blue")
 #'
-#' b12 <- stochdom_bf(x1, x2, order = "<", M =5e4)
-#' b13 <- stochdom_bf(x1, x3, order = "<", M =5e4)
+#' b12 <- stochdom_bf(x1, x2, order = "<", M = 5e4)
+#' b13 <- stochdom_bf(x1, x3, order = "<", M = 5e4)
 #' b12$bf
 #' b13$bf
 #' @export
-stochdom_bf <- function (x1, x2, breaks = "Sturges", order = "<", ...){
-  histo <- hist(c(x1,x2), breaks = breaks, plot = FALSE)
+stochdom_bf <- function(x1, x2, breaks = "Sturges", order = "<", ...) {
+  histo <- hist(c(x1, x2), breaks = breaks, plot = FALSE)
   b <- histo$breaks
   h1 <- hist(x1, breaks = b, plot = FALSE)
   h2 <- hist(x2, breaks = b, plot = FALSE)
@@ -37,9 +37,13 @@ stochdom_bf <- function (x1, x2, breaks = "Sturges", order = "<", ...){
   colnames(bmat) <- paste0("b", 1:B)
 
   Ab <- stochdom_Ab(bins = B, conditions = 2, order = order)
-  bf <- bf_multinom(k, options = rep(B, 2),  A = Ab$A, b = Ab$b,
-                    prior = rep(1/B, B * 2), ...)
-  list("breaks" = b, "k" = bmat,
-       "A" = Ab$A, "b" = Ab$b,
-       "bf" = bf)
+  bf <- bf_multinom(k,
+    options = rep(B, 2), A = Ab$A, b = Ab$b,
+    prior = rep(1 / B, B * 2), ...
+  )
+  list(
+    "breaks" = b, "k" = bmat,
+    "A" = Ab$A, "b" = Ab$b,
+    "bf" = bf
+  )
 }

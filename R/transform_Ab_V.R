@@ -76,7 +76,7 @@
 #    ' V_to_Ab(V)
 #    ' }
 #' @export
-V_to_Ab <- function (V){
+V_to_Ab <- function(V) {
   # check_V(V)
   # if (requireNamespace("rPorta", quietly = TRUE)){
   #   poi <- rPorta::as.poiFile(V)
@@ -96,8 +96,9 @@ V_to_Ab <- function (V){
   #   stop ("The pacakge 'rPorta' is required (https://github.com/TasCL/rPorta).",
   #         call. = FALSE)
   # }
-  stop ("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
-        call. = FALSE)
+  stop("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
+    call. = FALSE
+  )
 }
 
 
@@ -112,8 +113,7 @@ V_to_Ab <- function (V){
 #' for pairwise columns (1+2, 3+4, 5+6, ...). See \code{\link{Ab_multinom}}.
 #'
 #' @export
-Ab_to_V <- function (A, b, options = 2){
-
+Ab_to_V <- function(A, b, options = 2) {
   # options <- check_Ab(A, b, options)
   # tmp <- Ab_multinom(options, A, b, nonneg = TRUE)
   # A <- tmp$A
@@ -132,8 +132,9 @@ Ab_to_V <- function (A, b, options = 2){
   #         call. = FALSE)
   # }
 
-  stop ("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
-        call. = FALSE)
+  stop("Requires the package 'rPorta' (https://github.com/TasCL/rPorta). \n Since rPorta cannot be compiled with R>=4.0.0, the function 'V_to_Ab' is deprecated.",
+    call. = FALSE
+  )
 }
 
 
@@ -151,21 +152,21 @@ Ab_to_V <- function (A, b, options = 2){
 #'
 #' @examples
 #' # three binary and two ternary choices:
-#' options <- c(2,2,2, 3,3)
+#' options <- c(2, 2, 2, 3, 3)
 #' Ab_multinom(options)
 #' Ab_multinom(options, nonneg = TRUE)
 #' @export
-Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
+Ab_multinom <- function(options, A = NULL, b = NULL, nonneg = FALSE) {
   S <- sum(options - 1)
   sum_to_one <- matrix(0, length(options), S)
   cnt <- 0
-  for (i in 1:length(options)){
+  for (i in 1:length(options)) {
     idx <- seq.int(1, options[i] - 1) + cnt
-    sum_to_one[i,idx] <- 1
+    sum_to_one[i, idx] <- 1
     cnt <- cnt + options[i] - 1
   }
-  if (nonneg){
-    A_new <- rbind(A, - diag(S), sum_to_one)
+  if (nonneg) {
+    A_new <- rbind(A, -diag(S), sum_to_one)
     b_new <- c(b, rep(0, S), rep(1, length(options)))
   } else {
     A_new <- rbind(A, sum_to_one)
@@ -198,29 +199,34 @@ Ab_multinom <- function (options, A = NULL, b = NULL, nonneg = FALSE){
 #'
 #' @examples
 #' # p1 < p2 < p3 < p4
-#' A4 <- matrix(c(1, -1,  0,  0,
-#'                0,  1, -1,  0,
-#'                0,  0,  1, -1),
-#'              nrow = 3, byrow = TRUE)
+#' A4 <- matrix(
+#'   c(
+#'     1, -1, 0, 0,
+#'     0, 1, -1, 0,
+#'     0, 0, 1, -1
+#'   ),
+#'   nrow = 3, byrow = TRUE
+#' )
 #' b4 <- c(0, 0, 0)
 #'
 #' # drop the fixed column for: p4 = (1-p1-p2-p3)
 #' Ab_drop_fixed(A4, b4, options = c(4))
 #'
 #' @export
-Ab_drop_fixed <- function(A, b, options){
+Ab_drop_fixed <- function(A, b, options) {
   check_Ab(A, b, options + 1)
 
   cnt <- 0
-  for (i in 1:length(options)){
+  for (i in 1:length(options)) {
     idx <- seq.int(1, options[i] - 1) + cnt
-    A[,idx] <- A[,idx,drop=FALSE] - A[,max(idx) + 1]
-    b <- b - A[,max(idx) + 1]
-    A <- A[,- (max(idx) + 1),drop=FALSE]
+    A[, idx] <- A[, idx, drop = FALSE] - A[, max(idx) + 1]
+    b <- b - A[, max(idx) + 1]
+    A <- A[, -(max(idx) + 1), drop = FALSE]
     cnt <- cnt + options[i] - 1
   }
 
-  if (is.null(colnames(A)))
+  if (is.null(colnames(A))) {
     colnames(A) <- index_mult(options, fixed = FALSE)
+  }
   list(A = A, b = b, options = options)
 }

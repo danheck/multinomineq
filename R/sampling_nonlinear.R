@@ -20,16 +20,17 @@
 #' @examples
 #' # two binomial success probabilities: x = c(x1, x2)
 #' # restriction to a circle:
-#' model <- function(x)
-#'   (x[1]-.50)^2 + (x[2]-.50)^2 <= .15
+#' model <- function(x) {
+#'   (x[1] - .50)^2 + (x[2] - .50)^2 <= .15
+#' }
 #'
 #' # draw prior samples
-#' mcmc <- sampling_nonlinear(k = 0, options = c(2,2),
-#'                            inside = model, M = 1000)
+#' mcmc <- sampling_nonlinear(
+#'   k = 0, options = c(2, 2),
+#'   inside = model, M = 1000
+#' )
 #' head(mcmc)
-#' plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
-#'
-#'
+#' plot(c(mcmc[, 1]), c(mcmc[, 2]), xlim = 0:1, ylim = 0:1)
 #'
 #' \donttest{
 #' ##### Using a C++ indicator function (much faster)
@@ -39,81 +40,92 @@
 #'
 #' # define function via C++ pointer:
 #' model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
-#' mcmc <- sampling_nonlinear(k=0, options = c(2,2),
-#'                            inside = model_cpp)
+#' mcmc <- sampling_nonlinear(
+#'   k = 0, options = c(2, 2),
+#'   inside = model_cpp
+#' )
 #' head(mcmc)
-#' plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
+#' plot(c(mcmc[, 1]), c(mcmc[, 2]), xlim = 0:1, ylim = 0:1)
 #' }
 #' @export
-sampling_nonlinear <- function (k, options, inside, prior = rep(1, sum(options)),
-                                M = 1000, start, burnin = 10, eps = 1e-6,
-                                progress = TRUE, cpu = 1){
-
+sampling_nonlinear <- function(k, options, inside, prior = rep(1, sum(options)),
+                               M = 1000, start, burnin = 10, eps = 1e-6,
+                               progress = TRUE, cpu = 1) {
   stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
-  if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
+  if (missing(k) || is.null(k) || (length(k) == 1 && k == 0)) {
     k <- rep(0, sum(options))
+  }
   check_ko(k, options)
   check_io(inside, options)
 
   if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
-    if (inherits(inside, "XPtr"))
+    if (inherits(inside, "XPtr")) {
       stop("C++ functions (defined via RcppXPtrUtils::cppXPtr) not supported if cpu>1.")
+    }
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
-    if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0))
+    if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0)) {
       arg$k <- rep(0, sum(arg$options))
+    }
     mcmc_list <- run_parallel(arg, fun = "sampling_nonlinear", cpu = cpu, simplify = "as.mcmc.list")
     return(mcmc_list)
   }
   if (length(prior) == 1) prior <- rep(prior, sum(options))
 
   # find random starting values (and use the one with highest posterior density)
-  if (missing(start)  || is.null(start) || anyNA(start)){
+  if (missing(start) || is.null(start) || anyNA(start)) {
     start <- NA
     cnt <- 0
-    while (anyNA(start) && cnt < 100){
+    while (anyNA(start) && cnt < 100) {
       proposal <- rpdirichlet(100, rep(1, sum(options)), options)
-      if (is.function(inside))
+      if (is.function(inside)) {
         idx <- which(apply(proposal, 1, inside))
-      else
-        idx <- which(apply(proposal, 1,
-                           function(x) call_xptr(inside, x)) == 1)
-      if (length(idx) > 0){
-        ll <- loglik_multinom(proposal[idx,,drop = FALSE], k + prior, options)
-        start <- proposal[idx[which.min(ll)],]
+      } else {
+        idx <- which(apply(
+          proposal, 1,
+          function(x) call_xptr(inside, x)
+        ) == 1)
+      }
+      if (length(idx) > 0) {
+        ll <- loglik_multinom(proposal[idx, , drop = FALSE], k + prior, options)
+        start <- proposal[idx[which.min(ll)], ]
 
         # rough convexity check:
         alpha <- rpdirichlet(100, rep(1, length(idx)), length(idx), drop_fixed = FALSE)
-        xx <- alpha %*% proposal[idx,,drop=FALSE]
-        if (is.function(inside))
+        xx <- alpha %*% proposal[idx, , drop = FALSE]
+        if (is.function(inside)) {
           convex <- apply(xx, 1, inside)
-        else
+        } else {
           convex <- apply(xx, 1, function(x) call_xptr(inside, x))
-        if (!all(convex == 1))
-          stop("Indicator function 'inside' does not define a convex parameter space!\n",
-               "  (note that multiplicative constraints such as x[1]*x[2]<0.50 are not convex)")
+        }
+        if (!all(convex == 1)) {
+          stop(
+            "Indicator function 'inside' does not define a convex parameter space!\n",
+            "  (note that multiplicative constraints such as x[1]*x[2]<0.50 are not convex)"
+          )
+        }
       }
     }
-    if (anyNA(start))
+    if (anyNA(start)) {
       stop("Could not find starting values (based on 10000 samples).")
+    }
   }
   stopifnot(length(start) == sum(options - 1))
-  stopifnot(all(tapply(start, rep(seq(length(options)), options-1), sum) <= 1))
+  stopifnot(all(tapply(start, rep(seq(length(options)), options - 1), sum) <= 1))
 
-  if (is.function(inside)){
+  if (is.function(inside)) {
     stopifnot(inside(start))
-    mcmc <- sampling_nonlin_r(k, options, inside, prior, M, start, burnin,
-                              interactive() && progress, eps)
+    mcmc <- sampling_nonlin_r(
+      k, options, inside, prior, M, start, burnin,
+      interactive() && progress, eps
+    )
   } else {
     stopifnot(call_xptr(inside, start) == 1)
-    mcmc <- sampling_nonlin_cpp(k, options, inside, prior, M, start, burnin,
-                                interactive() && progress, eps)
+    mcmc <- sampling_nonlin_cpp(
+      k, options, inside, prior, M, start, burnin,
+      interactive() && progress, eps
+    )
   }
 
   colnames(mcmc) <- index_mult(options, fixed = FALSE)
   mcmc(mcmc, start = burnin + 1, end = M)
 }
-
-
-
-
-

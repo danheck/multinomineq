@@ -29,14 +29,18 @@
 #'
 #' @examples
 #' ############### binomial ##########################
-#' A <- matrix(c(1, 0, 0,   # x1 < .50
-#'               1, 1, 1,   # x1+x2+x3 < 1
-#'               0, 2, 2,   # 2*x2+2*x3 < 1
-#'               0, -1, 0,  # x2 > .2
-#'               0, 0, 1),  # x3 < .1
-#'             ncol = 3, byrow = TRUE)
+#' A <- matrix(
+#'   c(
+#'     1, 0, 0, # x1 < .50
+#'     1, 1, 1, # x1+x2+x3 < 1
+#'     0, 2, 2, # 2*x2+2*x3 < 1
+#'     0, -1, 0, # x2 > .2
+#'     0, 0, 1
+#'   ), # x3 < .1
+#'   ncol = 3, byrow = TRUE
+#' )
 #' b <- c(.5, 1, 1, -.2, .1)
-#' samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
+#' samp <- sampling_binom(c(5, 12, 7), c(20, 20, 20), A, b)
 #' head(samp)
 #' plot(samp)
 #'
@@ -44,56 +48,100 @@
 #' ############### multinomial ##########################
 #' # binary and ternary choice:
 #' #           (a1,a2   b1,b2,b3)
-#' k       <- c(15,9,   5,2,17)
-#' options <- c(2,      3)
+#' k <- c(15, 9, 5, 2, 17)
+#' options <- c(2, 3)
 #'
 #' # columns:   (a1,  b1,b2)
-#' A <- matrix(c(1, 0, 0,   # a1 < .20
-#'               0, 2, 1,   # 2*b1+b2 < 1
-#'               0, -1, 0,  # b1 > .2
-#'               0, 0, 1),  # b2 < .4
-#'             ncol = 3, byrow = TRUE)
+#' A <- matrix(
+#'   c(
+#'     1, 0, 0, # a1 < .20
+#'     0, 2, 1, # 2*b1+b2 < 1
+#'     0, -1, 0, # b1 > .2
+#'     0, 0, 1
+#'   ), # b2 < .4
+#'   ncol = 3, byrow = TRUE
+#' )
 #' b <- c(.2, 1, -.2, .4)
 #' samp <- sampling_multinom(k, options, A, b)
 #' head(samp)
 #' plot(samp)
 #' @importFrom coda as.mcmc as.mcmc.list mcmc mcmc.list
 #' @export
-sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options)),
-                               M = 5000, start, burnin = 10,
-                               progress = TRUE, cpu = 1){
-  stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
-  if (missing(k) || is.null(k) || (length(k) == 1 && k == 0))
+sampling_multinom <- function(k,
+                              options,
+                              A,
+                              b,
+                              V,
+                              prior = rep(1, sum(options)),
+                              M = 5000,
+                              start,
+                              burnin = 10,
+                              progress = TRUE,
+                              cpu = 1) {
+  stopifnot(
+    length(M) == 1,
+    M > 0,
+    M == round(M),
+    M > burnin,
+    burnin > 0
+  )
+  if (missing(k) || is.null(k) || (length(k) == 1 && k == 0)) {
     k <- rep(0, sum(options))
+  }
   check_ko(k, options)
   check_ko(prior, options)
 
-  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
+  if (inherits(cpu, c("SOCKcluster", "cluster")) ||
+    is.numeric(cpu) && cpu > 1) {
     arg <- lapply(as.list(match.call())[-1], eval, envir = parent.frame())
-    if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0))
+
+    if (is.null(arg$k) || (length(arg$k) == 1 && arg$k == 0)) {
       arg$k <- rep(0, sum(arg$options))
-    mcmc_list <- run_parallel(arg, fun = "sampling_multinom", cpu = cpu, simplify = "as.mcmc.list")
+    }
+
+    mcmc_list <- run_parallel(arg,
+      fun = "sampling_multinom",
+      cpu = cpu,
+      simplify = "as.mcmc.list"
+    )
     return(mcmc_list)
   }
 
-  if (!missing(V) && !is.null(V)){
-    mcmc <- sampling_V(k, options, V, prior = prior, M = M,
-                       start = start, burnin = burnin,
-                       progress = interactive() && progress)
+  if (!missing(V) && !is.null(V)) {
+    mcmc <- sampling_V(k, options, V,
+      prior = prior, M = M,
+      start = start, burnin = burnin,
+      progress = interactive() && progress
+    )
   } else {
-    if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_multinom(k + prior, options, A, b, n.fit = 1,
-                            control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
-    if (!all(A %*% start < b))
-      start <- .5*find_inside(A, b, options = options, random = TRUE) + .5*start
+    if (missing(start) || is.null(start) || any(start < 0)) {
+      start <- ml_multinom(k + prior, options, A, b,
+        n.fit = 1,
+        control = list(
+          maxit = 50,
+          reltol = .Machine$double.eps^.3
+        )
+      )$par
+    }
+
+    if (!all(A %*% start < b)) {
+      start <- .5 * find_inside(A, b, options = options, random = TRUE) + .5 * start
+    }
     check_start(start, A, b, interior = TRUE)
-    if (length(prior) == 1) prior <- rep(prior, sum(options))
+
+    if (length(prior) == 1) {
+      prior <- rep(prior, sum(options))
+    }
     check_Abokprior(A, b, options, k, prior)
-    mcmc <- sampling_mult(k, options, A, b, prior, M, start, burnin,
-                          interactive() && progress)
+
+    mcmc <- sampling_mult(
+      k, options, A, b, prior, M, start, burnin,
+      interactive() && progress
+    )
     colnames(mcmc) <- colnames(A)
-    if (is.null(colnames(A)))
+    if (is.null(colnames(A))) {
       colnames(mcmc) <- index_mult(options, fixed = FALSE)
+    }
   }
   mcmc(mcmc, start = burnin + 1, end = M)
 }
@@ -101,38 +149,68 @@ sampling_multinom <- function (k, options, A, b, V, prior = rep(1, sum(options))
 
 #' @rdname sampling_multinom
 #' @export
-sampling_binom <- function (k, n, A, b, V, map = 1:ncol(A), prior = c(1, 1),
-                            M = 5000, start, burnin = 10,
-                            progress = TRUE, cpu = 1){
+sampling_binom <- function(k,
+                           n,
+                           A,
+                           b,
+                           V,
+                           map = 1:ncol(A),
+                           prior = c(1, 1),
+                           M = 5000,
+                           start,
+                           burnin = 10,
+                           progress = TRUE,
+                           cpu = 1) {
   stopifnot(length(M) == 1, M > 0, M == round(M), M > burnin, burnin > 0)
-  if (length(n) == 1) n <- rep(n, length(k))
 
-  if (inherits(cpu, c("SOCKcluster", "cluster")) || is.numeric(cpu) && cpu > 1) {
-    arg <- lapply(as.list(match.call())[-1],
-                  function(i) tryCatch(eval(i), error = function(e) NULL))
-    mcmc.list <- run_parallel(arg, fun = "sampling_binom", cpu = cpu, simplify = "as.mcmc.list")
+  if (length(n) == 1) {
+    n <- rep(n, length(k))
+  }
+
+  if (inherits(cpu, c("SOCKcluster", "cluster")) ||
+    is.numeric(cpu) && cpu > 1) {
+    arg <- lapply(
+      as.list(match.call())[-1],
+      function(i) tryCatch(eval(i), error = function(e) NULL)
+    )
+
+    mcmc.list <- run_parallel(arg,
+      fun = "sampling_binom",
+      cpu = cpu,
+      simplify = "as.mcmc.list"
+    )
     return(mcmc.list)
   }
 
-  if (!missing(V) && !is.null(V)){
+  if (!missing(V) && !is.null(V)) {
     options <- rep(2, length(k))
     k2 <- add_fixed(k, options = options, sum = n)
-    mcmc <- sampling_V(k2, options = options, V = V,
-                       prior = rep(prior, length(k)), # extended prior for multinomial
-                       M = M, start = start, burnin = burnin,
-                       progress = interactive() && progress)
+    mcmc <- sampling_V(k2,
+      options = options,
+      V = V,
+      prior = rep(prior, length(k)), # extended prior for multinomial
+      M = M,
+      start = start,
+      burnin = burnin,
+      progress = interactive() && progress
+    )
   } else {
     aggr <- map_k_to_A(k, n, A, map)
     k <- aggr$k
     n <- aggr$n
     check_Abknprior(A, b, k, n, prior)
-    if (missing(start) || is.null(start) || any(start < 0))
-      start <-  ml_binom(k, n, #k + prior[1], n + sum(prior), ML: gives interior values
-                         A, b, map, n.fit = 1,
-                         control = list(maxit = 50, reltol = .Machine$double.eps^.3))$par
+    if (missing(start) || is.null(start) || any(start < 0)) {
+      start <- ml_binom(k, n, # k + prior[1], n + sum(prior), ML: gives interior values
+        A, b, map,
+        n.fit = 1,
+        control = list(maxit = 50, reltol = .Machine$double.eps^.3)
+      )$par
+    }
     check_start(start, A, b, interior = TRUE)
-    mcmc <- sampling_bin(k, n, A, b, prior, M, start, burnin,
-                         interactive() && progress)
+    mcmc <- sampling_bin(
+      k, n, A, b, prior, M, start, burnin,
+      interactive() && progress
+    )
     colnames(mcmc) <- colnames(A)
   }
   mcmc(mcmc, start = burnin + 1, end = M)

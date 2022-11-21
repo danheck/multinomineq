@@ -7,23 +7,23 @@ library("testthat")
 # with:            i>j = 1  <=> utility(i) > utility(j)
 V <- matrix(c(
   # strict weak orders
-  0,1,0, 0,1,0, 0,1,0,  # a < b < c
-  1,0,0, 0,1,0, 0,1,0,  # b < a < c
-  0,1,0, 0,1,0, 1,0,0,  # a < c < b
-  0,1,0, 1,0,0, 1,0,0,  # c < a < b
-  1,0,0, 1,0,0, 1,0,0,  # c < b < a
-  1,0,0, 1,0,0, 0,1,0,  # b < c < a
+  0, 1, 0, 0, 1, 0, 0, 1, 0, # a < b < c
+  1, 0, 0, 0, 1, 0, 0, 1, 0, # b < a < c
+  0, 1, 0, 0, 1, 0, 1, 0, 0, # a < c < b
+  0, 1, 0, 1, 0, 0, 1, 0, 0, # c < a < b
+  1, 0, 0, 1, 0, 0, 1, 0, 0, # c < b < a
+  1, 0, 0, 1, 0, 0, 0, 1, 0, # b < c < a
 
-  0,0,1, 0,1,0, 0,1,0,  # a ~ b < c
-  0,1,0, 0,0,1, 1,0,0,  # a ~ c < b
-  1,0,0, 1,0,0, 0,0,1,  # c ~ b < a
-  0,1,0, 0,1,0, 0,0,1,  # a < b ~ c
-  1,0,0, 0,0,1, 0,1,0,  # b < a ~ c
-  0,0,1, 1,0,0, 1,0,0,  # c < a ~ b
+  0, 0, 1, 0, 1, 0, 0, 1, 0, # a ~ b < c
+  0, 1, 0, 0, 0, 1, 1, 0, 0, # a ~ c < b
+  1, 0, 0, 1, 0, 0, 0, 0, 1, # c ~ b < a
+  0, 1, 0, 0, 1, 0, 0, 0, 1, # a < b ~ c
+  1, 0, 0, 0, 0, 1, 0, 1, 0, # b < a ~ c
+  0, 0, 1, 1, 0, 0, 1, 0, 0, # c < a ~ b
 
-  0,0,1, 0,0,1, 0,0,1   # a ~ b ~ c
+  0, 0, 1, 0, 0, 1, 0, 0, 1 # a ~ b ~ c
 ), byrow = TRUE, ncol = 9)
-options <- rep(3,3)
+options <- rep(3, 3)
 
 test_that("dimensionality of V works", {
   expect_silent(V_free <- drop_fixed(V, options))
@@ -33,18 +33,20 @@ test_that("dimensionality of V works", {
   # only with Porta:
   # V_to_Ab(V_free)
 
-  expect_silent(p <- find_inside(V=V, random = TRUE))
+  expect_silent(p <- find_inside(V = V, random = TRUE))
   expect_true(inside(p, V = V))
-  expect_true(inside(drop_fixed(p, options), V=V_free))
-  expect_silent(p_free <- find_inside(V=V_free, random = TRUE))
+  expect_true(inside(drop_fixed(p, options), V = V_free))
+  expect_silent(p_free <- find_inside(V = V_free, random = TRUE))
   expect_true(inside(p_free, V = V_free))
-  expect_true(inside(add_fixed(p_free, options), V=V))
+  expect_true(inside(add_fixed(p_free, options), V = V))
 
 
   # undebug(multinomineq:::sampling_V)
-  expect_silent(pp <- sampling_multinom(k = c(4,2,3,  19,4,2,  2,15,10),
-                                        options = c(3,3,3), V = V_free,
-                                        M = 100, progress = FALSE))
+  expect_silent(pp <- sampling_multinom(
+    k = c(4, 2, 3, 19, 4, 2, 2, 15, 10),
+    options = c(3, 3, 3), V = V_free,
+    M = 100, progress = FALSE
+  ))
   expect_true(all(inside(pp, V = V_free)))
   expect_true(all(inside(add_fixed(pp, options), V = V)))
 
