@@ -47,29 +47,37 @@ head(heck2017_raw)
 
 \donttest{
 # get cue values, validities, and predictions
-cueA <- heck2017_raw[,paste0("a",1:4)]
-cueB <- heck2017_raw[,paste0("b",1:4)]
+cueA <- heck2017_raw[, paste0("a", 1:4)]
+cueB <- heck2017_raw[, paste0("b", 1:4)]
 v <- c(.9, .8, .7, .6)
-strat <- strategy_multiattribute(cueA, cueB, v,
-                     c("TTB", "TTBprob", "WADD",
-                       "WADDprob", "EQW", "GUESS"))
+strat <- strategy_multiattribute(
+  cueA, cueB, v,
+  c(
+    "TTB", "TTBprob", "WADD",
+    "WADDprob", "EQW", "GUESS"
+  )
+)
 
 # get unique item types
 types <- strategy_unique(strat)
 types$unique
 
 # get table of choice frequencies for analysis
-freq <- with(heck2017_raw,
-             table(vp, types$item_type, choice))
-freqB <- freq[,4:1,1] + # reversed items: Option A
-         freq[,5:8,2]   # non-rev. items: Option B
+freq <- with(
+  heck2017_raw,
+  table(vp, types$item_type, choice)
+)
+freqB <- freq[, 4:1, 1] + # reversed items: Option A
+  freq[, 5:8, 2] # non-rev. items: Option B
 head(40 - freqB)
 data(heck2017)
-head(heck2017)  # same frequencies (different order)
+head(heck2017) # same frequencies (different order)
 
 # strategy classification
-pp <- strategy_postprob(freqB[1:4,], rep(40, 4),
-                        types$strategies)
+pp <- strategy_postprob(
+  freqB[1:4, ], rep(40, 4),
+  types$strategies
+)
 round(pp, 3)
 }
 }

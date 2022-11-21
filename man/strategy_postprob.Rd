@@ -21,19 +21,25 @@ Posterior model probabilities for multiple strategies (with equal prior model pr
 }
 \examples{
 # pattern 1: A, A, B with constant error e<.50
-strat1 <- list(pattern = c(-1, -1, 1),
-               c = .5, ordered = FALSE,
-               prior = c(1,1))
+strat1 <- list(
+  pattern = c(-1, -1, 1),
+  c = .5, ordered = FALSE,
+  prior = c(1, 1)
+)
 # pattern 2: A, B, B with ordered error e1<e3<e2<.50
-strat2 <- list(pattern = c(-1, 3, 2),
-               c = .5, ordered = TRUE,
-               prior = c(1,1))
-baseline <- list(pattern = 1:3, c = 1, ordered = FALSE,
-                 prior = c(1,1))
+strat2 <- list(
+  pattern = c(-1, 3, 2),
+  c = .5, ordered = TRUE,
+  prior = c(1, 1)
+)
+baseline <- list(
+  pattern = 1:3, c = 1, ordered = FALSE,
+  prior = c(1, 1)
+)
 
 # data
-k <- c(3, 4, 12)               # frequencies Option B
-n <- c(20, 20, 20)             # number of choices
+k <- c(3, 4, 12) # frequencies Option B
+n <- c(20, 20, 20) # number of choices
 strategy_postprob(k, n, list(strat1, strat2, baseline))
 }
 \seealso{

@@ -86,19 +86,23 @@ n <- rep(10, 6)
 
 # linear order constraints:
 #             p1 <p2 <p3 <p4 <p5 <p6 <.50
-A <- matrix(c(1, -1,  0,  0,  0,  0,
-              0,  1, -1,  0,  0,  0,
-              0,  0,  1, -1,  0,  0,
-              0,  0,  0,  1, -1,  0,
-              0,  0,  0,  0,  1, -1,
-              0,  0,  0,  0,  0,  1),
-            ncol = 6, byrow = TRUE)
+A <- matrix(
+  c(
+    1, -1, 0, 0, 0, 0,
+    0, 1, -1, 0, 0, 0,
+    0, 0, 1, -1, 0, 0,
+    0, 0, 0, 1, -1, 0,
+    0, 0, 0, 0, 1, -1,
+    0, 0, 0, 0, 0, 1
+  ),
+  ncol = 6, byrow = TRUE
+)
 b <- c(0, 0, 0, 0, 0, .50)
 
 # Bayes factor: unconstrained vs. constrained
-bf_binom(k, n, A, b, prior=c(1, 1), M=10000)
-bf_binom(k, n, A, b, prior=c(1, 1), M=2000, steps=c(2,4,5))
-bf_binom(k, n, A, b, prior=c(1, 1), M=1000, cmin = 200)
+bf_binom(k, n, A, b, prior = c(1, 1), M = 10000)
+bf_binom(k, n, A, b, prior = c(1, 1), M = 2000, steps = c(2, 4, 5))
+bf_binom(k, n, A, b, prior = c(1, 1), M = 1000, cmin = 200)
 
 }
 \references{

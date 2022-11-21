@@ -26,15 +26,15 @@ of stochastic dominance of continuous distributions.
 }
 \examples{
 x1 <- rnorm(300, 0, 1)
-x2 <- rnorm(300, .5, 1)  # dominates x1
+x2 <- rnorm(300, .5, 1) # dominates x1
 x3 <- rnorm(300, 0, 1.2) # intersects x1
 
 plot(ecdf(x1))
 lines(ecdf(x2), col = "red")
 lines(ecdf(x3), col = "blue")
 
-b12 <- stochdom_bf(x1, x2, order = "<", M =5e4)
-b13 <- stochdom_bf(x1, x3, order = "<", M =5e4)
+b12 <- stochdom_bf(x1, x2, order = "<", M = 5e4)
+b13 <- stochdom_bf(x1, x3, order = "<", M = 5e4)
 b12$bf
 b13$bf
 }

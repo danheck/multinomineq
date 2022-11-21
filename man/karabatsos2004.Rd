@@ -31,20 +31,24 @@ head(karabatsos2004)
 
 IJ <- dim(karabatsos2004$k.M)
 monotonicity <- nirt_to_Ab(IJ[1], IJ[2], axioms = "W1")
-p <- sampling_binom(k = c(karabatsos2004$k.M),
-                    n = c(karabatsos2004$n.M),
-                    A = monotonicity$A, b = monotonicity$b,
-                    prior = c(.5, .5), M = 300)
+p <- sampling_binom(
+  k = c(karabatsos2004$k.M),
+  n = c(karabatsos2004$n.M),
+  A = monotonicity$A, b = monotonicity$b,
+  prior = c(.5, .5), M = 300
+)
 
 # posterior means (Table 4, p. 120)
 post.mean <- matrix(apply(p, 2, mean), IJ[1],
-                    dimnames = dimnames(karabatsos2004$k.M))
+  dimnames = dimnames(karabatsos2004$k.M)
+)
 round(post.mean, 2)
 
 # posterior predictive checks (Table 4, p. 121)
 ppp <- ppp_binom(p, c(karabatsos2004$k.M), c(karabatsos2004$n.M),
-                 by = 1:prod(IJ))
-ppp <- matrix(ppp[,3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
+  by = 1:prod(IJ)
+)
+ppp <- matrix(ppp[, 3], IJ[1], dimnames = dimnames(karabatsos2004$k.M))
 round(ppp, 2)
 
 
@@ -54,10 +58,12 @@ round(ppp, 2)
 
 IJ <- dim(karabatsos2004$k.IIO)
 iio <- nirt_to_Ab(IJ[1], IJ[2], axioms = "W2")
-p <- sampling_binom(k = c(karabatsos2004$k.IIO),
-                    n = c(karabatsos2004$n.IIO),
-                    A = iio$A, b = iio$b,
-                    prior = c(.5, .5), M = 300)
+p <- sampling_binom(
+  k = c(karabatsos2004$k.IIO),
+  n = c(karabatsos2004$n.IIO),
+  A = iio$A, b = iio$b,
+  prior = c(.5, .5), M = 300
+)
 # posterior predictive checks (Table 6, p. 122)
 ppp <- ppp_binom(prob = p, k = c(karabatsos2004$k.IIO),
                  n = c(karabatsos2004$n.IIO), by = 1:prod(IJ))

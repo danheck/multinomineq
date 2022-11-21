@@ -34,8 +34,10 @@ population_bf(bfs)
 
 # (A) heterogeneous, inconsistent evidence
 # (B) heterogeneous, inconsistent evidence
-bfs <- cbind(A = c(2.3, 1.8, 3.3, 2.8, 4.0, 1.9, 2.5),
-             B = c(10.3, .7, 3.3, .8, 14.0, .9, 1.5))
+bfs <- cbind(
+  A = c(2.3, 1.8, 3.3, 2.8, 4.0, 1.9, 2.5),
+  B = c(10.3, .7, 3.3, .8, 14.0, .9, 1.5)
+)
 population_bf(bfs)
 
 }

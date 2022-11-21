@@ -18,7 +18,9 @@ Computes the posterior model probabilities based on the log-marginal likelihoods
 logmarginal <- c(-3.4, -2.0, -10.7)
 model_weights(logmarginal)
 
-nml <- matrix(c(2.5, 3.1, 4.2,
-                1.4, 0.3, 8.2), nrow = 2, byrow = TRUE)
+nml <- matrix(c(
+  2.5, 3.1, 4.2,
+  1.4, 0.3, 8.2
+), nrow = 2, byrow = TRUE)
 model_weights(-nml)
 }

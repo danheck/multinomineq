@@ -58,8 +58,8 @@ ratio of posterior/prior samples that satisfy the order constraints (e.g., of a 
 }
 \examples{
 # vector input
-post  <- c(count = 1447, M = 5000)
-prior <- c(count = 152,  M = 10000)
+post <- c(count = 1447, M = 5000)
+prior <- c(count = 152, M = 10000)
 count_to_bf(post, prior)
 
 # matrix input (due to nested stepwise procedure)
@@ -67,8 +67,10 @@ post <- cbind(count = c(139, 192), M = c(200, 1000))
 count_to_bf(post, prior)
 
 # exact prior probability known
-count_to_bf(posterior = c(count = 1447, M = 10000),
-            exact_prior = 1/factorial(4))
+count_to_bf(
+  posterior = c(count = 1447, M = 10000),
+  exact_prior = 1 / factorial(4)
+)
 }
 \references{
 Hoijtink, H. (2011). Informative Hypotheses: Theory and Practice for Behavioral and Social Scientists. Boca Raton, FL: Chapman & Hall/CRC.

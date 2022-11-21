@@ -54,5 +54,5 @@ Ab_max(which_max = 1, options = 5)
 
 # Example 2: Four binomial probabilities
 # Hypothesis: p1 is larger than p2,p3,p4
-Ab_max(which_max = 1, options = c(2,2,2,2), exclude_fixed = TRUE)
+Ab_max(which_max = 1, options = c(2, 2, 2, 2), exclude_fixed = TRUE)
 }

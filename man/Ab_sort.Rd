@@ -41,13 +41,17 @@ first constraints.
 }
 \examples{
 ### Binomial probabilities
-b <- c(0,0,.30,.70, 1)
-A <- matrix(c(-1,1,0,  # p1 >= p2
-              0,1,-1,  # p2 <= p3
-              1,0,0,   # p1 <=.30
-              0,1,0,   # p2 <= .70
-              0,0,1),  # p3 <= 1 (redundant)
-              ncol = 3, byrow = 2)
+b <- c(0, 0, .30, .70, 1)
+A <- matrix(
+  c(
+    -1, 1, 0, # p1 >= p2
+    0, 1, -1, # p2 <= p3
+    1, 0, 0, # p1 <=.30
+    0, 1, 0, # p2 <= .70
+    0, 0, 1
+  ), # p3 <= 1 (redundant)
+  ncol = 3, byrow = 2
+)
 Ab_sort(A, b)
 
 
@@ -55,6 +59,6 @@ Ab_sort(A, b)
 # prior sampling:
 Ab_sort(A, b, options = 4)
 # posterior sampling:
-Ab_sort(A, b, k = c(10,3, 2, 14), options = 4)
+Ab_sort(A, b, k = c(10, 3, 2, 14), options = 4)
 
 }

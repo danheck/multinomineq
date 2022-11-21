@@ -29,10 +29,12 @@ that lead to identical strategy predictions.
 }
 \examples{
 data(heck2017_raw)
-ca <- heck2017_raw[1:100, c("a1","a2","a3","a4")]
-cb <- heck2017_raw[1:100, c("b1","b2","b3","b4")]
+ca <- heck2017_raw[1:100, c("a1", "a2", "a3", "a4")]
+cb <- heck2017_raw[1:100, c("b1", "b2", "b3", "b4")]
 v <- c(.9, .8, .7, .6)
-strats <- strategy_multiattribute(ca,cb, v,
-                                 c("WADDprob","WADD","TTB"))
+strats <- strategy_multiattribute(
+  ca, cb, v,
+  c("WADDprob", "WADD", "TTB")
+)
 strategy_unique(strats)
 }

@@ -49,7 +49,9 @@ strategy_multiattribute(ca, cb, v, "WADDprob")
 
 # multiple item types
 data(heck2017_raw)
-strategy_multiattribute(heck2017_raw[1:10, c("a1","a2","a3","a4")],
-                        heck2017_raw[1:10, c("b1","b2","b3","b4")],
-                        v, "WADDprob")
+strategy_multiattribute(
+  heck2017_raw[1:10, c("a1", "a2", "a3", "a4")],
+  heck2017_raw[1:10, c("b1", "b2", "b3", "b4")],
+  v, "WADDprob"
+)
 }

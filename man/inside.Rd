@@ -31,22 +31,26 @@ Determines whether a point \code{x} is inside a convex poltyope by checking whet
 }
 \examples{
 # linear order constraints:  x1<x2<x3<.5
-A <- matrix(c(1,-1, 0,
-              0, 1,-1,
-              0, 0, 1), ncol = 3, byrow = TRUE)
+A <- matrix(c(
+  1, -1, 0,
+  0, 1, -1,
+  0, 0, 1
+), ncol = 3, byrow = TRUE)
 b <- c(0, 0, .50)
 
 # vertices: admissible points (corners of polytope)
-V <- matrix(c( 0, 0, 0,
-               0, 0,.5,
-               0,.5,.5,
-              .5,.5,.5), ncol = 3, byrow = TRUE)
+V <- matrix(c(
+  0, 0, 0,
+  0, 0, .5,
+  0, .5, .5,
+  .5, .5, .5
+), ncol = 3, byrow = TRUE)
 
-xin <- c(.1, .2, .45)  # inside
+xin <- c(.1, .2, .45) # inside
 inside(xin, A, b)
 inside(xin, V = V)
 
-xout <- c(.4, .1, .55)  # outside
+xout <- c(.4, .1, .55) # outside
 inside(xout, A, b)
 inside(xout, V = V)
 }

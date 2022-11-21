@@ -76,16 +76,17 @@ function is convex.
 \examples{
 # two binomial success probabilities: x = c(x1, x2)
 # restriction to a circle:
-model <- function(x)
-  (x[1]-.50)^2 + (x[2]-.50)^2 <= .15
+model <- function(x) {
+  (x[1] - .50)^2 + (x[2] - .50)^2 <= .15
+}
 
 # draw prior samples
-mcmc <- sampling_nonlinear(k = 0, options = c(2,2),
-                           inside = model, M = 1000)
+mcmc <- sampling_nonlinear(
+  k = 0, options = c(2, 2),
+  inside = model, M = 1000
+)
 head(mcmc)
-plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
-
-
+plot(c(mcmc[, 1]), c(mcmc[, 2]), xlim = 0:1, ylim = 0:1)
 
 \donttest{
 ##### Using a C++ indicator function (much faster)
@@ -95,9 +96,11 @@ cpp_code <- "SEXP inside(NumericVector x){
 
 # define function via C++ pointer:
 model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
-mcmc <- sampling_nonlinear(k=0, options = c(2,2),
-                           inside = model_cpp)
+mcmc <- sampling_nonlinear(
+  k = 0, options = c(2, 2),
+  inside = model_cpp
+)
 head(mcmc)
-plot(c(mcmc[,1]), c(mcmc[,2]), xlim=0:1, ylim=0:1)
+plot(c(mcmc[, 1]), c(mcmc[, 2]), xlim = 0:1, ylim = 0:1)
 }
 }

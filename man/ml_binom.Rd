@@ -82,41 +82,51 @@ for the Ab-representation or (B) the mixture weights \eqn{\alpha} for the V-repr
 \examples{
 # predicted linear order: p1 < p2 < p3 < .50
 # (cf. WADDprob in ?strategy_multiattribute)
-A <- matrix(c(1, -1,  0,
-              0,  1, -1,
-              0,  0,  1),
-            ncol = 3, byrow = TRUE)
+A <- matrix(
+  c(
+    1, -1, 0,
+    0, 1, -1,
+    0, 0, 1
+  ),
+  ncol = 3, byrow = TRUE
+)
 b <- c(0, 0, .50)
-ml_binom(k = c(4,1,23), n = 40, A, b)[1:2]
-ml_multinom(k = c(4,36,  1,39,  23,17),
-            options = c(2,2,2), A, b)[1:2]
+ml_binom(k = c(4, 1, 23), n = 40, A, b)[1:2]
+ml_multinom(
+  k = c(4, 36, 1, 39, 23, 17),
+  options = c(2, 2, 2), A, b
+)[1:2]
 
 
 # probabilistic strategy:  A,A,A,B  [e1<e2<e3<e4<.50]
-strat <- list(pattern = c(-1, -2, -3, 4),
-              c = .5, ordered = TRUE, prior = c(1,1))
-ml_binom(c(7,3,1, 19), 20, strategy = strat)[1:2]
+strat <- list(
+  pattern = c(-1, -2, -3, 4),
+  c = .5, ordered = TRUE, prior = c(1, 1)
+)
+ml_binom(c(7, 3, 1, 19), 20, strategy = strat)[1:2]
 
 
 # vertex representation (one prediction per row)
 V <- matrix(c(
   # strict weak orders
-  0, 1, 0, 1, 0, 1,  # a < b < c
-  1, 0, 0, 1, 0, 1,  # b < a < c
-  0, 1, 0, 1, 1, 0,  # a < c < b
-  0, 1, 1, 0, 1, 0,  # c < a < b
-  1, 0, 1, 0, 1, 0,  # c < b < a
-  1, 0, 1, 0, 0, 1,  # b < c < a
+  0, 1, 0, 1, 0, 1, # a < b < c
+  1, 0, 0, 1, 0, 1, # b < a < c
+  0, 1, 0, 1, 1, 0, # a < c < b
+  0, 1, 1, 0, 1, 0, # c < a < b
+  1, 0, 1, 0, 1, 0, # c < b < a
+  1, 0, 1, 0, 0, 1, # b < c < a
 
-  0, 0, 0, 1, 0, 1,  # a ~ b < c
-  0, 1, 0, 0, 1, 0,  # a ~ c < b
-  1, 0, 1, 0, 0, 0,  # c ~ b < a
-  0, 1, 0, 1, 0, 0,  # a < b ~ c
-  1, 0, 0, 0, 0, 1,  # b < a ~ c
-  0, 0, 1, 0, 1, 0,  # c < a ~ b
+  0, 0, 0, 1, 0, 1, # a ~ b < c
+  0, 1, 0, 0, 1, 0, # a ~ c < b
+  1, 0, 1, 0, 0, 0, # c ~ b < a
+  0, 1, 0, 1, 0, 0, # a < b ~ c
+  1, 0, 0, 0, 0, 1, # b < a ~ c
+  0, 0, 1, 0, 1, 0, # c < a ~ b
 
-  0, 0, 0, 0, 0, 0   # a ~ b ~ c
-  ), byrow = TRUE, ncol = 6)
-ml_multinom(k = c(4,1,5,  1,9,0,  7,2,1), n.fit = 1,
-            options = c(3,3,3), V = V)
+  0, 0, 0, 0, 0, 0 # a ~ b ~ c
+), byrow = TRUE, ncol = 6)
+ml_multinom(
+  k = c(4, 1, 5, 1, 9, 0, 7, 2, 1), n.fit = 1,
+  options = c(3, 3, 3), V = V
+)
 }

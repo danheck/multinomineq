@@ -38,15 +38,21 @@ Generates random draws from independent multinomial distributions (= product-mul
 rpbinom(prob = c(.2, .7, .9), n = c(10, 50, 30))
 
 # 2 and 3 options:  [a1,a2,  b1,b2,b3]
-rpmultinom(prob = c(a1=.5,   b1=.3,b2=.6),
-           n = c(10, 20), options = c(2, 3))
+rpmultinom(
+  prob = c(a1 = .5, b1 = .3, b2 = .6),
+  n = c(10, 20), options = c(2, 3)
+)
 # or:
-rpmultinom(prob = c(a1=.5,a2=.5,   b1=.3,b2=.6,b3=.1),
-           n = c(10, 20), options = c(2, 3),
-           drop_fixed = FALSE)
+rpmultinom(
+  prob = c(a1 = .5, a2 = .5, b1 = .3, b2 = .6, b3 = .1),
+  n = c(10, 20), options = c(2, 3),
+  drop_fixed = FALSE
+)
 
 # matrix with one probability vector per row:
-p <- rpdirichlet(n = 6, alpha = c(1,1,  1,1,1),
-                 options = c(2, 3))
-rpmultinom(prob = p, n = c(20, 50), options = c(2,3))
+p <- rpdirichlet(
+  n = 6, alpha = c(1, 1, 1, 1, 1),
+  options = c(2, 3)
+)
+rpmultinom(prob = p, n = c(20, 50), options = c(2, 3))
 }

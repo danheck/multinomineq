@@ -37,14 +37,14 @@ posterior-predicted frequencies.
 }
 \examples{
 # uniform samples:  p<.10
-prob <- matrix(runif(300*3, 0, .1), 300)
+prob <- matrix(runif(300 * 3, 0, .1), 300)
 n <- rep(10, 3)
-ppp_binom(prob, c(1,2,0), n)  # ok
-ppp_binom(prob, c(5,4,3), n)  # misfit
+ppp_binom(prob, c(1, 2, 0), n) # ok
+ppp_binom(prob, c(5, 4, 3), n) # misfit
 
 # multinomial (ternary choice)
-prob <- matrix(runif(300*2, 0, .05), 300)
-ppp_multinom(prob, c(1,0,9), 3)  # ok
+prob <- matrix(runif(300 * 2, 0, .05), 300)
+ppp_multinom(prob, c(1, 0, 9), 3) # ok
 }
 \references{
 Myung, J. I., Karabatsos, G., & Iverson, G. J. (2005). A Bayesian approach to testing decision making axioms. \emph{Journal of Mathematical Psychology, 49}, 205-225. \doi{10.1016/j.jmp.2005.02.004}

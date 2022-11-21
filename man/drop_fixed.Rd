@@ -28,15 +28,19 @@ Switches between two representation of polytopes for multinomial probabilities
 \examples{
 ######## bi- and trinomial (a1,a2, b1,b2,b3)
 # vectors with frequencies:
-drop_fixed(c(3,7,  4,1,5), options = c(2,3))
-add_fixed (c(3,    4,1),   options = c(2,3),
-           sum = c(10, 10))
+drop_fixed(c(3, 7, 4, 1, 5), options = c(2, 3))
+add_fixed(c(3, 4, 1),
+  options = c(2, 3),
+  sum = c(10, 10)
+)
 
 # matrices with probabilities:
-V <- matrix(c(1,  0,  0,
-              1, .5, .5,
-              0,  1,  0), 3, byrow = TRUE)
-V2 <- add_fixed(V, options = c(2,3))
+V <- matrix(c(
+  1, 0, 0,
+  1, .5, .5,
+  0, 1, 0
+), 3, byrow = TRUE)
+V2 <- add_fixed(V, options = c(2, 3))
 V2
-drop_fixed(V2, c(2,3))
+drop_fixed(V2, c(2, 3))
 }

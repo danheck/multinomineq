@@ -38,24 +38,34 @@ n <- rep(40, 4)
 
 # cue validities and values
 v <- c(.9, .8, .7, .6)
-cueA <- matrix(c(-1,  1,  1, -1,
-                  1, -1, -1,  1,
-                 -1,  1,  1,  1,
-                  1, -1, -1, -1),
-               ncol = 4, byrow = TRUE)
-cueB <- matrix(c(-1, -1, -1, -1,
-                 -1, 1 , -1, 1 ,
-                 -1, 1 , 1 , -1,
-                 -1, 1 , 1 , -1),
-               ncol = 4, byrow = TRUE)
+cueA <- matrix(
+  c(
+    -1, 1, 1, -1,
+    1, -1, -1, 1,
+    -1, 1, 1, 1,
+    1, -1, -1, -1
+  ),
+  ncol = 4, byrow = TRUE
+)
+cueB <- matrix(
+  c(
+    -1, -1, -1, -1,
+    -1, 1, -1, 1,
+    -1, 1, 1, -1,
+    -1, 1, 1, -1
+  ),
+  ncol = 4, byrow = TRUE
+)
 
 # get predictions
-strategies <- c("baseline", "WADDprob", "WADD",
-                "TTBprob", "TTB", "EQW", "GUESS")
+strategies <- c(
+  "baseline", "WADDprob", "WADD",
+  "TTBprob", "TTB", "EQW", "GUESS"
+)
 strats <- strategy_multiattribute(cueA, cueB, v, strategies)
 
 # strategy classification with Bayes factor
-strategy_postprob(heck2017[1:4,], n, strats)
+strategy_postprob(heck2017[1:4, ], n, strats)
 }
 \references{
 Heck, D. W., Hilbig, B. E., & Moshagen, M. (2017). From information processing to decisions: Formalizing and comparing probabilistic choice models. Cognitive Psychology, 96, 26-40. \doi{10.1016/j.cogpsych.2017.05.003}

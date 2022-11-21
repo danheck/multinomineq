@@ -118,13 +118,17 @@ If the steps are defined as \code{steps=c(5,10)}, the BF is computed in three st
 \examples{
 ### a set of linear order constraints:
 ### x1 < x2 < .... < x6 < .50
-A <- matrix(c(1, -1, 0, 0, 0, 0,
-              0, 1, -1, 0, 0, 0,
-              0, 0, 1, -1, 0, 0,
-              0, 0, 0, 1, -1, 0,
-              0, 0, 0, 0, 1, -1,
-              0, 0, 0, 0, 0, 1),
-            ncol = 6, byrow = TRUE)
+A <- matrix(
+  c(
+    1, -1, 0, 0, 0, 0,
+    0, 1, -1, 0, 0, 0,
+    0, 0, 1, -1, 0, 0,
+    0, 0, 0, 1, -1, 0,
+    0, 0, 0, 0, 1, -1,
+    0, 0, 0, 0, 0, 1
+  ),
+  ncol = 6, byrow = TRUE
+)
 b <- c(0, 0, 0, 0, 0, .50)
 
 ### check whether a specific vector is inside the polytope:
@@ -137,11 +141,11 @@ n <- rep(10, 6)
 
 ### count prior samples and compare to analytical result
 prior <- count_binom(0, 0, A, b, M = 5000, steps = 1:4)
-prior    # to get the proportion: attr(prior, "proportion")
+prior # to get the proportion: attr(prior, "proportion")
 (.50)^6 / factorial(6)
 
 ### count posterior samples + get Bayes factor
-posterior <- count_binom(k, n, A, b, M=2000, steps=1:4)
+posterior <- count_binom(k, n, A, b, M = 2000, steps = 1:4)
 count_to_bf(posterior, prior)
 
 ### automatic stepwise algorithm

@@ -103,19 +103,23 @@ inside the convex polytope defined by
 \examples{
 ### frequencies:
 #           (a1,a2,a3, b1,b2,b3,b4)
-k <-       c(1,5,9,    5,3,7,8)
-options <- c(3,        4)
+k <- c(1, 5, 9, 5, 3, 7, 8)
+options <- c(3, 4)
 
 ### linear order constraints
 # a1<a2<a3   AND   b2<b3<.50
 # (note: a2<a3 <=> a2 < 1-a1-a2 <=> a1+2*a2 < 1)
 # matrix A:
 #             (a1,a2, b1,b2,b3)
-A <- matrix(c(1, -1, 0,  0,  0,
-              1,  2, 0,  0,  0,
-              0,  0, 0,  1, -1,
-              0,  0, 0,  0,  1),
-            ncol = sum(options-1), byrow = TRUE)
+A <- matrix(
+  c(
+    1, -1, 0, 0, 0,
+    1, 2, 0, 0, 0,
+    0, 0, 0, 1, -1,
+    0, 0, 0, 0, 1
+  ),
+  ncol = sum(options - 1), byrow = TRUE
+)
 b <- c(0, 1, 0, .50)
 
 # count prior and posterior samples and get BF
@@ -123,7 +127,7 @@ prior <- count_multinom(0, options, A, b, M = 2e4)
 posterior <- count_multinom(k, options, A, b, M = 2e4)
 count_to_bf(posterior, prior)
 
-bf_multinom(k, options, A, b, M=10000)
+bf_multinom(k, options, A, b, M = 10000)
 bf_multinom(k, options, A, b, cmin = 5000, M = 1000)
 }
 \references{

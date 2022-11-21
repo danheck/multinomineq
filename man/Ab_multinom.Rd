@@ -29,7 +29,7 @@ If \code{A} and \code{b} are provided, the constraints are added to these inequa
 }
 \examples{
 # three binary and two ternary choices:
-options <- c(2,2,2, 3,3)
+options <- c(2, 2, 2, 3, 3)
 Ab_multinom(options)
 Ab_multinom(options, nonneg = TRUE)
 }

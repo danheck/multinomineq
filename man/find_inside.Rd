@@ -11,7 +11,7 @@ find_inside(
   options = NULL,
   random = FALSE,
   probs = TRUE,
-  boundary = 1e-07
+  boundary = 1e-05
 )
 }
 \arguments{
@@ -61,13 +61,17 @@ LP is used to find a random point (not uniformly sampled!) in the convex polytop
 }
 \examples{
 # inequality representation (A*x <= b)
-A <- matrix(c(1, -1,  0, 1,  0,
-              0,  0, -1, 0,  1,
-              0,  0,  0, 1, -1,
-              1,  1,  1, 1,  0,
-              1,  1,  1, 0,  0,
-              -1, 0, 0, 0, 0),
-            ncol = 5, byrow = TRUE)
+A <- matrix(
+  c(
+    1, -1, 0, 1, 0,
+    0, 0, -1, 0, 1,
+    0, 0, 0, 1, -1,
+    1, 1, 1, 1, 0,
+    1, 1, 1, 0, 0,
+    -1, 0, 0, 0, 0
+  ),
+  ncol = 5, byrow = TRUE
+)
 b <- c(0.5, 0, 0, .7, .4, -.2)
 find_inside(A, b)
 find_inside(A, b, random = TRUE)
@@ -76,21 +80,21 @@ find_inside(A, b, random = TRUE)
 # vertex representation
 V <- matrix(c(
   # strict weak orders
-  0, 1, 0, 1, 0, 1,  # a < b < c
-  1, 0, 0, 1, 0, 1,  # b < a < c
-  0, 1, 0, 1, 1, 0,  # a < c < b
-  0, 1, 1, 0, 1, 0,  # c < a < b
-  1, 0, 1, 0, 1, 0,  # c < b < a
-  1, 0, 1, 0, 0, 1,  # b < c < a
+  0, 1, 0, 1, 0, 1, # a < b < c
+  1, 0, 0, 1, 0, 1, # b < a < c
+  0, 1, 0, 1, 1, 0, # a < c < b
+  0, 1, 1, 0, 1, 0, # c < a < b
+  1, 0, 1, 0, 1, 0, # c < b < a
+  1, 0, 1, 0, 0, 1, # b < c < a
 
-  0, 0, 0, 1, 0, 1,  # a ~ b < c
-  0, 1, 0, 0, 1, 0,  # a ~ c < b
-  1, 0, 1, 0, 0, 0,  # c ~ b < a
-  0, 1, 0, 1, 0, 0,  # a < b ~ c
-  1, 0, 0, 0, 0, 1,  # b < a ~ c
-  0, 0, 1, 0, 1, 0,  # c < a ~ b
+  0, 0, 0, 1, 0, 1, # a ~ b < c
+  0, 1, 0, 0, 1, 0, # a ~ c < b
+  1, 0, 1, 0, 0, 0, # c ~ b < a
+  0, 1, 0, 1, 0, 0, # a < b ~ c
+  1, 0, 0, 0, 0, 1, # b < a ~ c
+  0, 0, 1, 0, 1, 0, # c < a ~ b
 
-  0, 0, 0, 0, 0, 0   # a ~ b ~ c
+  0, 0, 0, 0, 0, 0 # a ~ b ~ c
 ), byrow = TRUE, ncol = 6)
 find_inside(V = V)
 find_inside(V = V, random = TRUE)

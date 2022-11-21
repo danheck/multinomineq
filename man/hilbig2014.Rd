@@ -34,24 +34,34 @@ head(hilbig2014)
 
 # validities and cue values
 v <- c(.9, .8, .7, .6)
-cueA <- matrix(c(1,  1,  1, -1,
-                 1, -1, -1, -1,
-                 1,  1,  1, -1),
-               ncol = 4, byrow = TRUE)
-cueB <- matrix(c(-1, 1, -1,  1,
-                 -1, 1,  1, -1,
-                 -1, 1,  1,  1),
-               ncol = 4, byrow = TRUE)
+cueA <- matrix(
+  c(
+    1, 1, 1, -1,
+    1, -1, -1, -1,
+    1, 1, 1, -1
+  ),
+  ncol = 4, byrow = TRUE
+)
+cueB <- matrix(
+  c(
+    -1, 1, -1, 1,
+    -1, 1, 1, -1,
+    -1, 1, 1, 1
+  ),
+  ncol = 4, byrow = TRUE
+)
 
 # get strategy predictions
-strategies <- c("baseline", "WADDprob", "WADD",
-                "TTB", "EQW", "GUESS")
+strategies <- c(
+  "baseline", "WADDprob", "WADD",
+  "TTB", "EQW", "GUESS"
+)
 preds <- strategy_multiattribute(cueA, cueB, v, strategies)
-c <- c(1, rep(.5, 5))  # upper bound of probabilities
+c <- c(1, rep(.5, 5)) # upper bound of probabilities
 
 # use Bayes factor for strategy classification
 n <- rep(32, 3)
-strategy_postprob(k = hilbig2014[1:5,], n, preds)
+strategy_postprob(k = hilbig2014[1:5, ], n, preds)
 }
 \references{
 Hilbig, B. E., & Moshagen, M. (2014). Generalized outcome-based strategy classification: Comparing deterministic and probabilistic choice models. Psychonomic Bulletin & Review, 21(6), 1431-1443. \doi{10.3758/s13423-014-0643-0}

@@ -25,10 +25,14 @@ This function allows to transform the inequalities into the appropriate format
 }
 \examples{
 # p1 < p2 < p3 < p4
-A4 <- matrix(c(1, -1,  0,  0,
-               0,  1, -1,  0,
-               0,  0,  1, -1),
-             nrow = 3, byrow = TRUE)
+A4 <- matrix(
+  c(
+    1, -1, 0, 0,
+    0, 1, -1, 0,
+    0, 0, 1, -1
+  ),
+  nrow = 3, byrow = TRUE
+)
 b4 <- c(0, 0, 0)
 
 # drop the fixed column for: p4 = (1-p1-p2-p3)

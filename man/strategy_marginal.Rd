@@ -19,19 +19,23 @@ Computes the logarithm of the marginal likelihood, defined as the integral
 over the likelihood function weighted by the prior distribution of the error probabilities.
 }
 \examples{
-k <- c(1,11,18)
+k <- c(1, 11, 18)
 n <- c(20, 20, 20)
 # pattern: A, A, B with constant error e<.50
-strat <- list(pattern = c(-1, -1, 1),
-              c = .5, ordered = FALSE,
-              prior = c(1,1))
+strat <- list(
+  pattern = c(-1, -1, 1),
+  c = .5, ordered = FALSE,
+  prior = c(1, 1)
+)
 m1 <- strategy_marginal(k, n, strat)
 m1
 
 # pattern: A, B, B with ordered error e1<e3<e2<.50
-strat2 <- list(pattern = c(-1, 3, 2),
-               c = .5, ordered = TRUE,
-               prior = c(1,1))
+strat2 <- list(
+  pattern = c(-1, 3, 2),
+  c = .5, ordered = TRUE,
+  prior = c(1, 1)
+)
 m2 <- strategy_marginal(k, n, strat2)
 m2
 

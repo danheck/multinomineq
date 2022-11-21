@@ -80,15 +80,15 @@ starts with 0,1,2... (not with 1,2,3,... as in R)!
 # p000*p101 < p100*p001  &   p010*p111 < p110*p011
 
 # observed frequencies:
-k <- c(19,132,   0,9,   11,52,   6,97)
+k <- c(19, 132, 0, 9, 11, 52, 6, 97)
 
-model <- function(x)
-  x[1]*x[6] < x[5]*x[2]  &  x[3]*(1-sum(x)) < x[7]*x[4]
+model <- function(x) {
+  x[1] * x[6] < x[5] * x[2] & x[3] * (1 - sum(x)) < x[7] * x[4]
+}
 # NOTE: "1-sum(x)"  must be used instead of "x[8]"!
 
 # compute Bayes factor (Klugkist 2007: bf_0u=1.62)
-bf_nonlinear(k, 8, model, M=50000)
-
+bf_nonlinear(k, 8, model, M = 50000)
 
 \donttest{
 ##### Using a C++ indicator function (much faster)
@@ -99,8 +99,10 @@ cpp_code <- "SEXP model(NumericVector x){
 # define C++ pointer to indicator function:
 model_cpp <- RcppXPtrUtils::cppXPtr(cpp_code)
 
-bf_nonlinear(k=c(19,132, 0,9, 11,52, 6,97), M = 100000,
-             options = 8, inside = model_cpp)
+bf_nonlinear(
+  k = c(19, 132, 0, 9, 11, 52, 6, 97), M = 100000,
+  options = 8, inside = model_cpp
+)
 }
 }
 \references{

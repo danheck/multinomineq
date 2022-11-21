@@ -31,18 +31,23 @@ n <- 100
 k <- c(59, 54, 74)
 
 # Hypothesis 1: p1 < p2 < p3
-A1 <- matrix(c(1, -1,  0,
-               0,  1, -1), 2, 3, TRUE)
+A1 <- matrix(c(
+  1, -1, 0,
+  0, 1, -1
+), 2, 3, TRUE)
 b1 <- c(0, 0)
 
 # Hypothesis 2: p1 < p2 and p1 < p3
-A2 <- matrix(c(1, -1,  0,
-               1,  0, -1), 2, 3, TRUE)
+A2 <- matrix(c(
+  1, -1, 0,
+  1, 0, -1
+), 2, 3, TRUE)
 b2 <- c(0, 0)
 
 # get posterior probability for hypothesis
 bf1 <- bf_binom(k, n, A = A1, b = b1)
 bf2 <- bf_binom(k, n, A = A2, b = b2)
 postprob(bf1, bf2,
-         prior = c(bf1=1/3, bf2=1/3, unconstr=1/3))
+  prior = c(bf1 = 1 / 3, bf2 = 1 / 3, unconstr = 1 / 3)
+)
 }

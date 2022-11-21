@@ -103,14 +103,18 @@ convex hull of a set of vertices \code{V}.
 }
 \examples{
 ############### binomial ##########################
-A <- matrix(c(1, 0, 0,   # x1 < .50
-              1, 1, 1,   # x1+x2+x3 < 1
-              0, 2, 2,   # 2*x2+2*x3 < 1
-              0, -1, 0,  # x2 > .2
-              0, 0, 1),  # x3 < .1
-            ncol = 3, byrow = TRUE)
+A <- matrix(
+  c(
+    1, 0, 0, # x1 < .50
+    1, 1, 1, # x1+x2+x3 < 1
+    0, 2, 2, # 2*x2+2*x3 < 1
+    0, -1, 0, # x2 > .2
+    0, 0, 1
+  ), # x3 < .1
+  ncol = 3, byrow = TRUE
+)
 b <- c(.5, 1, 1, -.2, .1)
-samp <- sampling_binom(c(5,12,7), c(20,20,20), A, b)
+samp <- sampling_binom(c(5, 12, 7), c(20, 20, 20), A, b)
 head(samp)
 plot(samp)
 
@@ -118,15 +122,19 @@ plot(samp)
 ############### multinomial ##########################
 # binary and ternary choice:
 #           (a1,a2   b1,b2,b3)
-k       <- c(15,9,   5,2,17)
-options <- c(2,      3)
+k <- c(15, 9, 5, 2, 17)
+options <- c(2, 3)
 
 # columns:   (a1,  b1,b2)
-A <- matrix(c(1, 0, 0,   # a1 < .20
-              0, 2, 1,   # 2*b1+b2 < 1
-              0, -1, 0,  # b1 > .2
-              0, 0, 1),  # b2 < .4
-            ncol = 3, byrow = TRUE)
+A <- matrix(
+  c(
+    1, 0, 0, # a1 < .20
+    0, 2, 1, # 2*b1+b2 < 1
+    0, -1, 0, # b1 > .2
+    0, 0, 1
+  ), # b2 < .4
+  ncol = 3, byrow = TRUE
+)
 b <- c(.2, 1, -.2, .4)
 samp <- sampling_multinom(k, options, A, b)
 head(samp)

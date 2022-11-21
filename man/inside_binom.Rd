@@ -40,35 +40,41 @@ via (1) \code{A*x <= b} or (2) by the convex hull of a set of vertices \code{V}.
 \examples{
 ############ binomial
 # x1<x2<x3<.50:
-A <- matrix(c(1,-1,0,
-              0,1,-1,
-              0,0, 1), ncol=3, byrow=TRUE)
+A <- matrix(c(
+  1, -1, 0,
+  0, 1, -1,
+  0, 0, 1
+), ncol = 3, byrow = TRUE)
 b <- c(0, 0, .50)
-k <- c( 0, 1, 5)
-n <- c(10,10,10)
+k <- c(0, 1, 5)
+n <- c(10, 10, 10)
 inside_binom(k, n, A, b)
 
 ############ multinomial
 # two ternary choices:
 #     (a1,a2,a3,   b1,b2,b3)
-k <- c(1,4,10,     5,9,1)
+k <- c(1, 4, 10, 5, 9, 1)
 options <- c(3, 3)
 # a1<b1, a2<b2, no constraints on a3, b3
-A <- matrix(c(1,-1,0, 0,
-              0, 0,1,-1), ncol=4, byrow=TRUE)
+A <- matrix(c(
+  1, -1, 0, 0,
+  0, 0, 1, -1
+), ncol = 4, byrow = TRUE)
 b <- c(0, 0)
 inside_multinom(k, options, A, b)
 
 # V-representation:
-V <- matrix(c(0, 0, 0, 0,
-              0, 0, 0, 1,
-              0, 1, 0, 0,
-              0, 0, 1, 1,
-              0, 1, 0, 1,
-              1, 1, 0, 0,
-              0, 1, 1, 1,
-              1, 1, 0, 1,
-              1, 1, 1, 1),  9, 4, byrow = TRUE)
+V <- matrix(c(
+  0, 0, 0, 0,
+  0, 0, 0, 1,
+  0, 1, 0, 0,
+  0, 0, 1, 1,
+  0, 1, 0, 1,
+  1, 1, 0, 0,
+  0, 1, 1, 1,
+  1, 1, 0, 1,
+  1, 1, 1, 1
+), 9, 4, byrow = TRUE)
 inside_multinom(k, options, V = V)
 }
 \seealso{
