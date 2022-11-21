@@ -16,6 +16,8 @@ rasch <- outer(
 
 test_that("NIRT axioms match with Rasch predictions", {
   expect_silent(tmp <- nirt_to_Ab(N, M))
+
+  # constraints:  0<theta<1
   A <- tmp$A
   b <- tmp$b
   expect_equal(nrow(A), length(b))
@@ -24,7 +26,8 @@ test_that("NIRT axioms match with Rasch predictions", {
   n <- 500
   k <- rpbinom(c(rasch), n)
   # k <- rbinom(M*N, n, .5)
-  # backup starting value to avoid CRAN issue (2022-11-21)
+
+  # backup starting value to avoid CRAN issue (2022-11-21):
   start <- c(
     0.09537178,
     0.23024786,

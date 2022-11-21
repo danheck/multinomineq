@@ -13,3 +13,7 @@ tests/testthat/_snaps
 ^\.github$
 
 tests/testthat/*.pdf
+
+vignettes/*.html
+vignettes/*.R
+
