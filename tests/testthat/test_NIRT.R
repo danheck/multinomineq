@@ -14,7 +14,9 @@ rasch <- outer(
   function(x, y) (1 + exp(-x + y))^-1
 )
 
+
 test_that("NIRT axioms match with Rasch predictions", {
+  skip_on_cran()
   expect_silent(tmp <- nirt_to_Ab(N, M))
 
   # constraints:  0<theta<1
@@ -27,39 +29,22 @@ test_that("NIRT axioms match with Rasch predictions", {
   k <- rpbinom(c(rasch), n)
   # k <- rbinom(M*N, n, .5)
 
-  # backup starting value to avoid CRAN issue (2022-11-21):
-  start <- c(
-    0.09537178,
-    0.23024786,
-    0.36512393,
-    0.50000000,
-    0.63487607,
-    0.23024786,
-    0.36512393,
-    0.50000000,
-    0.63487607,
-    0.76975214,
-    0.36512393,
-    0.50000000,
-    0.63487607,
-    0.76975214,
-    0.90462822
-  )
-  suppressWarnings(try(start <- find_inside(A, b), silent = TRUE))
+  # CRAN issue with starting values (2022-11-21):
+  start <- find_inside(A, b)
 
   cpost <- count_binom(k, n, A, b,
-    M = 5000, progress = FALSE,
-    steps = seq(2, nrow(A) - 1, 2), start = start
+                       M = 5000, progress = FALSE,
+                       steps = seq(2, nrow(A) - 1, 2), start = start
   )
   cprior <- count_binom(0, 0, A, b,
-    M = 5000, progress = FALSE,
-    steps = seq(2, nrow(A) - 1, 2), start = start
+                        M = 5000, progress = FALSE,
+                        steps = seq(2, nrow(A) - 1, 2), start = start
   )
   count_to_bf(cpost, cprior)
   # multinomineq:::count_auto_bin(k, n, A, b, M=5000, eps = .05)
   expect_silent(tt <- sampling_binom(k, n, A, b,
-    start = start,
-    M = 2000, progress = FALSE
+                                     start = start,
+                                     M = 2000, progress = FALSE
   ))
   plot(tt[, 1], ty = "l")
   expect_silent(ppp <- ppp_binom(tt, k, n))
@@ -105,7 +90,7 @@ test_that("Examples in Karabatsos (2004, Figure 4) give identical results", {
   skip("functions not yet fully implemented")
   IRT_W1 <- nirt_to_Ab(3, 3, axioms = "W1")
   pp <- sampling_binom(c(ppw), c(N), IRT_W1$A, IRT_W1$b,
-    M = 10000, burnin = 1000
+                       M = 10000, burnin = 1000
   )
   summ <- t(apply(pp, 2, mcmc.summ))
 
@@ -121,7 +106,7 @@ test_that("Examples in Karabatsos (2004, Figure 4) give identical results", {
 
   IRT_W2 <- nirt_to_Ab(3, 3, axioms = c("W1", "W2"))
   pp <- sampling_binom(c(ppw), c(N), IRT_W2$A, IRT_W2$b,
-    M = 10000, burnin = 1000
+                       M = 10000, burnin = 1000
   )
   summ <- t(apply(pp, 2, mcmc.summ))
   matrix(summ[, 1], 3)
@@ -148,8 +133,9 @@ p.obs2 <- round(ppw2 / N2, 2)
 test_that("Examples in Karabatsos (2001, Figure 7) give identical results", {
   skip("functions not yet fully implemented")
   IRT_all <- nirt_to_Ab(3, 3, axioms = c("W1", "W2", "DC"))
-  pp <- sampling_binom(c(ppw2), c(N2), IRT_all$A, IRT_all$b, # prior = c(.5,.5),
-    M = 15000, burnin = 1000
+  pp <- sampling_binom(c(ppw2), c(N2),
+                       IRT_all$A, IRT_all$b, # prior = c(.5,.5),
+                       M = 15000, burnin = 1000
   )
 
   dc.post <- sapply(IRT_all$exclude, function(ee) inside(pp, ee$A, ee$b))
@@ -216,12 +202,12 @@ test_that("Karabatsos, 2004 (Table 3) matches (posterior mean)", {
     prior = c(.5, .5), M = 10000
   )
   post.mean <- matrix(apply(pp, 2, mean), IJ[1],
-    dimnames = dimnames(karabatsos2004$k.M)
+                      dimnames = dimnames(karabatsos2004$k.M)
   )
   expect_equal(pmean, unname(post.mean), tol = .01)
 
   ppp <- ppp_binom(pp, c(karabatsos2004$k.M), c(karabatsos2004$n.M),
-    by = 1:prod(IJ)
+                   by = 1:prod(IJ)
   )[, 3]
   expect_equal(unname(ppp), c(ppp.ij), tol = .03)
 })
@@ -248,13 +234,13 @@ test_that("Karabatsos, 2004 (Table 6) matches (PPP values)", {
     prior = c(.5, .5), M = 10000
   )
   ppp <- ppp_binom(pp, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
-    by = 1:prod(IJ)
+                   by = 1:prod(IJ)
   )
   round(matrix(ppp[, 3], 7), 2)
   expect_equal(unname(ppp[, 3]), c(ppp.ij), tol = .03)
 
   ppp <- ppp_binom(pp, c(karabatsos2004$k.IIO), c(karabatsos2004$n.IIO),
-    by = rep(1:IJ[2], each = IJ[1])
+                   by = rep(1:IJ[2], each = IJ[1])
   )
   expect_equal(unname(ppp[, 3]), c(ppp.items), tol = .03)
 })
