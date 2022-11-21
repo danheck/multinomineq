@@ -36,7 +36,7 @@ The description-experience gap states that people underweigh small probabilities
 We will conduct a reanalysis of Hertwig's data set using the inequality-constrained multinomial model in Regenwetter & Robinson (2017).
 
 First, it is necessary to install the R package `multinomineq` from Github.
-Note that it is necessary to install the developer R tools first (see https://support.posit.co/hc/en-us/articles/200486498-Package-Development-Prerequisites).
+Note that it is necessary to install the developer R tools first.
 Afterwards, `multinomineq` can be installed and loaded via:
 
 ```{r}
