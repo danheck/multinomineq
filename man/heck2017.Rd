@@ -23,7 +23,7 @@ Choice frequencies with multiattribute decisions across 4 item types (Heck, Hilb
 Each participant made 40 choices for each of 4 item types with four cues
 (with validities .9, .8, .7, and .6).
 The pattern of cue values of Option A and and B was as follows:
-\itemize{
+\describe{
   \item{Item Type 1: }{A = (-1, 1, 1, -1) vs. B = (-1, -1, -1, -1)}
   \item{Item Type 2: }{A = (1, -1, -1, 1) vs. B = (-1, 1, -1, 1)}
   \item{Item Type 3: }{A = (-1, 1, 1, 1) vs. B = (-1, 1, 1, -1)}

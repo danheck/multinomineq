@@ -28,7 +28,7 @@ functions. Instead, the necessary axioms for a unidimensional representation of
 the latent trait are tested directly.
 
 The axioms are as follows:
-\itemize{
+\describe{
   \item{\code{"W1"}: }{Weak row/subject independence: Persons can be ordered on
                       an ordinal scale independent of items.}
   \item{\code{"W2"}: }{Weak column/item independence: Items can be ordered on

@@ -18,7 +18,7 @@ swop5
 }
 \description{
 Facet-defining inequalities of the strict weak order mixture model
-for all 10 paired comparisons of 5 choice elements {a,b,c,d,e} in a
+for all 10 paired comparisons of 5 choice elements \{a,b,c,d,e\} in a
 3-alternative forced-choice task (Regenwetter & Davis-Stober, 2012).
 }
 \examples{

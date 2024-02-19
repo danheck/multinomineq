@@ -1,7 +1,7 @@
 #' Strict Weak Order Polytope for 5 Elements and Ternary Choices
 #'
 #' Facet-defining inequalities of the strict weak order mixture model
-#' for all 10 paired comparisons of 5 choice elements {a,b,c,d,e} in a
+#' for all 10 paired comparisons of 5 choice elements \{a,b,c,d,e\} in a
 #' 3-alternative forced-choice task (Regenwetter & Davis-Stober, 2012).
 #'
 #' @format A list with 3 elements:

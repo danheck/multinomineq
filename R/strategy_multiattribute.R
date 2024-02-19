@@ -23,7 +23,7 @@ as_strategy <- function(pattern, c = .50, ordered = TRUE, prior = c(1, 1)) {
 #'
 #' @return
 #' a \code{strategy} object (a list) with the entries:
-#' \itemize{
+#' \describe{
 #' \item{\code{pattern}: }{a numeric vector encoding the predicted choice pattern by the sign
 #'        (negative = Option A, positive = Option B, 0 = guessing).
 #'       Identical error probabilities are encoded by using the same absolute number

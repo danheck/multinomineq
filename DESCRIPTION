@@ -1,8 +1,8 @@
 Package: multinomineq
 Type: Package
 Title: Bayesian Inference for Multinomial Models with Inequality Constraints
-Version: 0.2.5
-Date: 2022-11-21
+Version: 0.2.6
+Date: 2024-02-19
 Authors@R: person("Daniel W.", "Heck", 
                   email = "daniel.heck@uni-marburg.de", 
                   role = c("aut","cre"), 
@@ -52,4 +52,4 @@ LinkingTo:
     RcppArmadillo,
     RcppProgress
 VignetteBuilder: knitr
-RoxygenNote: 7.2.2
+RoxygenNote: 7.3.1
